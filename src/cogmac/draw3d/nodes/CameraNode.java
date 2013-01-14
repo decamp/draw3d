@@ -40,9 +40,9 @@ public class CameraNode implements DrawNode {
     private boolean mUpdateOnDraw    = true;
     
     
-    private CameraNode(CameraTransform transform, RenderTile tile) {
+    private CameraNode( CameraTransform transform, RenderTile tile ) {
         mTransform = transform;
-        mTile = tile;
+        mTile      = tile;
     }
     
     
@@ -67,7 +67,7 @@ public class CameraNode implements DrawNode {
      * 
      * @param updateOnDraw
      */
-    public void setUpdateModelviewOnDraw(boolean updateOnPush) {
+    public void setUpdateModelviewOnDraw( boolean updateOnPush ) {
         mUpdateOnDraw = updateOnPush;
     }
 
@@ -116,13 +116,13 @@ public class CameraNode implements DrawNode {
     public void updateProjectionTransform() {
         double[] mat = mProjectionPair.getTransformRef();
         
-        if(mTile == null) {
-            mTransform.computeCameraToNormDeviceMatrix(mBounds, null, mat);
+        if( mTile == null ) {
+            mTransform.computeCameraToNormDeviceMatrix( mBounds, null, mat );
         }else{
-            mTransform.computeCameraToNormDeviceMatrix(mTile.renderSpaceBounds(), mTile.tileBounds(), mat);
+            mTransform.computeCameraToNormDeviceMatrix( mTile.renderSpaceBounds(), mTile.tileBounds(), mat );
         }
         
-        mProjectionPair.setTransformRef(mat);
+        mProjectionPair.setTransformRef( mat );
     }
 
     /**
@@ -143,44 +143,52 @@ public class CameraNode implements DrawNode {
     }
 
     
+    public LongRect viewport() {
+        return mTile == null ? mBounds : mTile.renderSpaceBounds();
+    }
 
+    
+    public LongRect screenBounds() {
+        return mBounds;
+    }
+    
+    
     
     public void init(GLAutoDrawable gld) {}
     
     
-    public void reshape(GLAutoDrawable gld, int x, int y, int w, int h) {
-        mBounds = LongRect.fromBounds(x, y, w, h);
+    public void reshape( GLAutoDrawable gld, int x, int y, int w, int h ) {
+        mBounds = LongRect.fromBounds( x, y, w, h );
         
-        if(mUpdateOnReshape) {
+        if( mUpdateOnReshape ) {
             updateProjectionTransform();
         }
     }
     
     
-    public void dispose(GLAutoDrawable gld) {}
+    public void dispose( GLAutoDrawable gld ) {}
     
     
-    public void pushDraw(GL gl) {
-        
-        if(mUpdateOnDraw)
+    public void pushDraw( GL gl ) {
+        if( mUpdateOnDraw )
             updateModelviewTransform();
         
-        gl.glMatrixMode(GL_PROJECTION);
+        gl.glMatrixMode( GL_PROJECTION );
         gl.glPushMatrix();
         gl.glLoadIdentity();
-        gl.glMultMatrixd(mProjectionPair.getTransformRef(), 0);
+        gl.glMultMatrixd( mProjectionPair.getTransformRef(), 0 );
         
-        gl.glMatrixMode(GL_MODELVIEW);
+        gl.glMatrixMode( GL_MODELVIEW );
         gl.glPushMatrix();
         gl.glLoadIdentity();
-        gl.glMultMatrixd(mModelviewPair.getTransformRef(), 0);
+        gl.glMultMatrixd( mModelviewPair.getTransformRef(), 0 );
     }
     
     
-    public void popDraw(GL gl) {
-        gl.glMatrixMode(GL_PROJECTION);
+    public void popDraw( GL gl ) {
+        gl.glMatrixMode( GL_PROJECTION );
         gl.glPopMatrix();
-        gl.glMatrixMode(GL_MODELVIEW);
+        gl.glMatrixMode( GL_MODELVIEW );
         gl.glPopMatrix();
     }
     
