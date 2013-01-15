@@ -56,7 +56,7 @@ public class BlendFuncNode extends DrawNodeAdapter {
     public void pushDraw(GL gl) {
         mRevertEnable = gl.glIsEnabled( GL_BLEND );
         gl.glGetIntegerv( GL_BLEND_SRC, mRevert, 0 );
-        gl.glGetIntegerv( GL_BLEND_SRC, mRevert, 1 );
+        gl.glGetIntegerv( GL_BLEND_DST, mRevert, 1 );
         
         if( mEnable ) {
             gl.glEnable( GL_BLEND );

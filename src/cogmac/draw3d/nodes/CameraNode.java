@@ -3,6 +3,7 @@ package cogmac.draw3d.nodes;
 import javax.media.opengl.*;
 
 import cogmac.draw3d.context.RenderTile;
+import cogmac.draw3d.nodes.DrawNode;
 import cogmac.math3d.*;
 import cogmac.math3d.actors.SpatialObject;
 import cogmac.math3d.camera.CameraTransform;
@@ -16,48 +17,40 @@ import static javax.media.opengl.GL.*;
 public class CameraNode implements DrawNode {
 
     
-    public static CameraNode newInstance(CameraTransform transform) {
-        return new CameraNode(transform, null);
-    }
-
-    
-    public static CameraNode newInstance(CameraTransform transform, RenderTile tile) {
-        return new CameraNode(transform, tile);
-    }
-    
-    
-    
     private final CameraTransform mTransform;
     private final RenderTile mTile;
     
     private final TransformPair mProjectionPair = new TransformPair();
     private final TransformPair mModelviewPair  = new TransformPair();
-    
-    private LongRect mBounds = LongRect.fromEdges(0, 0, 1, 1);
-    
+    private final double[][] mRevert = new double[2][16];
 
+    private LongRect mViewport             = LongRect.fromBounds( 0, 0, 1, 1 );
+    private LongRect mOverrideViewport     = null;
+    private LongRect mOverrideTileViewport = null;
+    
     private boolean mUpdateOnReshape = true;
     private boolean mUpdateOnDraw    = true;
     
     
-    private CameraNode( CameraTransform transform, RenderTile tile ) {
+    public CameraNode( CameraTransform transform, RenderTile tile ) {
         mTransform = transform;
         mTile      = tile;
     }
     
     
     
-    public SpatialObject getCameraObject() {
+    public SpatialObject camera() {
         return mTransform.getCameraObject();
     }    
 
     
-    public CameraTransform getCameraTransform() {
+    public CameraTransform cameraTransform() {
         return mTransform;
     }
     
     
-    public boolean getUpdateModelviewOnDraw() {
+    
+    public boolean updateModelviewOnDraw() {
         return mUpdateOnDraw;
     }
 
@@ -67,12 +60,12 @@ public class CameraNode implements DrawNode {
      * 
      * @param updateOnDraw
      */
-    public void setUpdateModelviewOnDraw( boolean updateOnPush ) {
+    public void updateModelviewOnDraw( boolean updateOnPush ) {
         mUpdateOnDraw = updateOnPush;
     }
 
     
-    public boolean getUpdateProjectionOnReshape() {
+    public boolean updateProjectionOnReshape() {
         return mUpdateOnReshape;
     }
 
@@ -82,7 +75,7 @@ public class CameraNode implements DrawNode {
      * 
      * @param updateOnReshape
      */
-    public void setUpdateProjectionOnReshape(boolean updateOnReshape) {
+    public void updateProjectionOnReshape(boolean updateOnReshape) {
         mUpdateOnReshape = updateOnReshape;
     }
 
@@ -93,7 +86,7 @@ public class CameraNode implements DrawNode {
      * 
      * @return a view of the projection transform
      */
-    public TransformPair getProjectionTransform() {
+    public TransformPair projectionTransform() {
         return mProjectionPair;
     }
     
@@ -104,7 +97,7 @@ public class CameraNode implements DrawNode {
      * 
      * @return a view of the modelview transform
      */
-    public TransformPair getModelviewTransform() {
+    public TransformPair modelviewTransform() {
         return mModelviewPair;
     }
     
@@ -113,15 +106,10 @@ public class CameraNode implements DrawNode {
      * the underlying CameraTranfsorm and current position of
      * the camera object.
      */
-    public void updateProjectionTransform() {
+    public synchronized void updateProjectionTransform() {
         double[] mat = mProjectionPair.getTransformRef();
         
-        if( mTile == null ) {
-            mTransform.computeCameraToNormDeviceMatrix( mBounds, null, mat );
-        }else{
-            mTransform.computeCameraToNormDeviceMatrix( mTile.renderSpaceBounds(), mTile.tileBounds(), mat );
-        }
-        
+        mTransform.computeCameraToNormDeviceMatrix( viewport(), tileViewport(), mat );
         mProjectionPair.setTransformRef( mat );
     }
 
@@ -130,35 +118,65 @@ public class CameraNode implements DrawNode {
      * underlying CameraTransform and current positioning of
      * the camera object.
      */
-    public void updateModelviewTransform() {
+    public synchronized void updateModelviewTransform() {
         double[] mat = mModelviewPair.getTransformRef();
-        
-        if(mTile == null) {
-            mTransform.computeModelToCameraMatrix(mBounds, null, mat);
-        }else{
-            mTransform.computeModelToCameraMatrix(mTile.renderSpaceBounds(), mTile.tileBounds(), mat);
-        }
-        
+        mTransform.computeModelToCameraMatrix( viewport(), tileViewport(), mat );
         mModelviewPair.setTransformRef(mat);
     }
 
+    /**
+     * @return Current bounds for entire space.
+     */
+    public synchronized LongRect viewport() {
+        return mOverrideViewport != null ? mOverrideViewport :
+               mTile != null ? mTile.renderSpaceBounds() :
+               mViewport;
+    }
     
-    public LongRect viewport() {
-        return mTile == null ? mBounds : mTile.renderSpaceBounds();
+    /**
+     * @return Current viewport.
+     */
+    public synchronized LongRect tileViewport() {
+        return mOverrideTileViewport != null ? mOverrideTileViewport :
+               mTile != null ? mTile.tileBounds() :
+               mViewport;
+    }
+        
+
+    public LongRect overrideViewport() {
+        return mOverrideViewport;
+    }
+    
+    
+    public void overrideViewport( LongRect viewport ) {
+        if( viewport == mOverrideViewport )
+            return;
+        
+        mOverrideViewport = viewport;
+        updateProjectionTransform();
+    }
+    
+    
+    public LongRect overrideTileViewport() {
+        return mOverrideTileViewport;
+    }
+    
+    
+    public void overrideTileViewport( LongRect tileViewport ) {
+        if( tileViewport == mOverrideTileViewport )
+            return;
+        
+        mOverrideTileViewport = tileViewport;
+        updateProjectionTransform();
     }
 
-    
-    public LongRect screenBounds() {
-        return mBounds;
-    }
-    
     
     
     public void init(GLAutoDrawable gld) {}
     
     
     public void reshape( GLAutoDrawable gld, int x, int y, int w, int h ) {
-        mBounds = LongRect.fromBounds( x, y, w, h );
+        mViewport = LongRect.fromBounds( x, y, w, h );
         
         if( mUpdateOnReshape ) {
             updateProjectionTransform();
@@ -173,23 +191,79 @@ public class CameraNode implements DrawNode {
         if( mUpdateOnDraw )
             updateModelviewTransform();
         
-        gl.glMatrixMode( GL_PROJECTION );
-        gl.glPushMatrix();
-        gl.glLoadIdentity();
-        gl.glMultMatrixd( mProjectionPair.getTransformRef(), 0 );
+        gl.glGetDoublev( GL_MODELVIEW_MATRIX, mRevert[0], 0 );
+        gl.glGetDoublev( GL_PROJECTION_MATRIX, mRevert[1], 0 );
         
+        gl.glMatrixMode( GL_PROJECTION );
+        gl.glLoadMatrixd( mProjectionPair.getTransformRef(), 0 );
         gl.glMatrixMode( GL_MODELVIEW );
-        gl.glPushMatrix();
-        gl.glLoadIdentity();
-        gl.glMultMatrixd( mModelviewPair.getTransformRef(), 0 );
+        gl.glLoadMatrixd( mModelviewPair.getTransformRef(), 0 );
     }
     
     
     public void popDraw( GL gl ) {
         gl.glMatrixMode( GL_PROJECTION );
-        gl.glPopMatrix();
+        gl.glLoadMatrixd( mRevert[1], 0 );
         gl.glMatrixMode( GL_MODELVIEW );
-        gl.glPopMatrix();
+        gl.glLoadMatrixd( mRevert[0], 0 );
+    }
+    
+    
+    
+    /**
+     * @deprecated Use <code>camera()</code>
+     */
+    public SpatialObject getCameraObject() {
+        return mTransform.getCameraObject();
+    }    
+
+    /**
+     * @deprecated Use <code>transform()</code>.
+     */
+    public CameraTransform getCameraTransform() {
+        return mTransform;
+    }
+    
+    /**
+     * @deprecated Use <code>updateModelviewOnDraw()</code>
+     */
+    public boolean getUpdateModelviewOnDraw() {
+        return mUpdateOnDraw;
+    }
+
+    /**
+     * @deprecated Use <code>updateModelviewOnDraw()</code>
+     */
+    public void setUpdateModelviewOnDraw( boolean updateOnPush ) {
+        mUpdateOnDraw = updateOnPush;
+    }
+    
+    /**
+     * @deprecated Use <code>updateProjectionOnReshape()</code>
+     */
+    public boolean getUpdateProjectionOnReshape() {
+        return mUpdateOnReshape;
+    }
+
+    /**
+     * @deprecated Use <code>updateProjectionOnReshape()</code>
+     */
+    public void setUpdateProjectionOnReshape(boolean updateOnReshape) {
+        mUpdateOnReshape = updateOnReshape;
+    }
+
+    /**
+     * @deprecated Use <code>projectionTransform()</code>
+     */
+    public TransformPair getProjectionTransform() {
+        return mProjectionPair;
+    }
+    
+    /**
+     * @deprecated Use <code>modelviewTransform()</code>
+     */
+    public TransformPair getModelviewTransform() {
+        return mModelviewPair;
     }
     
     
