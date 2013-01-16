@@ -17,8 +17,8 @@ public class InitNode extends DrawNodeAdapter {
     }
     
     
-    public static InitNode newInstance(float r, float g, float b, float a) {
-        return new InitNode(r,g,b,a);
+    public static InitNode newInstance( float r, float g, float b, float a ) {
+        return new InitNode( r,g,b,a );
     }
 
     
@@ -27,8 +27,8 @@ public class InitNode extends DrawNodeAdapter {
     private final float[] mClearColor = {0,0,0,1};
     
     
-    private InitNode(float r, float g, float b, float a) {
-        setClearColor(r, g, b, a);
+    private InitNode( float r, float g, float b, float a ) {
+        setClearColor( r, g, b, a );
     }
     
     
@@ -59,7 +59,7 @@ public class InitNode extends DrawNodeAdapter {
     public void init(GLAutoDrawable gld) {
         GL gl = gld.getGL();
         
-        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        gl.glBlendFunc( GL_SRC_ALPHA_SATURATE, GL_ONE_MINUS_SRC_ALPHA );
         gl.glEnable(GL_BLEND);
         
         gl.glDepthFunc(GL_LESS);

@@ -14,7 +14,7 @@ public class BlendFuncNode extends DrawNodeAdapter {
     private int mDstFactor;
     
     private boolean mRevertEnable = true;
-    private final int[] mRevert   = { GL_ONE, GL_ONE_MINUS_SRC_ALPHA };
+    private final int[] mRevert   = { GL_ONE, GL_ZERO };
     
     
     public BlendFuncNode( boolean enable, int srcFactor, int dstFactor ) {
