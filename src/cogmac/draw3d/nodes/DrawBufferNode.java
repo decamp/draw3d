@@ -35,11 +35,15 @@ public class DrawBufferNode extends DrawNodeAdapter {
         List<DrawNode> nodes = new ArrayList<DrawNode>(2);
         
         if(vertBuffer != null) {
-            nodes.add(BufferNode.newVertexInstance(vertBuffer, vertUsage));
+            BufferNode vbo = BufferNode.newVertexInstance( vertUsage );
+            vbo.buffer( vertBuffer );
+            nodes.add( vbo );
         }
         
         if(indexBuffer != null) {
-            nodes.add(BufferNode.newElementInstance(indexBuffer, indexUsage));
+            BufferNode ibo = BufferNode.newElementInstance( indexUsage );
+            ibo.buffer( indexBuffer );
+            nodes.add( ibo );
         }
         
         return new DrawBufferNode(nodes.toArray(new DrawNode[nodes.size()]), params);

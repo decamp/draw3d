@@ -289,11 +289,11 @@ public class TrianglesNode implements RenderModule {
         private final boolean mIsLast;
         private final BufferNode mBufferNode;
         
-        DrawHandler(boolean isLast) {
+        DrawHandler( boolean isLast ) {
             mIsLast = isLast;
-            
-            if(mDrawBuffer != null) {
-                mBufferNode = BufferNode.newVertexInstance(mDrawBuffer, GL_STATIC_DRAW);
+            if( mDrawBuffer != null ) {
+                mBufferNode = BufferNode.newVertexInstance( GL_STATIC_DRAW );
+                mBufferNode.buffer( mDrawBuffer );
             }else{
                 mBufferNode = null;
             }
