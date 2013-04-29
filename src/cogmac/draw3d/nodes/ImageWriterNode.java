@@ -436,9 +436,9 @@ public class ImageWriterNode extends DrawNodeAdapter {
             }else{
                 ret.clear();
             }
-
-            ret.order(ByteOrder.BIG_ENDIAN);
-            mComp.open(ret, w, h, PngBufferWriter.COLOR_TYPE_RGBA, 8, mCompLevel);
+            
+            ret.order( ByteOrder.BIG_ENDIAN );
+            mComp.open( ret, w, h, PngBufferWriter.COLOR_TYPE_RGBA, 8, mCompLevel, null );
             
             for(int y = 0; y < h; y++) {
                 int m0 = p0 + (h - y - 1) * w * 4;

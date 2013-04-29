@@ -10,36 +10,55 @@ import static javax.media.opengl.GL.*;
  */
 public final class FramebufferNode implements DrawNode {
     
+    
     public static FramebufferNode newInstance() {
         return new FramebufferNode();
     }
     
-    private final int[] mId     = {0};
+    
+    private final int[] mId = { 0 };
     
     private int mWidth  = -1;
     private int mHeight = -1;
     private boolean mResizeOnReshape = false;
     
     private Attachment[] mAtts      = {};
-    private final int[] mDrawRevert = {0};
-    private final int[] mReadRevert = {0};
+    private final int[] mDrawRevert = { 0 };
+    private final int[] mReadRevert = { 0 };
     
     private boolean mNeedsInit  = true;
     
     
     private FramebufferNode() {}
-    
-    
+        
     
     public void attach( int attachment, TextureNode node ) {
         Attachment a = new Attachment( attachment, node );
         Attachment[] atts = new Attachment[mAtts.length + 1];
-        System.arraycopy(mAtts, 0, atts, 0, mAtts.length);
+        System.arraycopy( mAtts, 0, atts, 0, mAtts.length );
         atts[atts.length-1] = a;
-        
         mAtts      = atts;
         mNeedsInit = true;
     }
+    
+    public int attachmentCount() {
+        return mAtts.length;
+    }
+    
+    public TextureNode texture( int index ) {
+        return mAtts[index].mNode;
+    }
+    
+    public TextureNode textureFor( int attachment ) {
+        for( Attachment a: mAtts ) {
+            if( a.mAttachment == attachment ) {
+                return a.mNode;
+            }
+        }
+        
+        return null;
+    }
+    
     
     
     public int target() {
@@ -48,10 +67,6 @@ public final class FramebufferNode implements DrawNode {
     
     public int id() {
         return mId[0];
-    }
-    
-    public int internalFormat() {
-        return -1;
     }
     
     public void size( int w, int h ) {
@@ -64,13 +79,8 @@ public final class FramebufferNode implements DrawNode {
             return;
         }
         
-        mWidth  = w;
-        mHeight = h;
-        
-        for(Attachment a: mAtts) {
-            a.mNode.size( w, h );
-        }
-        
+        mWidth     = w;
+        mHeight    = h;
         mNeedsInit = true;
     }
     
@@ -96,74 +106,76 @@ public final class FramebufferNode implements DrawNode {
     
     
     
-    public void bindDraw(GL gl) {
-        bind(gl, GL_DRAW_FRAMEBUFFER_EXT);
-        
-        int status = gl.glCheckFramebufferStatusEXT(GL_DRAW_FRAMEBUFFER_EXT);
-        if(status != GL_FRAMEBUFFER_COMPLETE_EXT)
-            throw new IllegalStateException("Failed to complete framebuffer before attachment.");
+    public void bindDraw( GL gl ) {
+        bind( gl, GL_DRAW_FRAMEBUFFER_EXT );
+        int status = gl.glCheckFramebufferStatusEXT( GL_DRAW_FRAMEBUFFER_EXT );
+        if( status != GL_FRAMEBUFFER_COMPLETE_EXT ) {
+            throw new IllegalStateException( "Failed to complete framebuffer before attachment." );
+        }
     }
     
-    public void bindRead(GL gl) {
-        bind(gl, GL_READ_FRAMEBUFFER_EXT);
+    public void bindRead( GL gl ) {
+        bind( gl, GL_READ_FRAMEBUFFER_EXT );
     }
     
-    public void unbindDraw(GL gl) {
-        gl.glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+    public void unbindDraw( GL gl ) {
+        gl.glBindFramebufferEXT( GL_DRAW_FRAMEBUFFER_EXT, 0 );
     }
     
-    public void unbindRead(GL gl) {
-        gl.glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+    public void unbindRead( GL gl ) {
+        gl.glBindFramebufferEXT( GL_READ_FRAMEBUFFER_EXT, 0 );
     }
 
-    public void dispose(GL gl) {
-        if(mId[0] != 0) {
-            gl.glDeleteFramebuffersEXT(1, mId, 0);
+    public void dispose( GL gl ) {
+        if( mId[0] != 0 ) {
+            gl.glDeleteFramebuffersEXT( 1, mId, 0 );
             mId[0] = 0;
         }
         
-        for(Attachment a: mAtts) {
-            a.mNode.dispose(gl);
+        for( Attachment a: mAtts ) {
+            a.mNode.dispose( gl );
         }
         
         mNeedsInit = true;
         mAtts = new Attachment[0];
     }
     
-    public void pushDraw(GL gl) {
-        if(mNeedsInit) {
-            doInit(gl, GL_DRAW_FRAMEBUFFER_EXT);
+    public void pushDraw( GL gl ) {
+        if( mNeedsInit ) {
+            doInit( gl, GL_DRAW_FRAMEBUFFER_EXT );
         }
         
-        pushDrawBuffer(gl, mId[0]);
-        
-        int status = gl.glCheckFramebufferStatusEXT(GL_DRAW_FRAMEBUFFER_EXT);
-        if(status != GL_FRAMEBUFFER_COMPLETE_EXT)
-            throw new IllegalStateException("Failed to complete framebuffer before attachment.");
-    }
-    
-    public void popDraw(GL gl) {
-        popDrawBuffer(gl);
-    }
-    
-    public void pushRead(GL gl) {
-        if(mNeedsInit) {
-            doInit(gl, GL_READ_FRAMEBUFFER_EXT);
+        pushDrawBuffer( gl, mId[0] );
+        int status = gl.glCheckFramebufferStatusEXT( GL_DRAW_FRAMEBUFFER_EXT );
+        if( status != GL_FRAMEBUFFER_COMPLETE_EXT ) {
+            throw new IllegalStateException( "Failed to complete framebuffer before attachment." );
         }
-        
-        pushReadBuffer(gl, mId[0]);
     }
     
-    public void popRead(GL gl) {
-        popReadBuffer(gl);
+    public void popDraw( GL gl ) {
+        popDrawBuffer( gl );
+    }
+    
+    public void pushRead( GL gl ) {
+        if( mNeedsInit ) {
+            doInit( gl, GL_READ_FRAMEBUFFER_EXT );
+        }
+        pushReadBuffer( gl, mId[0] );
+    }
+    
+    public void popRead( GL gl ) {
+        popReadBuffer( gl );
     }
     
     
-    public void init(GLAutoDrawable gld) {
+    /**
+     * TODO: The revert on this is all wrong.
+     */
+    public void init( GLAutoDrawable gld ) {
         GL gl = gld.getGL();
-        gl.glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, mDrawRevert, 0);
-        doInit(gl, GL_DRAW_FRAMEBUFFER_EXT);
-        gl.glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, mDrawRevert[0]);
+        gl.glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING_EXT, mDrawRevert, 0 );
+        doInit( gl, GL_DRAW_FRAMEBUFFER_EXT );
+        gl.glBindFramebufferEXT( GL_DRAW_FRAMEBUFFER_EXT, mDrawRevert[0] );
     }
     
     public void reshape( GLAutoDrawable gld, int x, int y, int w, int h ) {
@@ -178,9 +190,9 @@ public final class FramebufferNode implements DrawNode {
     
     
     private void doInit( GL gl, int target ) {
-        if( !mNeedsInit )
+        if( !mNeedsInit ) {
             return;
-        
+        }
         mNeedsInit = false;
         
         if( mId[0] == 0 ) {
@@ -190,10 +202,13 @@ public final class FramebufferNode implements DrawNode {
             }
         }
         
+        boolean initSize = mWidth >= 0 && mHeight >= 0;
         for( Attachment a: mAtts ) {
-            a.mNode.init(gl);
+            if( initSize ) {
+                a.mNode.size( mWidth, mHeight );
+            }
+            a.mNode.init( gl );
         }
-        
         gl.glBindFramebufferEXT( target, mId[0] );
         
         for( Attachment a: mAtts ) {
@@ -259,10 +274,10 @@ public final class FramebufferNode implements DrawNode {
         
     }
     
+    
 
     //Ugh.  There's a bug with glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT), which makes this
     //hack necessary.
-    
     
     private static final Map<GLContext,BindingStack> mStacks = new WeakHashMap<GLContext,BindingStack>();
     
@@ -275,53 +290,52 @@ public final class FramebufferNode implements DrawNode {
     }
     
     private static synchronized BindingStack currentStack() {
-        GLContext context = GLContext.getCurrent();
-        BindingStack stack = mStacks.get(context);
-        
-        if(stack == null) {
+        GLContext context  = GLContext.getCurrent();
+        BindingStack stack = mStacks.get( context );
+        if( stack == null ) {
             stack = new BindingStack();
-            mStacks.put(context, stack);
+            mStacks.put( context, stack );
         }
         
         return stack;
     }
     
-    private static synchronized void pushDrawBuffer(GL gl, int id) {
+    private static synchronized void pushDrawBuffer( GL gl, int id ) {
         BindingStack stack = currentStack();
-        stack.mDrawStack.push(stack.mDrawId);
+        stack.mDrawStack.push( stack.mDrawId );
         stack.mDrawId = id;
-        gl.glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, id);
+        gl.glBindFramebufferEXT( GL_DRAW_FRAMEBUFFER_EXT, id );
     }
     
-    private static synchronized void popDrawBuffer(GL gl) {
+    private static synchronized void popDrawBuffer( GL gl ) {
         BindingStack stack = currentStack();
-        if(stack.mDrawStack.isEmpty()) {
+        if( stack.mDrawStack.isEmpty() ) {
             //Just in case.
             stack.mDrawId = 0;
-        }else{
+        } else {
             stack.mDrawId = stack.mDrawStack.pop();
         }
         
-        gl.glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, stack.mDrawId);
+        gl.glBindFramebufferEXT( GL_DRAW_FRAMEBUFFER_EXT, stack.mDrawId );
     }
     
-    private static synchronized void pushReadBuffer(GL gl, int id) {
+    private static synchronized void pushReadBuffer( GL gl, int id ) {
         BindingStack stack = currentStack();
-        stack.mReadStack.push(stack.mReadId);
+        stack.mReadStack.push( stack.mReadId );
         stack.mReadId = id;
-        gl.glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, id);
+        gl.glBindFramebufferEXT( GL_READ_FRAMEBUFFER_EXT, id );
     }
     
-    private static synchronized void popReadBuffer(GL gl) {
+    private static synchronized void popReadBuffer( GL gl ) {
         BindingStack stack = currentStack();
-        if(stack.mReadStack.isEmpty()) {
+        if( stack.mReadStack.isEmpty() ) {
             //Just in case
             stack.mReadId = 0;
-        }else{
+        } else {
             stack.mReadId = stack.mReadStack.pop();
         }
         
-        gl.glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, stack.mReadId);
+        gl.glBindFramebufferEXT( GL_READ_FRAMEBUFFER_EXT, stack.mReadId );
     }
     
 }

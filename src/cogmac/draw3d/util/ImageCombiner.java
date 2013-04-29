@@ -65,7 +65,6 @@ public class ImageCombiner {
     
     
     public static void combine( List<File> files, int cols, int rows, File out ) throws IOException {
-        
         PngFileWriter writer = new PngFileWriter();
         int[] pix      = null;
         ByteBuffer buf = null;
@@ -92,7 +91,7 @@ public class ImageCombiner {
                 }
                 
                 pix = new int[ow];
-                writer.open( out, ow, oh, PngFileWriter.COLOR_TYPE_RGBA, 8, PngFileWriter.LEVEL_BEST_COMPRESSION );
+                writer.open( out, ow, oh, PngFileWriter.COLOR_TYPE_RGBA, 8, PngFileWriter.LEVEL_BEST_COMPRESSION, null );
                 buf = ByteBuffer.allocateDirect( ow * 4 );
                 buf.order( ByteOrder.BIG_ENDIAN );
             }
