@@ -157,8 +157,8 @@ public final class KdTriangleTree implements RayPicker {
                 double v1 = rayPoint[i1] + rayDir[i1] * t;
                 double v2 = rayPoint[i2] + rayDir[i2] * t;
                 
-                if(v1 >= bounds[i1] - Tolerance.ABS_ERR && v1 <= bounds[i1+3] + Tolerance.ABS_ERR) {
-                    if(v2 >= bounds[i2] - Tolerance.ABS_ERR && v2 <= bounds[i2+3] + Tolerance.ABS_ERR) {
+                if(v1 >= bounds[i1] - Tol.ABS_ERR && v1 <= bounds[i1+3] + Tol.ABS_ERR) {
+                    if(v2 >= bounds[i2] - Tol.ABS_ERR && v2 <= bounds[i2+3] + Tol.ABS_ERR) {
                         if(t < tMin) {      
                             tMin = t;
                         }
@@ -214,8 +214,8 @@ public final class KdTriangleTree implements RayPicker {
                     continue;
                 
                 if( intersect.mRayDist >= result.mRayDist || 
-                    intersect.mRayDist > maxDist + Tolerance.ABS_ERR|| 
-                    intersect.mRayDist < minDist - Tolerance.ABS_ERR )
+                    intersect.mRayDist > maxDist + Tol.ABS_ERR|| 
+                    intersect.mRayDist < minDist - Tol.ABS_ERR )
                 {
                     continue;
                 }

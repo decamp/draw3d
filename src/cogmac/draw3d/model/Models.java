@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 
 import cogmac.draw3d.pick.*;
-import cogmac.math3d.Tolerance;
+import cogmac.math3d.Tol;
 import cogmac.math3d.geom.*;
 
 
@@ -62,7 +62,7 @@ public final class Models {
     
     
     public static KdPointTree<IndexedVertex> indexVertices( MeshModel model ) {
-        return indexVertices( model, Tolerance.ABS_ERR );
+        return indexVertices( model, Tol.ABS_ERR );
     }
     
     

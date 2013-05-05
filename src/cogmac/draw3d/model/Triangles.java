@@ -4,7 +4,7 @@ import java.util.*;
 import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.POSITIVE_INFINITY;
 
-import cogmac.math3d.Tolerance;
+import cogmac.math3d.Tol;
 import cogmac.math3d.Vectors;
 import cogmac.math3d.geom.*;
 
@@ -45,64 +45,7 @@ public class Triangles {
 
         return a * x[0] + b * x[1] + c * x[2] + d;
     }
-    
-
-    /**
-     * Computes normal of triangle <i>(p0, p1, p2)</i>, without normalizing length.
-     * 
-     * @param p0
-     * @param p1
-     * @param p2
-     * @param out
-     */
-    public static void computeNorm(double[] p0, double[] p1, double[] p2, double[] out) {
-        out[0] = (((p1[1] - p0[1]) * (p2[2] - p0[2])) - ((p2[1] - p0[1]) * (p1[2] - p0[2])));
-        out[1] = (((p1[2] - p0[2]) * (p2[0] - p0[0])) - ((p2[2] - p0[2]) * (p1[0] - p0[0])));
-        out[2] = (((p1[0] - p0[0]) * (p2[1] - p0[1])) - ((p2[0] - p0[0]) * (p1[1] - p0[1])));
-    }
-    
-    
-    /**
-     * Computes unit-length normal of triangle <i>(p0, p1, p2)</i>.
-     * 
-     * @param p0
-     * @param p1
-     * @param p2
-     * @param out
-     */
-    public static void computeUnitNorm(double[] p0, double[] p1, double[] p2, double[] out) {
-        computeNorm( p0, p1, p2, out );
-        double d = Vectors.hypot( out );
-        
-        if( d > Tolerance.ABS_ERR ) {
-            out[0] /= d;
-            out[1] /= d;
-            out[2] /= d;
-        }
-        
-    }
-
-    
-    /**
-     * Computes angle between p0p1 and p0p2, in radians. 
-     * @param p0 vertex at angle
-     * @param p1 vertex at end of edge1
-     * @param p2 vertex at end of edge2
-     * @return radians
-     */
-    public static double computeAngle(double[] p0, double[] p1, double[] p2) {
-        double x1 = p1[0]-p0[0];
-        double y1 = p1[1]-p0[1];
-        double z1 = p1[2]-p0[2];
-        double x2 = p2[0]-p0[0];
-        double y2 = p2[1]-p0[1];
-        double z2 = p2[2]-p0[2];
-        double d1 = Math.sqrt(x1*x1 + y1*y1 + z1*z1);
-        double d2 = Math.sqrt(x2*x2 + y2*y2 + z2*z2);
-        
-        return Math.acos((x1*x2 + y1*y2 + z1*z2) / d1 / d2);
-    }
-    
+  
 
     /**
      * Computes center point of triangle.
@@ -136,20 +79,20 @@ public class Triangles {
                                                        double[] out) 
     {
         double[] norm = new double[3];
-        computeNorm(v0, v1, v2, norm);
+        Vectors.cross( v0, v1, v2, norm );
         double dx = e1[0] - e0[0];
         double dy = e1[1] - e0[1];
         double dz = e1[2] - e0[2];
-        
         double dot = norm[0]*dx + norm[1]*dy + norm[2]*dz;
         
-        if(Math.abs(dot) < Tolerance.ABS_ERR)
+        if( Math.abs(dot) < Tol.ABS_ERR ) {
             return 0;
+        }
         
         double t = (norm[0]*(e0[0]-v0[0]) + norm[1]*(e0[1]-v0[1]) + norm[2]*(e0[2]-v0[2])) / -dot;
-        
-        if(t < lineTolerance || t > (1.0 - lineTolerance))
+        if(t < lineTolerance || t > (1.0 - lineTolerance)) {
             return 0;
+        }
         
         out[0] = e0[0] + dx * t;
         out[1] = e0[1] + dy * t;
@@ -158,17 +101,20 @@ public class Triangles {
         //Compute if point lies on correct side of each triangle edge.
         double[] norm2 = new double[3];
         
-        computeNorm(v0, v1, out, norm2);
-        if(norm[0]*norm2[0] + norm[1]*norm2[1] + norm[2]*norm2[2] < Tolerance.ABS_ERR)
+        Vectors.cross(v0, v1, out, norm2);
+        if( norm[0]*norm2[0] + norm[1]*norm2[1] + norm[2]*norm2[2] < Tol.ABS_ERR ) {
             return 0;
+        }
         
-        computeNorm(v1, v2, out, norm2);
-        if(norm[0]*norm2[0] + norm[1]*norm2[1] + norm[2]*norm2[2] < Tolerance.ABS_ERR)
+        Vectors.cross(v1, v2, out, norm2);
+        if( norm[0]*norm2[0] + norm[1]*norm2[1] + norm[2]*norm2[2] < Tol.ABS_ERR ) {
             return 0;
+        }
         
-        computeNorm(v2, v0, out, norm2);
-        if(norm[0]*norm2[0] + norm[1]*norm2[1] + norm[2]*norm2[2] < Tolerance.ABS_ERR)
+        Vectors.cross(v2, v0, out, norm2);
+        if( norm[0]*norm2[0] + norm[1]*norm2[1] + norm[2]*norm2[2] < Tol.ABS_ERR ) {
             return 0;
+        }
         
         return (dot < 0.0 ? 1 : -1);
     }
@@ -197,15 +143,16 @@ public class Triangles {
                                                        double[] out,
                                                        double[] outNorm) 
     {
-        computeNorm(v0, v1, v2, outNorm);
+        Vectors.cross(v0, v1, v2, outNorm);
         double dx = e1[0] - e0[0];
         double dy = e1[1] - e0[1];
         double dz = e1[2] - e0[2];
         
         double dot = outNorm[0]*dx + outNorm[1]*dy + outNorm[2]*dz;
         
-        if( Math.abs(dot) < Tolerance.ABS_ERR )
+        if( Math.abs(dot) < Tol.ABS_ERR ) {
             return 0;
+        }
         
         double t = (outNorm[0]*(e0[0]-v0[0]) + outNorm[1]*(e0[1]-v0[1]) + outNorm[2]*(e0[2]-v0[2])) / -dot;
         
@@ -219,17 +166,20 @@ public class Triangles {
         //Compute if point lies on correct side of each triangle edge.
         double[] norm2 = new double[3];
         
-        computeNorm(v0, v1, out, norm2);
-        if(outNorm[0]*norm2[0] + outNorm[1]*norm2[1] + outNorm[2]*norm2[2] < Tolerance.ABS_ERR)
+        Vectors.cross(v0, v1, out, norm2);
+        if( outNorm[0]*norm2[0] + outNorm[1]*norm2[1] + outNorm[2]*norm2[2] < Tol.ABS_ERR ) {
             return 0;
+        }
         
-        computeNorm(v1, v2, out, norm2);
-        if(outNorm[0]*norm2[0] + outNorm[1]*norm2[1] + outNorm[2]*norm2[2] < Tolerance.ABS_ERR)
+        Vectors.cross(v1, v2, out, norm2);
+        if( outNorm[0]*norm2[0] + outNorm[1]*norm2[1] + outNorm[2]*norm2[2] < Tol.ABS_ERR ) {
             return 0;
+        }
         
-        computeNorm(v2, v0, out, norm2);
-        if(outNorm[0]*norm2[0] + outNorm[1]*norm2[1] + outNorm[2]*norm2[2] < Tolerance.ABS_ERR)
+        Vectors.cross(v2, v0, out, norm2);
+        if( outNorm[0]*norm2[0] + outNorm[1]*norm2[1] + outNorm[2]*norm2[2] < Tol.ABS_ERR ) {
             return 0;
+        }
         
         return (dot < 0.0 ? 1 : -1);
     }
@@ -257,20 +207,22 @@ public class Triangles {
                                                     double[] out) 
     {
         double[] norm = new double[3];
-        computeNorm(v0, v1, v2, norm);
+        Vectors.cross(v0, v1, v2, norm);
         double dx = e1[0] - e0[0];
         double dy = e1[1] - e0[1];
         double dz = e1[2] - e0[2];
         
         double dot = norm[0]*dx + norm[1]*dy + norm[2]*dz;
         
-        if( Math.abs( dot ) < Tolerance.ABS_ERR )
+        if( Math.abs( dot ) < Tol.ABS_ERR ) {
             return 0;
+        }
         
         double t = (norm[0]*(e0[0]-v0[0]) + norm[1]*(e0[1]-v0[1]) + norm[2]*(e0[2]-v0[2])) / -dot;
         
-        if(t < lineTolerance || t > (1.0 - lineTolerance))
+        if(t < lineTolerance || t > (1.0 - lineTolerance)) {
             return 0;
+        }
         
         out[0] = e0[0] + dx * t;
         out[1] = e0[1] + dy * t;
@@ -924,4 +876,50 @@ public class Triangles {
         return ret;
     }
 
+    
+
+    /**
+     * Computes normal of triangle <i>(p0, p1, p2)</i>, without normalizing length.
+     * 
+     * @param p0
+     * @param p1
+     * @param p2
+     * @param out
+     * @deprecated
+     */
+    public static void computeNorm(double[] p0, double[] p1, double[] p2, double[] out) {
+        out[0] = (((p1[1] - p0[1]) * (p2[2] - p0[2])) - ((p2[1] - p0[1]) * (p1[2] - p0[2])));
+        out[1] = (((p1[2] - p0[2]) * (p2[0] - p0[0])) - ((p2[2] - p0[2]) * (p1[0] - p0[0])));
+        out[2] = (((p1[0] - p0[0]) * (p2[1] - p0[1])) - ((p2[0] - p0[0]) * (p1[1] - p0[1])));
+    }
+    
+    
+    /**
+     * Computes unit-length normal of triangle <i>(p0, p1, p2)</i>.
+     * 
+     * @param p0
+     * @param p1
+     * @param p2
+     * @param out
+     * @deprecated
+     */
+    public static void computeUnitNorm(double[] p0, double[] p1, double[] p2, double[] out) {
+        Vectors.cross( p0, p1, p2, out );
+        Vectors.normalize( out, 1.0 );
+    }
+
+    
+    /**
+     * Computes angle between p0p1 and p0p2, in radians. 
+     * @param p0 vertex at angle
+     * @param p1 vertex at end of edge1
+     * @param p2 vertex at end of edge2
+     * @return radians
+     * @deprecated Use Vectors.ang()
+     */
+    public static double computeAngle(double[] p0, double[] p1, double[] p2) {
+        return Vectors.ang( p0, p1, p2 );
+    }
+  
+    
 }

@@ -20,8 +20,7 @@ class TriangleIntersector {
         double[] v2 = target.vertexRef()[2];
 
         //Compute triangle normal.
-        Triangles.computeNorm(v0, v1, v2, norm);
-        
+        Vectors.cross( v0, v1, v2, norm );
         
         //Compute side of triangle that ray will hit.
         double dot = Vectors.dot(norm, rayDir);
@@ -51,15 +50,15 @@ class TriangleIntersector {
         //Compute if point lies on correct side of each triangle edge.
         double[] temp = mTemp;
         
-        Triangles.computeNorm(v0, v1, outPoint, temp);
+        Vectors.cross(v0, v1, outPoint, temp);
         if(Vectors.dot(norm, temp) < 0.0)
             return false;
         
-        Triangles.computeNorm(v1, v2, outPoint, temp);
+        Vectors.cross(v1, v2, outPoint, temp);
         if(Vectors.dot(norm, temp) < 0.0)
             return false;
         
-        Triangles.computeNorm(v2, v0, outPoint, temp);
+        Vectors.cross(v2, v0, outPoint, temp);
         if(Vectors.dot(norm, temp) < 0.0)
             return false;
         

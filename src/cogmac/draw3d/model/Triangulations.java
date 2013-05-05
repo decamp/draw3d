@@ -3,6 +3,7 @@ package cogmac.draw3d.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import cogmac.math3d.Vectors;
 import cogmac.math3d.geom.Aabb;
 import cogmac.math3d.geom.ExtrudedLineLoop;
 import cogmac.math3d.geom.Volume;
@@ -101,9 +102,10 @@ public final class Triangulations {
                     double[] v1 = vv.get((i + size - 1) % size);
                     double[] v2 = vv.get((i + 1) % size);
     
-                    double ang = Triangles.computeAngle(v0, v1, v2);
-                    if(Double.isNaN(ang))
+                    double ang = Vectors.ang( v0, v1, v2 );
+                    if( Double.isNaN(ang) ) {
                         ang = Double.NEGATIVE_INFINITY;
+                    }
     
                     if(ang < minAng) {
                         minAng = ang;
