@@ -32,10 +32,10 @@ public class CameraNode implements DrawNode {
     
     private final double[][] mRevert = new double[2][16];
 
-    private final float[] mViewport       = { 0, 0, 1, 1 };
-    private final float[] mTileViewport   = { 0, 0, 1, 1 };
-    private float[] mOverrideViewport     = null;
-    private float[] mOverrideTileViewport = null;
+    private final int[] mViewport       = { 0, 0, 1, 1 };
+    private final int[] mTileViewport   = { 0, 0, 1, 1 };
+    private int[] mOverrideViewport     = null;
+    private int[] mOverrideTileViewport = null;
     
     private SpatialObject  mCamera;
     private ViewFunc       mViewFunc;
@@ -75,7 +75,39 @@ public class CameraNode implements DrawNode {
     public SpatialObject camera() {
         return mCamera;
     }    
+    
 
+    
+    public double[] viewMatRef() {
+        return mViewMat;
+    }
+    
+    
+    public double[] viewMatInvRef() {
+        return mViewMatInv;
+    }
+
+    
+    public double[] projectionMatRef() {
+        return mProjMat;
+    }
+    
+    
+    public double[] projectionMatInvRef() {
+        return mProjMatInv;
+    }
+    
+    
+    public double[] viewportMatRef() {
+        return mViewportMat;
+    }
+    
+    
+    public double[] viewportMatInvRef() {
+        return mViewportMatInv;
+    }
+
+    
     
     public ViewFunc viewFunc() {
         return mViewFunc;
@@ -107,6 +139,44 @@ public class CameraNode implements DrawNode {
     }
     
     
+    public float nearPlane() {
+        return mProjFunc.nearPlane();
+    }
+    
+    
+    public void nearPlane( float dist ) {
+        mProjFunc.nearPlane( dist );
+    }
+    
+    
+    public float farPlane() {
+        return mProjFunc.farPlane();
+    }
+    
+    
+    public void farPlane( float dist ) {
+        mProjFunc.farPlane( dist );
+    }
+    
+    
+    public float fov() {
+        if( mProjFunc instanceof FovFunc ) {
+            return ((FovFunc)mProjFunc).fov();
+        } else {
+            return 0f;
+        }
+    }
+    
+    
+    public void fov( float fov ) {
+        if( mProjFunc instanceof FovFunc ) {
+           ((FovFunc)mProjFunc).fov( fov );
+        } 
+    }
+    
+    
+    
+    
     public int viewUpdateTriggers() {
         return mViewTriggers;
     }
@@ -134,36 +204,6 @@ public class CameraNode implements DrawNode {
     
     public void viewportUpdateTriggers( int triggers ) {
         mViewTriggers = triggers;
-    }
-
-    
-    public double[] viewMatRef() {
-        return mViewMat;
-    }
-    
-    
-    public double[] viewMatInvRef() {
-        return mViewMatInv;
-    }
-
-    
-    public double[] projectionMatRef() {
-        return mProjMat;
-    }
-    
-    
-    public double[] projectionMatInvRef() {
-        return mProjMatInv;
-    }
-    
-    
-    public double[] viewportMatRef() {
-        return mViewportMat;
-    }
-    
-    
-    public double[] viewportMatInvRef() {
-        return mViewportMatInv;
     }
     
     /**
@@ -194,16 +234,16 @@ public class CameraNode implements DrawNode {
      * @return Current viewport for entire space. 
      *         The array that is returned IS NOT a safe copy and MUST NOT be modified.
      */
-    public synchronized float[] viewport() {
+    public synchronized int[] viewportRef() {
         if( mOverrideViewport != null ) {
             return mOverrideViewport;
         }
         if( mTile != null ) {
             LongRect r = mTile.renderSpaceBounds();
-            mViewport[0] = r.minX();
-            mViewport[1] = r.minY();
-            mViewport[2] = r.maxX();
-            mViewport[3] = r.maxY();
+            mViewport[0] = (int)r.minX();
+            mViewport[1] = (int)r.minY();
+            mViewport[2] = (int)r.maxX();
+            mViewport[3] = (int)r.maxY();
         }
         
         return mViewport;
@@ -214,46 +254,65 @@ public class CameraNode implements DrawNode {
      *         The array that is returned IS NOT a safe copy and MUST NOT be modified.
      * 
      */
-    public synchronized float[] tileViewport() {
+    public synchronized int[] tileViewportRef() {
         if( mOverrideTileViewport != null ) {
             return mOverrideTileViewport;
         }
         if( mTile == null ) {
-            return viewport();
+            return viewportRef();
         }
         
         LongRect r = mTile.tileBounds();
-        mTileViewport[0] = r.minX();
-        mTileViewport[1] = r.minY();
-        mTileViewport[2] = r.maxX();
-        mTileViewport[3] = r.maxY();
+        mTileViewport[0] = (int)r.minX();
+        mTileViewport[1] = (int)r.minY();
+        mTileViewport[2] = (int)r.maxX();
+        mTileViewport[3] = (int)r.maxY();
         return mTileViewport;
     }
         
 
-    public float[] overrideViewport() {
+    
+    
+    public int[] overrideViewport() {
         return mOverrideViewport;
     }
     
     
-    public void overrideViewport( float[] box2 ) {
-        mOverrideViewport = box2;
+    public void overrideViewport( int[] box2 ) {
+        if( box2 == null ) {
+            mOverrideViewport = null;
+        } else { 
+            if( mOverrideViewport == null ) {
+                mOverrideViewport = new int[4];
+            }
+            System.arraycopy( box2, 0, mOverrideViewport, 0, 4 );
+        }
+        
         doUpdateViewport();
         doUpdateComposites();
     }
     
     
-    public float[] overrideTileViewport() {
+    public int[] overrideTileViewport() {
         return mOverrideTileViewport;
     }
     
     
-    public void overrideTileViewport( float[] box2 ) {
-        mOverrideTileViewport = box2;
+    public void overrideTileViewport( int[] box2 ) {
+        if( box2 == null ) {
+            mOverrideTileViewport = null;
+        } else { 
+            if( mOverrideTileViewport == null ) {
+                mOverrideTileViewport = new int[4];
+            }
+            System.arraycopy( box2, 0, mOverrideTileViewport, 0, 4 );
+        }
+
         doUpdateViewport();
         doUpdateComposites();
     }
-
+    
+    
     
     
     public void init(GLAutoDrawable gld) {}
@@ -293,6 +352,7 @@ public class CameraNode implements DrawNode {
     
     
     
+    
     private void triggerUpdates( int triggers ) {
         boolean updated = false;
         
@@ -324,8 +384,8 @@ public class CameraNode implements DrawNode {
     
     
     private void doUpdateProj() {
-        float[] viewport = viewport();
-        float[] tile     = tileViewport();
+        int[] viewport = viewportRef();
+        int[] tile     = tileViewportRef();
         if( tile == viewport ) {
             tile = null;
         }
@@ -335,12 +395,12 @@ public class CameraNode implements DrawNode {
     
     
     private void doUpdateViewport() {
-        float[] viewport = viewport();
-        float[] tile     = tileViewport();
+        int[] viewport = viewportRef();
+        int[] tile     = tileViewportRef();
         if( tile == viewport ) {
             tile = null;
         }
-        mViewportFunc.computeViewportMat( viewport(), tileViewport(), mViewportMat );
+        mViewportFunc.computeViewportMat( viewportRef(), tileViewportRef(), mViewportMat );
         Matrices.invert( mViewportMat, mViewportMatInv );
     }
     
