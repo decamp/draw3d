@@ -19,6 +19,7 @@ import cogmac.draw3d.scene.*;
  * 
  * @author decamp
  */
+@SuppressWarnings( "deprecation" )
 public class TileRenderer implements Renderer {
 
     
