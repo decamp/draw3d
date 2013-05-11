@@ -11,13 +11,19 @@ import java.nio.*;
  */
 public class Images {
 
+    public static final int RED   = 0;
+    public static final int GREEN = 1;
+    public static final int BLUE  = 2;
+    public static final int ALPHA = 3;
+    
+    
     /**
      * Returns equivalent OpenGL internalFormat, format and data types for a BufferedImage.
      * (e.g., GL_BGRA and GL_UNSIGNED_BYTE). It will also specify if the ordering of 
      * the DataBuffer component values must be reversed to achieve a GL-compatible format.
      * 
      * @param image Some image 
-     * @param out4  Length-3 array to hold output. On return: <br/>
+     * @param out4  Length-4 array to hold output. On return: <br/>
      *              out3[0] will hold INPUT FORMAT for image. <br/>
      *              out3[1] will hold FORMAT for image. <br/>
      *              out3[2] will hold DATA TYPE for image.
@@ -250,196 +256,361 @@ public class Images {
     }
     
     
-    
-    public static void invert( BufferedImage image ) {
+    public static float[][] imageToRgbPlanes( BufferedImage image, int[] optWork, float[][] optOut ) {
         final int w = image.getWidth();
         final int h = image.getHeight();
-        int[] pix = new int[w * h];
-        
-        image.getRGB( 0,0,w,h,pix,0,w );
-        
-        for(int i = 0; i < w * h; i++) {
-            int v = pix[i];
-            
-            int a = v >>> 24;
-            int r = (255 - ((v >> 16) & 0xFF));
-            int g = (255 - ((v >>  8) & 0xFF));
-            int b = (255 - ((v      ) & 0xFF));
-            
-            pix[i] = (a << 24) |
-                     (r << 16) |
-                     (g <<  8) |
-                     b;
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        if( optOut == null ) {
+            optOut = new float[3][w*h];
         }
         
-        image.setRGB(0,0,w,h,pix,0,w);
-    }
-    
-    
-    public static void valuesToAlpha( BufferedImage image ) {
-        final int w     = image.getWidth();
-        final int h     = image.getHeight();
-        final int[] pix = new int[w * h];
+        final float[] cr = optOut[0];
+        final float[] cg = optOut[1];
+        final float[] cb = optOut[2];
+        final float scale = 1f / 255f;
         
-        image.getRGB(0,0,w,h,pix,0,w);
-        
-        for(int i = 0; i < w * h; i++) {
-            int v = pix[i];
-            
-            int a = v >>> 24;
-            int r = ((v >> 16) & 0xFF);
-            int g = ((v >>  8) & 0xFF);
-            int b = ((v      ) & 0xFF);
-            
-            a = (a * r + a * g + a * b) / (3 * 255);
-            
-            pix[i] = (v & 0x00FFFFFF | (a << 24)); 
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                int i = x + y * w;
+                int v = optWork[x];
+                cr[i] = ( v >> 16 & 0xFF ) * scale;
+                cg[i] = ( v >>  8 & 0xFF ) * scale;
+                cb[i] = ( v       & 0xFF ) * scale;
+            }
         }
         
-        image.setRGB(0, 0, w, h, pix, 0, w);
-    }
-    
-    
-    public static void alphaToValues( BufferedImage image ) {
-        final int w     = image.getWidth();
-        final int h     = image.getHeight();
-        final int[] pix = new int[w * h];
-        
-        image.getRGB(0,0,w,h,pix,0,w);
-        
-        for(int i = 0; i < w * h; i++) {
-            int v = pix[i];
-            pix[i] = (v >>> 24) * 0x00010101 | 0xFF000000;
-        }
-        
-        image.setRGB(0, 0, w, h, pix, 0, w);
+        return optOut;
     }
 
-    
-    public static void darknessToAlpha( BufferedImage image ) {
-        darknessToAlpha( image, 0.0, 1.0 );
+
+    public static float[][] imageToRgbaPlanes( BufferedImage image, int[] optWork, float[][] optOut ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        if( optOut == null ) {
+            optOut = new float[4][w*h];
+        }
+        
+        final float[] cr = optOut[0];
+        final float[] cg = optOut[1];
+        final float[] cb = optOut[2];
+        final float[] ca = optOut[3];
+        final float scale = 1f / 255f;
+        
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                int i = x + y * w;
+                int v = optWork[x];
+                cr[i] = ( v >> 16 & 0xFF ) * scale;
+                cg[i] = ( v >>  8 & 0xFF ) * scale;
+                cb[i] = ( v       & 0xFF ) * scale;
+                ca[i] = ( v >> 24 & 0xFF ) * scale;
+            }
+        }
+        
+        return optOut;
     }
     
     
-    public static void darknessToAlpha( BufferedImage image, double minValue, double maxValue  ) {
-        final int w     = image.getWidth();
-        final int h     = image.getHeight();
-        final int[] pix = new int[w * h];
+    public static float[] imageToPlane( BufferedImage image, int component, int[] optWork, float[] optOut ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        if( optOut == null ) {
+            optOut = new float[w*h];
+        }
         
-        image.getRGB(0,0,w,h,pix,0,w);
+        final int shift;
+        switch( component ) {
+        case RED:
+            shift = 16;
+            break;
+        case GREEN:
+            shift = 8;
+            break;
+        case BLUE:
+            shift = 0;
+            break;
+        default:
+            shift = 24;
+            break;
+        }
         
-        for(int i = 0; i < w * h; i++) {
-            int v = pix[i];
-            
-            int a = (v >>> 24);
-            int r = ((v >> 16) & 0xFF);
-            int g = ((v >>  8) & 0xFF);
-            int b = ((v      ) & 0xFF);
-            
-            double q = ( r + g + b ) / ( 3.0 * 255.0 );
-            q = ( maxValue - q ) / ( maxValue - minValue );
-            
-            if( q < 0.0 ) {
-                a = 0;
-            } else if( q > 1.0 ) {
-                a = 255;
-            } else {
-                a = (int)( q * 255.0 + 0.5 );
+        final float scale = 1f / 255f;
+        
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                optOut[ x + y * w ] = ( optWork[x] >> shift & 0xFF ) * scale;
+            }
+        }
+        
+        return optOut;
+    }
+    
+    
+    public static BufferedImage rgbPlanesToImage( float[][] planes, 
+                                                  int w,
+                                                  int h, 
+                                                  int[] optWork, 
+                                                  BufferedImage optOut ) 
+    {
+        if( optOut == null ) {
+            optOut = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
+        }
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        
+        final float[] pr = planes[0];
+        final float[] pg = planes[1];
+        final float[] pb = planes[2];
+        
+        for( int y = 0; y < h; y++ ) {
+            for( int x = 0; x < w; x++ ) {
+                int i = x + y * w;
+                int cr = (int)( pr[i] * 255f + 0.5f ) & 0xFF;
+                int cg = (int)( pg[i] * 255f + 0.5f ) & 0xFF;
+                int cb = (int)( pb[i] * 255f + 0.5f ) & 0xFF;
+                optWork[x] = 0xFF000000 | cr << 16 | cg << 8 | cb;
+            }
+            optOut.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+        
+        return optOut;
+    }
+    
+
+    public static BufferedImage rgbaPlanesToImage( float[][] planes, 
+                                                   int w,
+                                                   int h, 
+                                                   int[] optWork, 
+                                                   BufferedImage optOut ) 
+    {
+        if( optOut == null ) {
+            optOut = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
+        }
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+
+        final float[] pr = planes[0];
+        final float[] pg = planes[1];
+        final float[] pb = planes[2];
+        final float[] pa = planes[3];
+
+        for( int y = 0; y < h; y++ ) {
+            for( int x = 0; x < w; x++ ) {
+                int i = x + y * w;
+                int cr = (int)( pr[i] * 255f + 0.5f ) & 0xFF;
+                int cg = (int)( pg[i] * 255f + 0.5f ) & 0xFF;
+                int cb = (int)( pb[i] * 255f + 0.5f ) & 0xFF;
+                int ca = (int)( pa[i] * 255f + 0.5f ) & 0xFF;
+                optWork[x] = ca << 24 | cr << 16 | cg << 8 | cb;
+            }
+            optOut.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+
+        return optOut;
+    }
+    
+    
+    
+    public static void invert( BufferedImage image, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                int v = optWork[x];
+                int a = 0xFF - ( v >>> 24        );
+                int r = 0xFF - ( v >>  16 & 0xFF );
+                int g = 0xFF - ( v >>   8 & 0xFF );
+                int b = 0xFF - ( v        & 0xFF );
+                optWork[x] = a | r << 16 | g << 8 | b;
+            }
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+    }
+    
+    
+    public static void invertRgb( BufferedImage image, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+        
+            for( int x = 0; x < w; x++ ) {
+                int v = optWork[x];
+                int a = v & 0xFF000000;
+                int r = 0xFF - ( v >> 16 & 0xFF);
+                int g = 0xFF - ( v >>  8 & 0xFF);
+                int b = 0xFF - ( v       & 0xFF);
+                optWork[x] = a | r << 16 | g << 8 | b;
             }
             
-            pix[i] = (v & 0x00FFFFFF | (a << 24)); 
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+    }
+    
+    
+    public static void invertAlpha( BufferedImage image, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
         }
         
-        image.setRGB(0, 0, w, h, pix, 0, w);
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                int v = optWork[x];
+                int a = 0xFF - ( v >>> 24 );
+                optWork[x] = v & 0x00FFFFFF | a << 24;
+            }
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
     }
-
     
-    public static void multAlphaByDarkness( BufferedImage image, double minValue, double maxValue  ) {
-        final int w     = image.getWidth();
-        final int h     = image.getHeight();
-        final int[] pix = new int[w * h];
+    
+    public static void meanRgbToAlpha( BufferedImage image, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
         
-        image.getRGB(0,0,w,h,pix,0,w);
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
         
-        for(int i = 0; i < w * h; i++) {
-            int v = pix[i];
-            
-            int a = (v >>> 24);
-            int r = ((v >> 16) & 0xFF);
-            int g = ((v >>  8) & 0xFF);
-            int b = ((v      ) & 0xFF);
-            
-            double q = ( r + g + b ) / ( 3.0 * 255.0 );
-            q = ( maxValue - q ) / ( maxValue - minValue );
-            
-            if( q < 0.0 ) {
-                a *= 0;
-            } else if( q > 1.0 ) {
-                a *= 255;
-            } else {
-                a *= (int)( q * 255.0 + 0.5 );
+            for( int x = 0; x < w; x++ ) {
+                int v = optWork[x];
+                int r = v >> 16 & 0xFF;
+                int g = v >>  8 & 0xFF;
+                int b = v       & 0xFF;
+                optWork[x] = v & 0x00FFFFFF | ( r + g + b ) / 3 << 24;
             }
             
-            a /= 255;
-            pix[i] = (v & 0x00FFFFFF | (a << 24)); 
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+       }
+    }
+    
+    
+    public static void alphaToRgb( BufferedImage image, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
         }
         
-        image.setRGB(0, 0, w, h, pix, 0, w);
-    }
-    
-    
-    public static void fillRgb( BufferedImage image, int rgb ) {
-        final int w     = image.getWidth();
-        final int h     = image.getHeight();
-        final int[] pix = new int[w * h];
-        
-        image.getRGB( 0,0,w,h,pix,0,w );
-        
-        for(int i = 0; i < w * h; i++) {
-            int v = pix[i];
-            
-            v = ( ( v & 0xFF000000 ) |
-                  ( rgb & 0x00FFFFFF ) );
-            
-            pix[i] = v; 
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                optWork[x] = ( optWork[x] >>> 24 ) * 0x01010101;
+            }
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
         }
-        
-        image.setRGB(0, 0, w, h, pix, 0, w);
-        
-    }
-    
-    
-    public static BufferedImage toGrayscale( BufferedImage im ) {
-        BufferedImage ret = new BufferedImage(im.getWidth(), im.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        Graphics2D g = (Graphics2D)ret.getGraphics();
-        g.setBackground(new Color(0,0,0,0));
-        g.clearRect(0, 0, im.getWidth(), im.getHeight());
-        ret.getGraphics().drawImage(im, 0, 0, null);
-        return ret;
-    }
-    
-    
-    public static BufferedImage resizeBilinear( BufferedImage im, int w, int h ) {
-        BufferedImage ret = new BufferedImage(w, h, im.getType());
-        Graphics2D g = (Graphics2D)ret.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.drawImage(im, 0, 0, w, h, null);
-        return ret;
-    }
-    
-    
-    public static BufferedImage resizeBicubic( BufferedImage im, int w, int h ) {
-        BufferedImage ret = new BufferedImage(w, h, im.getType());
-        Graphics2D g = (Graphics2D)ret.getGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.drawImage(im, 0, 0, w, h, null);
-        return ret;
     }
 
+    
+    public static void multRgbByAlpha( BufferedImage image, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                int v = optWork[x];
+                int a = v >>> 24;
+                int r = ( v >> 16 & 0xFF ) * a / 0xFF;
+                int g = ( v >>  8 & 0xFF ) * a / 0xFF;
+                int b = ( v       & 0xFF ) * a / 0xFF;
+                optWork[x] = a << 24 | r << 16 | g << 8 | b;
+            }
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+    }
+    
+    
+    public static void fillRgb( BufferedImage image, int rgb, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        rgb &= 0x00FFFFFF;
+        
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                optWork[x] = optWork[x] & 0xFF000000 | rgb;
+            }
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+    }
+    
+    
+    public static void fillAlpha( BufferedImage image, int alpha, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        
+        alpha = ( alpha & 0xFF ) << 24;
+        
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                optWork[x] = optWork[x] & 0x00FFFFFF | alpha;
+            }
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+    }
+
+    
+    public static void swapRedBlue( BufferedImage image, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                int v = optWork[x];
+                optWork[x] = v & 0xFF00FF00 | v >> 16 & 0xFF | v << 16 & 0x00FF0000;
+            }
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+    }
+    
+    
     
     public static BufferedImage toArgb( BufferedImage im ) {
-        if( im.getType() == BufferedImage.TYPE_INT_ARGB )
+        if( im.getType() == BufferedImage.TYPE_INT_ARGB ) {
             return im;
+        }
         
         final int w = im.getWidth();
         final int h = im.getHeight();
@@ -451,26 +622,36 @@ public class Images {
     }
     
     
-    public static void swapColors( BufferedImage im ) {
-        final int w = im.getWidth();
-        final int h = im.getHeight();
-        int[] pix = new int[w * h];
-        im.getRGB(0, 0, w, h, pix, 0, w);
-        
-        for(int i = 0; i < pix.length; i++) {
-            int v = pix[i];
-            int a = (v >>> 24);
-            int r = ((v >> 16) & 0xFF);
-            int g = ((v >>  8) & 0xFF);
-            int b = ((v      ) & 0xFF);
-            
-            pix[i] = ((a << 24) & 0xFF000000) |
-                     ((b << 16) & 0x00FF0000) |
-                     ((g <<  8) & 0x0000FF00) |
-                     ((r      ) & 0x000000FF);
+    public static BufferedImage toGrayscale( BufferedImage im ) {
+        if( im.getType() == BufferedImage.TYPE_BYTE_GRAY ) {
+            return im;
         }
         
-        im.setRGB(0, 0, w, h, pix, 0, w);
+        final int w = im.getWidth();
+        final int h = im.getHeight();
+        BufferedImage ret = new BufferedImage( w, h, BufferedImage.TYPE_BYTE_GRAY );
+        Graphics2D g = (Graphics2D)ret.getGraphics();
+        g.setComposite( AlphaComposite.Src );
+        g.drawImage( im, 0, 0, null );
+        return ret;
+    }
+    
+    
+    public static BufferedImage resizeBilinear( BufferedImage im, int w, int h ) {
+        BufferedImage ret = new BufferedImage(w, h, im.getType());
+        Graphics2D g = (Graphics2D)ret.getGraphics();
+        g.setRenderingHint( RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR );
+        g.drawImage( im, 0, 0, w, h, null );
+        return ret;
+    }
+    
+    
+    public static BufferedImage resizeBicubic( BufferedImage im, int w, int h ) {
+        BufferedImage ret = new BufferedImage(w, h, im.getType());
+        Graphics2D g = (Graphics2D)ret.getGraphics();
+        g.setRenderingHint( RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR );
+        g.drawImage( im, 0, 0, w, h, null );
+        return ret;
     }
     
 }
