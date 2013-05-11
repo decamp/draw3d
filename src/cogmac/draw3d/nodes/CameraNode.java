@@ -98,6 +98,16 @@ public class CameraNode implements DrawNode {
     }
     
     
+    public double[] viewProjectionMatRef() {
+        return mViewProjMat;
+    }
+    
+    
+    public double[] viewProjectionMatInvRef() {
+        return mViewProjMatInv;
+    }
+    
+    
     public double[] viewportMatRef() {
         return mViewportMat;
     }
