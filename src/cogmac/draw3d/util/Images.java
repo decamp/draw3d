@@ -35,15 +35,15 @@ public class Images {
         
         switch( image.getType() ) {
         case BufferedImage.TYPE_USHORT_GRAY:
-            out4[0] = GL_R;
-            out4[1] = GL_R;
+            out4[0] = GL_RED;
+            out4[1] = GL_RED;
             out4[2] = GL_UNSIGNED_SHORT;
             out4[3] = 0;
             return true;
         
         case BufferedImage.TYPE_BYTE_GRAY:
-            out4[0] = GL_R;
-            out4[1] = GL_R;
+            out4[0] = GL_RED;
+            out4[1] = GL_RED;
             out4[2] = GL_UNSIGNED_BYTE;
             out4[3] = 0;
             return true;
