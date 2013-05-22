@@ -229,7 +229,7 @@ abstract class AbstractTextureNode implements TextureNode {
         if( mId[0] == 0 ) {
             gl.glGenTextures( 1, mId, 0 );
             if( mId[0] == 0 ) {
-                throw new RuntimeException("Failed to allocate texture.");
+                throw new RuntimeException( "Failed to allocate texture." );
             }
         }
         
@@ -246,9 +246,9 @@ abstract class AbstractTextureNode implements TextureNode {
             
             if( hasSize() ) {
                 doAlloc( gl );
-            
-                if( gl.glGetError() != GL_NO_ERROR ) {
-                    throw new RuntimeException( "Failed to allocate texture storage." );
+                int err = gl.glGetError();
+                if( err != GL_NO_ERROR ) {
+                    throw new RuntimeException( "Failed to allocate texture storage: " + err );
                 }
             }
         }
