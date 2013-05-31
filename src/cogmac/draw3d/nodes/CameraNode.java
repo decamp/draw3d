@@ -21,6 +21,10 @@ public class CameraNode implements DrawNode {
     
     private final RenderTile mTile;
     
+    private final double[] mCamPos         = new double[3];
+    private final double[] mCamRot         = new double[16];
+    private final double[] mCamRotInv      = new double[16];
+    
     private final double[] mViewMat        = new double[16];
     private final double[] mViewMatInv     = new double[16];
     private final double[] mProjMat        = new double[16];
@@ -77,6 +81,20 @@ public class CameraNode implements DrawNode {
     }    
     
 
+    public double[] camPosRef() {
+        return mCamPos;
+    }
+    
+    
+    public double[] camRotRef() {
+        return mCamRot;
+    }
+
+    
+    public double[] camRotInvRef() {
+        return mCamRotInv;
+    }
+    
     
     public double[] viewMatRef() {
         return mViewMat;
@@ -388,8 +406,11 @@ public class CameraNode implements DrawNode {
     
     
     private void doUpdateView() {
+        System.arraycopy( mCamera.mPos, 0, mCamPos, 0, 3 );
+        System.arraycopy( mCamera.mRot, 0, mCamRot, 0, 16 );
         mViewFunc.computeViewMat( mCamera, mViewMat );
         Matrices.invert( mViewMat, mViewMatInv );
+        Matrices.invert( mCamRot, mCamRotInv );
     }
     
     

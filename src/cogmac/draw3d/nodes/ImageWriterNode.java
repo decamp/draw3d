@@ -1,4 +1,4 @@
-    package cogmac.draw3d.nodes;
+package cogmac.draw3d.nodes;
 
 import java.io.*;
 import java.nio.*;
@@ -34,6 +34,8 @@ public class ImageWriterNode extends DrawNodeAdapter {
     public static final int LEVEL_BEST_SPEED       = NativeZLib.Z_BEST_SPEED;
     public static final int LEVEL_BEST_COMPRESSION = NativeZLib.Z_BEST_COMPRESSION;
     public static final int LEVEL_DEFAULT          = NativeZLib.Z_DEFAULT_COMPRESSION;
+
+    private static final Double GAMMA = 1.0 / 2.2;
     
     
     
@@ -70,7 +72,7 @@ public class ImageWriterNode extends DrawNodeAdapter {
     
     
     private ImageWriterNode( int threadCount ) {
-        mThreadCount  = Math.max(1, threadCount);
+        mThreadCount  = Math.max(1, threadCount - 1);
         mMaxQueueSize = MAX_QUEUE_SIZE * mThreadCount;
         mPoolSize     = (MAX_QUEUE_SIZE + 1) * mThreadCount;
         
@@ -79,13 +81,11 @@ public class ImageWriterNode extends DrawNodeAdapter {
     }
     
     
+    
     public void readTarget( int readTarget ) {
         mReadTarget = readTarget;
     }
     
-    
-    
-
     
     public void addColorWriter( File outDir,
                                 int compressionLevel,
@@ -159,13 +159,11 @@ public class ImageWriterNode extends DrawNodeAdapter {
 
     
     @Override
-    public void pushDraw(GL gl) {
+    public void popDraw(GL gl) {
         for(FrameReader s: mSavers) {
             s.readFrame(gl);
         }
     }
-    
-    
     
     
     
@@ -281,6 +279,7 @@ public class ImageWriterNode extends DrawNodeAdapter {
         }
         
         
+        @SuppressWarnings( "resource" )
         @Override
         public void run() {
             while(true) {
@@ -303,7 +302,7 @@ public class ImageWriterNode extends DrawNodeAdapter {
                 }
                 
                 try {
-                    FileChannel chan = new FileOutputStream(task.mFile).getChannel();
+                    FileChannel chan = new FileOutputStream( task.mFile ).getChannel();
                     while(task.mOut.remaining() > 0) {
                         chan.write(task.mOut);
                     }
@@ -361,7 +360,7 @@ public class ImageWriterNode extends DrawNodeAdapter {
         }
         
         
-        public void readFrame(GL gl) {
+        public void readFrame( GL gl ) {
             final int w = mWidth;
             final int h = mHeight;
             
@@ -388,7 +387,7 @@ public class ImageWriterNode extends DrawNodeAdapter {
             gl.glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buf);
             buf.position(0).limit(cap);
             
-            FrameEncoder enc = mEncoders.get(mCount++ % mEncoders.size());
+            FrameEncoder enc = mEncoders.get( mCount++ % mEncoders.size() );
             WriteTask task = new WriteTask( mPool, 
                                            buf, 
                                            mFileMaker.getNextFile(),
@@ -421,14 +420,19 @@ public class ImageWriterNode extends DrawNodeAdapter {
         }
         
         
-        public synchronized ByteBuffer encode(ByteBuffer buffer) throws IOException {
+        public synchronized ByteBuffer encode( ByteBuffer buffer ) throws IOException {
             final int w = buffer.getInt();
             final int h = buffer.getInt();
             
-            int p0 = buffer.position();
+            int p0  = buffer.position();
+            int p1  = p0 + w * h * 4;
             int cap = w * h * 4;
-            
             ByteBuffer ret = mPool.poll();
+            
+            for( int i = p0 + 3; i < p1; i += 4 ) {
+                buffer.put( i, (byte)255 );
+            }
+            
             
             if(ret == null || ret.capacity() < cap) {
                 //System.out.println("## Alloc 2");
@@ -436,9 +440,9 @@ public class ImageWriterNode extends DrawNodeAdapter {
             }else{
                 ret.clear();
             }
-            
-            ret.order( ByteOrder.BIG_ENDIAN );
-            mComp.open( ret, w, h, PngBufferWriter.COLOR_TYPE_RGBA, 8, mCompLevel, null );
+
+            ret.order(ByteOrder.BIG_ENDIAN);
+            mComp.open( ret, w, h, PngBufferWriter.COLOR_TYPE_RGBA, 8, mCompLevel, GAMMA );
             
             for(int y = 0; y < h; y++) {
                 int m0 = p0 + (h - y - 1) * w * 4;

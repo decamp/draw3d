@@ -31,8 +31,6 @@ public class Images {
      * @return true if equivalent format and data type were found
      */
     public static boolean glFormatFor( BufferedImage image, int[] out4 ) {
-        int bufType = image.getData().getDataBuffer().getDataType();
-        
         switch( image.getType() ) {
         case BufferedImage.TYPE_USHORT_GRAY:
             out4[0] = GL_RED;

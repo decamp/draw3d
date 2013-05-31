@@ -169,8 +169,9 @@ public class MilkShape {
     }
 
     
+    @SuppressWarnings( "resource" )
     public static void saveModel( MeshModel model, File outFile ) throws IOException {
-        FileChannel out = new FileOutputStream(outFile).getChannel();
+        FileChannel out = new FileOutputStream( outFile ).getChannel();
         ByteBuffer buf = ByteBuffer.allocate(1024*8);
         buf.order(ByteOrder.LITTLE_ENDIAN);
         

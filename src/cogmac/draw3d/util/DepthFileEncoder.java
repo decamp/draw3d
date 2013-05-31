@@ -132,8 +132,7 @@ public class DepthFileEncoder {
         mLineBuf.clear();
     }
     
-    
-    
+
     public static float[] readDepthFile(File file, int[] outSize, float[] outArr) throws IOException {
         GZIPInputStream gin = new GZIPInputStream(new FileInputStream(file));
         DataInputStream in = new DataInputStream(new BufferedInputStream(gin));
@@ -147,13 +146,16 @@ public class DepthFileEncoder {
         outSize[0] = w;
         outSize[1] = h;
         
-        if(outArr == null || outArr.length < w * h)
+        if( outArr == null || outArr.length < w * h ) {
             outArr = new float[w * h];
+        }
         
         for(int i = 0; i < w * h; i++) {
             outArr[i] = in.readFloat();
         }
         
+        
+        in.close();
         return outArr;
     }
     

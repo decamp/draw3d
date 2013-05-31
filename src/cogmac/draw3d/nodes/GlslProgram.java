@@ -133,13 +133,14 @@ public class GlslProgram extends DrawNodeAdapter {
     
     
     
-    private static String fileToString(File file) throws IOException {
+    private static String fileToString( File file ) throws IOException {
         StringBuilder s = new StringBuilder();
         
         BufferedReader in = new BufferedReader(new FileReader(file));
         for(String k = in.readLine(); k != null; k = in.readLine()) {
             s.append(k).append('\n');
         }
+        in.close();
         
         return s.toString();
     }
