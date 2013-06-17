@@ -317,6 +317,7 @@ public class CameraNode implements DrawNode {
         }
         
         doUpdateViewport();
+        doUpdateProj();
         doUpdateComposites();
     }
     
@@ -337,6 +338,7 @@ public class CameraNode implements DrawNode {
         }
 
         doUpdateViewport();
+        doUpdateProj();
         doUpdateComposites();
     }
     

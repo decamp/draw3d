@@ -586,6 +586,27 @@ public class Images {
     }
 
     
+    
+    public static void fillTransparentRgb( BufferedImage image, int rgb, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+        rgb &= 0x00FFFFFF;
+        
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                if( ( optWork[x] & 0xFF000000 ) == 0 ) {
+                    optWork[x] = optWork[x] & 0xFF000000 | rgb;
+                }
+            }
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+    }
+    
+    
     public static void swapRedBlue( BufferedImage image, int[] optWork ) {
         final int w = image.getWidth();
         final int h = image.getHeight();
