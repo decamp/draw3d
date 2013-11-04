@@ -1,10 +1,7 @@
 package cogmac.draw3d.context;
 
-import java.awt.Frame;
-import java.awt.Insets;
-import java.awt.Window;
+import java.awt.*;
 import javax.media.opengl.GLCanvas;
-import cogmac.gui.layout.LayoutAdapter;
 import cogmac.math3d.LongRect;
 
 
@@ -91,13 +88,8 @@ class WindowRenderTile extends AbstractRenderTile {
         
         final java.awt.Component comp = ((GLCanvas)drawable());
         
-        mFrame.add(comp);
-        mFrame.setLayout(new LayoutAdapter() {
-            public void layoutContainer(java.awt.Container cont) {
-                Insets st = cont.getInsets();
-                comp.setBounds(st.left, st.top, cont.getWidth() - st.left - st.right, cont.getHeight() - st.top - st.bottom);
-            }
-        });
+        mFrame.add( comp );
+        mFrame.setLayout( new Layout( comp ) );
         
         updateFrameSize();
     }
@@ -163,5 +155,34 @@ class WindowRenderTile extends AbstractRenderTile {
             }
         }
     }
+
     
+    private final class Layout implements LayoutManager {
+
+        private final java.awt.Component mComp;
+
+        Layout( java.awt.Component comp ) {
+            mComp = comp;
+        }
+
+
+        public void layoutContainer( Container cont ) {
+            Insets st = cont.getInsets();
+            mComp.setBounds( st.left, st.top, cont.getWidth() - st.left - st.right, cont.getHeight() - st.top - st.bottom );
+        }
+
+        public Dimension minimumLayoutSize( Container cont ) {
+            return new Dimension( 1, 1 );
+        }
+
+        public Dimension preferredLayoutSize( Container cont ) {
+            return new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE );
+        }
+
+        public void addLayoutComponent( String name, Component comp ) {}
+
+        public void removeLayoutComponent( Component comp ) {}
+    }
+
+
 }

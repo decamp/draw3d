@@ -1,11 +1,9 @@
 package cogmac.draw3d.context;
 
 import java.awt.*;
+
 import javax.media.opengl.GLCanvas;
 import javax.swing.JFrame;
-
-import cogmac.gui.layout.FillLayout;
-
 
 
 /**
@@ -112,5 +110,51 @@ class FullscreenRenderTile extends AbstractRenderTile {
             mFrame.setVisible(visible);
         }
     }
+    
+    
+    
+    private static class FillLayout implements LayoutManager {
+        
+        public FillLayout() {}
+        
+        
+        public void layoutContainer( Container cont ) {
+            final int w = cont.getWidth();
+            final int h = cont.getHeight();
+            final int count = cont.getComponentCount();
+            for( int i = 0; i < count; i++ ) {
+                Component c = cont.getComponent( i );
+                if( c != null ) {
+                    c.setBounds(0, 0, w, h );
+                }
+            }
+        }
+
+
+        
+        @Override
+        public void addLayoutComponent( String arg0, Component  c ) {}
+
+
+        
+        @Override
+        public Dimension minimumLayoutSize( Container c ) {
+            return new Dimension( 1, 1 );
+        }
+
+
+        
+        @Override
+        public Dimension preferredLayoutSize( Container c ) {
+            return new Dimension( Integer.MAX_VALUE, Integer.MAX_VALUE );
+        }
+
+
+        
+        @Override
+        public void removeLayoutComponent( Component c ) {}
+
+    }
+
     
 }
