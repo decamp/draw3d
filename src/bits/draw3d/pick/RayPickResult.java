@@ -8,7 +8,7 @@ import bits.draw3d.model.Triangle;
  * can be used to store both results and working data, providing better control over
  * thread safety and memory management.  
  * 
- * @author decamp
+ * @author Philip DeCamp
  */
 public interface RayPickResult {
 
@@ -59,7 +59,7 @@ public interface RayPickResult {
     public double[] pickedPointRef();
     
     /**
-     * Returns the picked triangled.
+     * Returns the picked triangle.
      * <p>
      * If <tt>hasPick()</tt> is <tt>false</tt>, this method is undefined.
      * 

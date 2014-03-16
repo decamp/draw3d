@@ -235,15 +235,14 @@ public class RenderSpaceBuilder {
         Bounder targetScreenBounder = screenBounds == null ? null : new ConstantBounder(screenBounds); 
         Bounder targetTileBounder   = tileBounds   == null ? null : new ConstantBounder(tileBounds);
         
-        RenderTile tile = WindowRenderTile.newInstance( mSpace, 
-                                                        mId++, 
-                                                        viewportBounder,
-                                                        targetTileBounder, 
-                                                        targetScreenBounder,
-                                                        canvas,
-                                                        title,
-                                                        null,
-                                                        resizable );
+        RenderTile tile = WindowRenderTile.create( mSpace, 
+                                                   mId++, 
+                                                   viewportBounder,
+                                                   targetTileBounder, 
+                                                   targetScreenBounder,
+                                                   canvas,
+                                                   title,
+                                                   resizable );
         
         mSpace.addTile(tile);
     }

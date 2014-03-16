@@ -12,15 +12,14 @@ import bits.math3d.LongRect;
 class WindowRenderTile extends AbstractRenderTile {
 
 
-    static RenderTile newInstance( RenderSpace renderSpace,
-                                   int id,
-                                   Bounder renderBounder,
-                                   Bounder targetTileBounder,
-                                   Bounder targetScreenBounder,
-                                   GLCanvas drawable,
-                                   String frameTitle,
-                                   LongRect frameBounds,
-                                   boolean resizable )
+    static RenderTile create( RenderSpace renderSpace,
+                              int id,
+                              Bounder renderBounder,
+                              Bounder targetTileBounder,
+                              Bounder targetScreenBounder,
+                              GLCanvas drawable,
+                              String frameTitle,
+                              boolean resizable )
     {
         return new WindowRenderTile( renderSpace, 
                                      id, 
@@ -29,7 +28,6 @@ class WindowRenderTile extends AbstractRenderTile {
                                      targetScreenBounder,
                                      drawable, 
                                      frameTitle, 
-                                     frameBounds, 
                                      resizable );
     }
     
@@ -49,7 +47,6 @@ class WindowRenderTile extends AbstractRenderTile {
                               Bounder targetScreenBounder,
                               GLCanvas drawable,
                               String frameTitle,
-                              LongRect frameBounds,
                               boolean resizable )
     {
         super( renderSpace, 

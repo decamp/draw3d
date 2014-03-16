@@ -21,6 +21,8 @@ import static java.lang.Double.NEGATIVE_INFINITY;
  * @deprecated
  * @author decamp
  */
+@Deprecated
+@SuppressWarnings("all")
 public final class FasterSahKdTree implements RayPicker {
 
     
@@ -93,8 +95,8 @@ public final class FasterSahKdTree implements RayPicker {
                 double v1 = rayPoint[i1] + rayDir[i1] * t;
                 double v2 = rayPoint[i2] + rayDir[i2] * t;
                 
-                if(v1 >= bounds[i1] - Tolerance.TOL && v1 <= bounds[i1+3] + Tolerance.TOL) {
-                    if(v2 >= bounds[i2] - Tolerance.TOL && v2 <= bounds[i2+3] + Tolerance.TOL) {
+                if(v1 >= bounds[i1] - Tol.TOL && v1 <= bounds[i1+3] + Tol.TOL) {
+                    if(v2 >= bounds[i2] - Tol.TOL && v2 <= bounds[i2+3] + Tol.TOL) {
                         if(t < tMin) {      
                             tMin = t;
                         }
@@ -143,7 +145,7 @@ public final class FasterSahKdTree implements RayPicker {
                 if((intersect.mTargetSide & sides) == 0)
                     continue;
                 
-                if(intersect.mRayDist >= result.mRayDist || intersect.mRayDist > maxDist + Tolerance.TOL || intersect.mRayDist < minDist - Tolerance.TOL)
+                if(intersect.mRayDist >= result.mRayDist || intersect.mRayDist > maxDist + Tol.TOL || intersect.mRayDist < minDist - Tol.TOL)
                     continue;
         
                 result.mHasPick  = true;

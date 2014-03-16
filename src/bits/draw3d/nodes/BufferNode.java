@@ -16,18 +16,19 @@ import bits.draw3d.context.RenderTile;
 public class BufferNode extends DrawNodeAdapter {
     
     
-    public static BufferNode newVertexInstance( int usage ) {
+    public static BufferNode createVertexNode( int usage ) {
         return new BufferNode( GL_ARRAY_BUFFER, 
                                GL_ARRAY_BUFFER_BINDING, 
-                               GL_DYNAMIC_DRAW );
+                               usage );
     }
     
 
-    public static BufferNode newElementInstance( int usage ) {
+    public static BufferNode createElementNode( int usage ) {
         return new BufferNode( GL_ELEMENT_ARRAY_BUFFER, 
                                GL_ELEMENT_ARRAY_BUFFER_BINDING, 
                                usage );
     }
+    
     
     
     private final int   mType;
@@ -294,4 +295,17 @@ public class BufferNode extends DrawNodeAdapter {
     }
 
 
+    @Deprecated public static BufferNode newVertexInstance( int usage ) {
+        return new BufferNode( GL_ARRAY_BUFFER, 
+                               GL_ARRAY_BUFFER_BINDING, 
+                               usage );
+    }
+    
+
+    @Deprecated public static BufferNode newElementInstance( int usage ) {
+        return new BufferNode( GL_ELEMENT_ARRAY_BUFFER, 
+                               GL_ELEMENT_ARRAY_BUFFER_BINDING, 
+                               usage );
+    }
+    
 }

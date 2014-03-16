@@ -7,7 +7,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import bits.draw3d.util.Images;
-import bits.prototype.ImagePanel;
+import bits.util.gui.ImagePanel;
 
 
 public class TestImages {

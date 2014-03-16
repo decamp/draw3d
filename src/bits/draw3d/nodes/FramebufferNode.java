@@ -24,7 +24,6 @@ public final class FramebufferNode implements DrawNode {
     
     private Attachment[] mAtts      = {};
     private final int[] mDrawRevert = { 0 };
-    private final int[] mReadRevert = { 0 };
     
     private boolean mNeedsInit  = true;
     
@@ -107,7 +106,7 @@ public final class FramebufferNode implements DrawNode {
     
     
     public void bindDraw( GL gl ) {
-        bind( gl, GL_DRAW_FRAMEBUFFER_EXT );
+        doBind( gl, GL_DRAW_FRAMEBUFFER_EXT );
         int status = gl.glCheckFramebufferStatusEXT( GL_DRAW_FRAMEBUFFER_EXT );
         if( status != GL_FRAMEBUFFER_COMPLETE_EXT ) {
             throw new IllegalStateException( "Failed to complete framebuffer before attachment." );
@@ -115,7 +114,7 @@ public final class FramebufferNode implements DrawNode {
     }
     
     public void bindRead( GL gl ) {
-        bind( gl, GL_READ_FRAMEBUFFER_EXT );
+        doBind( gl, GL_READ_FRAMEBUFFER_EXT );
     }
     
     public void unbindDraw( GL gl ) {
@@ -248,7 +247,7 @@ public final class FramebufferNode implements DrawNode {
         }
     }
     
-    private void bind( GL gl, int target ) {
+    private void doBind( GL gl, int target ) {
         if( mNeedsInit ) {
             doInit( gl, target );
         }
@@ -256,12 +255,7 @@ public final class FramebufferNode implements DrawNode {
         gl.glBindFramebufferEXT( target, mId[0] );
     }
     
-    private void unbind( GL gl, int target ) {
-        gl.glBindFramebufferEXT( target, 0 );
-    }  
-    
-    
-    
+        
     private static class Attachment {
         
         final int mAttachment;

@@ -240,7 +240,6 @@ COMPARE_TRIANGLES:
     
     
     public static void colorize( MeshModel model, double r, double g, double b, double a ) {
-        Random rand = new Random( System.nanoTime() );
         for( Group gr: model.getGroups() ) {
             for( Triangle t: gr.getTriangles() ) {
                 double[][] c = new double[3][];

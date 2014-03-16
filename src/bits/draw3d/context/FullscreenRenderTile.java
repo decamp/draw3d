@@ -33,7 +33,6 @@ class FullscreenRenderTile extends AbstractRenderTile {
     private final String mFrameTitle;
     private final GraphicsDevice mScreenDevice;
     private final boolean mExclusive;
-    private final Bounder mTargetTileBounder;
     
     private JFrame mFrame = null;
     
@@ -48,7 +47,6 @@ class FullscreenRenderTile extends AbstractRenderTile {
                                   boolean exclusive) 
     {
         super(renderSpace, id, renderBounder, targetTileBounder, null, drawable, false, true);
-        mTargetTileBounder = targetTileBounder;
         mFrameTitle = frameTitle;
         mScreenDevice = screen;
         mExclusive = exclusive;

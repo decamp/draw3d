@@ -16,13 +16,14 @@ import static java.lang.Double.NEGATIVE_INFINITY;
  * <p>
  * This kd tree uses a trivial, median volume method for partitioning the space.  It's 
  * fast to build, but provides about the worst result you can get with a KD tree 
- * (without trying to get bad results).  In testing, this is still some
+ * (without trying to get bad results). In testing, this is still some
  * 30-odd times faster than brute force picking for 3000 triangles, and is obviously
  * more scalable.
  * 
  * @deprecated
  * @author decamp
  */
+@SuppressWarnings( "all" )
 public final class MedianVolumeKdTree implements RayPicker {
 
     private static final int TERM_ITEM_COUNT = 3;
@@ -84,8 +85,8 @@ public final class MedianVolumeKdTree implements RayPicker {
                 double v1 = rayPoint[i1] + rayDir[i1] * t;
                 double v2 = rayPoint[i2] + rayDir[i2] * t;
                 
-                if(v1 >= bounds[i1] - Tolerance.TOL && v1 <= bounds[i1+3] + Tolerance.TOL) {
-                    if(v2 >= bounds[i2] - Tolerance.TOL && v2 <= bounds[i2+3] + Tolerance.TOL) {
+                if(v1 >= bounds[i1] - Tol.TOL && v1 <= bounds[i1+3] + Tol.TOL) {
+                    if(v2 >= bounds[i2] - Tol.TOL && v2 <= bounds[i2+3] + Tol.TOL) {
                         if(t < tMin) {      
                             tMin = t;
                         }
@@ -134,7 +135,7 @@ public final class MedianVolumeKdTree implements RayPicker {
                 if((intersect.mTargetSide & sides) == 0)
                     continue;
                 
-                if(intersect.mRayDist >= result.mRayDist || intersect.mRayDist > maxDist + Tolerance.TOL || intersect.mRayDist < minDist - Tolerance.TOL)
+                if(intersect.mRayDist >= result.mRayDist || intersect.mRayDist > maxDist + Tol.TOL || intersect.mRayDist < minDist - Tol.TOL)
                     continue;
         
                 result.mHasPick  = true;

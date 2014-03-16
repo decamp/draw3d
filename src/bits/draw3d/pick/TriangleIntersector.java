@@ -38,8 +38,9 @@ class TriangleIntersector {
                     norm[1] * (rayPoint[1] - v0[1]) +
                     norm[2] * (rayPoint[2] - v0[2])) / -dot;
 
-        if(t <= 0.0)
+        if( t <= 0.0 ) {
             return false;
+        }
         
         double[] outPoint = out.mPoint;
         outPoint[0] = rayPoint[0] + rayDir[0] * t;
@@ -50,18 +51,21 @@ class TriangleIntersector {
         //Compute if point lies on correct side of each triangle edge.
         double[] temp = mTemp;
         
-        Vectors.cross(v0, v1, outPoint, temp);
-        if(Vectors.dot(norm, temp) < 0.0)
+        Vectors.cross( v0, v1, outPoint, temp );
+        if( Vectors.dot( norm, temp ) < 0.0 ) {
             return false;
-        
-        Vectors.cross(v1, v2, outPoint, temp);
-        if(Vectors.dot(norm, temp) < 0.0)
+        }
+
+        Vectors.cross( v1, v2, outPoint, temp );
+        if( Vectors.dot( norm, temp ) < 0.0 ) {
             return false;
-        
-        Vectors.cross(v2, v0, outPoint, temp);
-        if(Vectors.dot(norm, temp) < 0.0)
+        }
+
+        Vectors.cross( v2, v0, outPoint, temp );
+        if( Vectors.dot( norm, temp ) < 0.0 ) {
             return false;
-        
+        }
+
         out.mRayDist = t;
         return true;
     }
