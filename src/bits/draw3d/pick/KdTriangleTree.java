@@ -38,7 +38,6 @@ import static java.lang.Double.NEGATIVE_INFINITY;
  * never added to a leaf node that they do not actually intersect.
  * 
  * @author decamp
- * TODO: NOT WORKING - REQUIRES DEBUGGING
  */
 public final class KdTriangleTree implements RayPicker {
 
