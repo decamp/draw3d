@@ -1,5 +1,7 @@
 package bits.draw3d.nodes;
 
+import bits.draw3d.util.Images;
+
 import java.awt.image.BufferedImage;
 import java.nio.*;
 
@@ -9,39 +11,18 @@ import static javax.media.opengl.GL.*;
 
 /**
  * @author decamp
+ * @deprecated Use Texture2Node.
  */
-public final class BufferedTexture2dNode extends Texture2dNode {
-    
+@Deprecated public final class BufferedTexture2dNode extends Texture2dNode {
 
-    public static BufferedTexture2dNode newInstance() {
-        return new BufferedTexture2dNode();
-    }
-    
-    
-    public static BufferedTexture2dNode newInstance( BufferedImage image ) {
-        BufferedTexture2dNode ret = newInstance();
-        ret.buffer( image );
-        return ret;
-    }
-    
-    
-    public static BufferedTexture2dNode newInstance( ByteBuffer buf,
-                                                     int intFormat, 
-                                                     int format,
-                                                     int dataType,
-                                                     int w,
-                                                     int h )
-    {
-        BufferedTexture2dNode ret = newInstance();
-        ret.buffer( buf, intFormat, format, dataType, w, h );
-        return ret;
-    }
 
-    
     private ByteBuffer mBuf = null;
-    
-    
-    
+
+
+    public BufferedTexture2dNode() {}
+
+
+
     public void buffer( BufferedImage image ) {
         if( image == null ) {
             buffer( null, 0, 0, 0, -1, -1 );
@@ -67,7 +48,7 @@ public final class BufferedTexture2dNode extends Texture2dNode {
             if( mBuf == null ) {
                 return;
             }
-            
+
             super.format( -1, -1, -1 );
             super.size( -1, -1 );
             mBuf = null;
@@ -111,7 +92,7 @@ public final class BufferedTexture2dNode extends Texture2dNode {
     
     
     
-    static ByteBuffer toDirectBuffer( BufferedImage image ) {
+    @Deprecated static ByteBuffer toDirectBuffer( BufferedImage image ) {
         int w = image.getWidth();
         int h = image.getHeight();
         
@@ -131,6 +112,32 @@ public final class BufferedTexture2dNode extends Texture2dNode {
         }
         
         return buf;
+    }
+
+
+
+    @Deprecated public static BufferedTexture2dNode newInstance() {
+        return new BufferedTexture2dNode();
+    }
+
+
+    @Deprecated public static BufferedTexture2dNode newInstance( BufferedImage image ) {
+        BufferedTexture2dNode ret = newInstance();
+        ret.buffer( image );
+        return ret;
+    }
+
+
+    @Deprecated public static BufferedTexture2dNode newInstance( ByteBuffer buf,
+                                                                 int intFormat,
+                                                                 int format,
+                                                                 int dataType,
+                                                                 int w,
+                                                                 int h )
+    {
+        BufferedTexture2dNode ret = newInstance();
+        ret.buffer( buf, intFormat, format, dataType, w, h );
+        return ret;
     }
 
 }

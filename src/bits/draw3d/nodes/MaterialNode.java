@@ -13,29 +13,23 @@ import static javax.media.opengl.GL.*;
  */
 public class MaterialNode extends DrawNodeAdapter {
 
-    
-    public static MaterialNode newInstance( Material mat ) {
-        return new MaterialNode( mat, mat );
-    }
-    
-    
-    public static MaterialNode newInstance( Material front, Material back ) {
-        return new MaterialNode( front, back );
-    }
 
-    
-    
     private final Material mFront;
     private final Material mBack;
-    
-    
-    private MaterialNode( Material front, Material back ) {
+
+
+    public MaterialNode( Material mat ) {
+        mFront = mat;
+        mBack  = mat;
+    }
+
+
+    public MaterialNode( Material front, Material back ) {
         mFront = front;
         mBack  = back;
     }
     
-    
-        
+
     @Override
     public void pushDraw( GL gl ) {
         if( mFront == mBack ) {
@@ -53,8 +47,17 @@ public class MaterialNode extends DrawNodeAdapter {
         }
     }
 
-    
     @Override
     public void popDraw( GL gl ) {}
+
+
+    @Deprecated public static MaterialNode newInstance( Material mat ) {
+        return new MaterialNode( mat, mat );
+    }
+
+
+    @Deprecated public static MaterialNode newInstance( Material front, Material back ) {
+        return new MaterialNode( front, back );
+    }
 
 }

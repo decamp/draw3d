@@ -1,32 +1,27 @@
 package bits.draw3d.nodes;
 
-import static javax.media.opengl.GL.*;
-
-import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
+import bits.draw3d.util.DrawUtil;
+import bits.draw3d.util.Images;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
 
-import bits.draw3d.util.Images;
+import static javax.media.opengl.GL.*;
 
 
 /**
  * @author decamp
- * @depracated Use {@link Mipmap2Node}
  */
-@Deprecated public class BufferedMipmap2dNode extends Texture2dNode {
+public class Mipmap2Node extends AbstractTextureNode {
 
-    
-    private static final GLU GLU_INST = new GLU();
+
     private ByteBuffer mBuf = null;
-    
-    
-    public BufferedMipmap2dNode() {
-        param( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-        param( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-        param( GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-        param( GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+
+
+    public Mipmap2Node() {
+        super( GL_TEXTURE_2D, GL_TEXTURE_BINDING_2D );
     }
     
     
@@ -38,15 +33,15 @@ import bits.draw3d.util.Images;
             int[] format = new int[4];
             ByteBuffer buf = Images.imageToBgraBuffer( image, format );
             buffer( buf,
-                    GL_RGBA,
-                    GL_BGRA,
-                    GL_UNSIGNED_BYTE,
+                    format[0],
+                    format[1],
+                    format[2],
                     image.getWidth(),
                     image.getHeight() );
         }
     }
-    
-    
+
+
     public synchronized void buffer( ByteBuffer buf,
                                      int intFormat,
                                      int format,
@@ -70,56 +65,53 @@ import bits.draw3d.util.Images;
         
         fireAlloc();
     }
-    
-    
+
     @Override
     public void format( int intFormat, int format, int dataType ) {}
-    
-    
+
     @Override
     public void size( int w, int h ) {}
-    
-    
+
     @Override
     public void dispose( GL gl ) {
         super.dispose( gl );
         mBuf = null;
     }
-    
-    
+
     @Override
     protected synchronized void doAlloc( GL gl ) {
-        GLU_INST.gluBuild2DMipmaps( GL_TEXTURE_2D,
-                                    internalFormat(),
-                                    width(),
-                                    height(),
-                                    format(),
-                                    dataType(),
-                                    mBuf );
+        DrawUtil.GLU.gluBuild2DMipmaps( GL_TEXTURE_2D,
+                                        internalFormat(),
+                                        width(),
+                                        height(),
+                                        format(),
+                                        dataType(),
+                                        mBuf );
+        mBuf = null;
     }
 
 
 
-    @Deprecated public static BufferedMipmap2dNode newInstance() {
-        return new BufferedMipmap2dNode();
+    @Deprecated public static Mipmap2Node newInstance() {
+        return new Mipmap2Node();
     }
 
 
-    @Deprecated public static BufferedMipmap2dNode newInstance( BufferedImage image ) {
-        BufferedMipmap2dNode ret = new BufferedMipmap2dNode();
+    @Deprecated public static Mipmap2Node newInstance( BufferedImage image ) {
+        Mipmap2Node ret = new Mipmap2Node();
         ret.buffer( image );
         return ret;
     }
 
 
-    @Deprecated public static BufferedMipmap2dNode newInstance( ByteBuffer buf,
+    @Deprecated public static Mipmap2Node newInstance( ByteBuffer buf,
                                                                 int intFormat,
                                                                 int format,
                                                                 int dataType,
                                                                 int w,
                                                                 int h )
     {
-        BufferedMipmap2dNode ret = new BufferedMipmap2dNode();
+        Mipmap2Node ret = new Mipmap2Node();
         ret.buffer( buf, intFormat, format, dataType, w, h );
         return ret;
     }

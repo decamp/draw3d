@@ -10,54 +10,48 @@ import javax.media.opengl.GL;
  */
 public class DrawBufferParams {
 
-
-    public static DrawBufferParams newInstance() {
-        return new DrawBufferParams();
-    }
-
-
     public static DrawBufferParams copy( DrawBufferParams node ) {
         return new DrawBufferParams( node );
     }
 
 
-    private boolean mVertEnabled = false;
-    private int     mVertSize    = 3;
-    private int     mVertType    = GL_FLOAT;
-    private int     mVertStride  = 0;
-    private int     mVertOffset  = 0;
+    public boolean mVertEnabled = false;
+    public int     mVertSize    = 3;
+    public int     mVertType    = GL_FLOAT;
+    public int     mVertStride  = 0;
+    public int     mVertOffset  = 0;
 
-    private boolean mTexEnabled = false;
-    private int     mTexSize    = 2;
-    private int     mTexType    = GL_FLOAT;
-    private int     mTexStride  = 0;
-    private int     mTexOffset  = 0;
+    public boolean mTexEnabled = false;
+    public int     mTexSize    = 2;
+    public int     mTexType    = GL_FLOAT;
+    public int     mTexStride  = 0;
+    public int     mTexOffset  = 0;
 
-    private boolean mNormEnabled = false;
-    private int     mNormType    = GL_FLOAT;
-    private int     mNormStride  = 0;
-    private int     mNormOffset  = 0;
+    public boolean mNormEnabled = false;
+    public int     mNormType    = GL_FLOAT;
+    public int     mNormStride  = 0;
+    public int     mNormOffset  = 0;
 
-    private boolean mColorEnabled = false;
-    private int     mColorSize    = 4;
-    private int     mColorType    = GL_UNSIGNED_BYTE;
-    private int     mColorStride  = 0;
-    private int     mColorOffset  = 0;
+    public boolean mColorEnabled = false;
+    public int     mColorSize    = 4;
+    public int     mColorType    = GL_UNSIGNED_BYTE;
+    public int     mColorStride  = 0;
+    public int     mColorOffset  = 0;
 
-    private boolean mIndexEnabled = false;
-    private int     mIndexType    = GL_UNSIGNED_INT;
-    private int     mIndexStride  = 4;
+    public boolean mIndexEnabled = false;
+    public int     mIndexType    = GL_UNSIGNED_INT;
+    public int     mIndexStride  = 4;
 
-    private boolean mCommandEnabled = false;
-    private int     mCommandMode    = GL_TRIANGLES;
-    private int     mCommandOffset  = 0;
-    private int     mCommandCount   = 0;
-
-
-    private DrawBufferParams() {}
+    public boolean mCommandEnabled = false;
+    public int     mCommandMode    = GL_TRIANGLES;
+    public int     mCommandOffset  = 0;
+    public int     mCommandCount   = 0;
 
 
-    private DrawBufferParams( DrawBufferParams copy ) {
+    public DrawBufferParams() {}
+
+
+    public DrawBufferParams( DrawBufferParams copy ) {
         mVertEnabled = copy.mVertEnabled;
         mVertSize = copy.mVertSize;
         mVertType = copy.mVertType;
@@ -332,6 +326,10 @@ public class DrawBufferParams {
         mIndexEnabled = false;
     }
 
+
+    @Deprecated public static DrawBufferParams newInstance() {
+        return new DrawBufferParams();
+    }
 
 }
 

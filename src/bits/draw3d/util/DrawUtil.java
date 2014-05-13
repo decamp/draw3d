@@ -1,6 +1,8 @@
 package bits.draw3d.util;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.glu.GLU;
+
 import static javax.media.opengl.GL.*;
 
 import com.sun.opengl.util.GLUT;
@@ -10,10 +12,11 @@ import com.sun.opengl.util.GLUT;
  * @author decamp
  */
 public class DrawUtil {
-    
+
+    public static final GLU  GLU  = new GLU();
     public static final GLUT GLUT = new GLUT();
-    
-    
+
+
     public static void pushIdentity( GL gl ) {
         gl.glMatrixMode( GL_PROJECTION );
         gl.glPushMatrix();
@@ -22,16 +25,16 @@ public class DrawUtil {
         gl.glPushMatrix();
         gl.glLoadIdentity();
     }
-    
-    
+
+
     public static void popStacks( GL gl ) {
         gl.glMatrixMode( GL_PROJECTION );
         gl.glPopMatrix();
         gl.glMatrixMode( GL_MODELVIEW );
         gl.glPopMatrix();
     }
-    
-    
+
+
     public static void drawNormQuad( GL gl ) {
         gl.glBegin( GL_QUADS );
         gl.glTexCoord2i( 0, 0 );
@@ -44,6 +47,5 @@ public class DrawUtil {
         gl.glVertex2i( -1, 1 );
         gl.glEnd();
     }
-    
 
 }

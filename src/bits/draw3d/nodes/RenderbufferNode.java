@@ -8,13 +8,7 @@ import static javax.media.opengl.GL.*;
  */
 public class RenderbufferNode implements TextureNode {
     
-    
-    public static RenderbufferNode newInstance() {
-        return new RenderbufferNode();
-    }
-    
-    
-    private final int[] mId = {0};
+    private final int[] mId = { 0 };
     
     private int mIntFormat  = GL_RGBA;
     private int mWidth  = -1;
@@ -27,9 +21,8 @@ public class RenderbufferNode implements TextureNode {
     private final int[] mRevert = {0};
     
     
-    private RenderbufferNode() {}
-    
-    
+    public RenderbufferNode() {}
+
     
     public int target() {
         return GL_RENDERBUFFER_EXT;
@@ -197,6 +190,11 @@ public class RenderbufferNode implements TextureNode {
                 }
             }
         }
+    }
+
+
+    @Deprecated public static RenderbufferNode newInstance() {
+        return new RenderbufferNode();
     }
 
 }

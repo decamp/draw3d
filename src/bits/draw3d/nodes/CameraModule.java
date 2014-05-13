@@ -14,10 +14,10 @@ import bits.math3d.camera.*;
 public class CameraModule implements RenderModule {
 
     
-    public static CameraModule newInstance( SpatialObject  optCamera,     
-                                            ViewFunc       optView, 
-                                            ProjectionFunc optProj, 
-                                            ViewportFunc   optViewport ) 
+    @Deprecated public static CameraModule newInstance( SpatialObject  optCamera,
+                                                        ViewFunc       optView,
+                                                        ProjectionFunc optProj,
+                                                        ViewportFunc   optViewport )
     {
         return new CameraModule( optCamera, optView, optProj, optViewport );
     }
@@ -30,7 +30,7 @@ public class CameraModule implements RenderModule {
     private final Map<RenderTile,CameraNode> mNodeMap = new LinkedHashMap<RenderTile,CameraNode>();
     
         
-    private CameraModule( SpatialObject camera, ViewFunc view, ProjectionFunc proj, ViewportFunc viewport ) {
+    public CameraModule( SpatialObject camera, ViewFunc view, ProjectionFunc proj, ViewportFunc viewport ) {
         mCamera       = camera == null ? new SpatialObject() : camera;
         mViewFunc     = view;
         mProjFunc     = proj;

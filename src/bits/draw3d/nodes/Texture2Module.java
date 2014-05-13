@@ -1,19 +1,17 @@
 package bits.draw3d.nodes;
 
-import static javax.media.opengl.GL.*;
-
-import java.util.*;
-import java.nio.*;
-import java.awt.image.BufferedImage;
-
 import bits.draw3d.context.RenderTile;
+import bits.draw3d.util.Images;
 
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 
 /**
  * @author decamp
  */
-public class BufferedTexture2dModule implements RenderModule {
+public class Texture2Module implements RenderModule {
 
     private ByteBuffer mBuf = null;
     private int mIntFormat  = 0;
@@ -22,19 +20,20 @@ public class BufferedTexture2dModule implements RenderModule {
     private int mWidth      = -1;
     private int mHeight     = -1;
 
-    private final Map<Integer,Integer>        mParams = new HashMap<Integer,Integer>();
-    private final List<BufferedTexture2dNode> mNodes  = new ArrayList<BufferedTexture2dNode>();
+    private final Map<Integer,Integer> mParams = new HashMap<Integer,Integer>();
+    private final List<Texture2Node>   mNodes  = new ArrayList<Texture2Node>();
 
 
-    public BufferedTexture2dModule() {}
+    public Texture2Module() {}
 
 
     public void buffer( BufferedImage image ) {
         if( image == null ) {
             buffer( null, 0, 0, 0, -1, -1 );
         } else {
-            ByteBuffer buf = BufferedTexture2dNode.toDirectBuffer( image );
-            buffer( buf, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, image.getWidth(), image.getHeight() );
+            int[] format = new int[4];
+            ByteBuffer buf = Images.imageToByteBuffer( image, format );
+            buffer( buf, format[0], format[1], format[2], image.getWidth(), image.getHeight() );
         }
     }
 
@@ -53,7 +52,7 @@ public class BufferedTexture2dModule implements RenderModule {
         mWidth     = w;
         mHeight    = h;
         
-        for( BufferedTexture2dNode n : mNodes ) {
+        for( Texture2Node n : mNodes ) {
             n.buffer( buf, intFormat, format, dataType, w, h );
         }
     }
@@ -63,7 +62,7 @@ public class BufferedTexture2dModule implements RenderModule {
         Integer k = key;
         Integer v = value;
          mParams.put( k, v );
-        for( BufferedTexture2dNode node : mNodes ) {
+        for( Texture2Node node : mNodes ) {
             node.param( k, v );
         }
     }
@@ -74,7 +73,7 @@ public class BufferedTexture2dModule implements RenderModule {
             return null;
         }
         
-        BufferedTexture2dNode ret = new BufferedTexture2dNode();
+        Texture2Node ret = new Texture2Node();
         if( mBuf != null ) {
             ret.buffer( mBuf, mIntFormat, mFormat, mDataType, mWidth, mHeight );
         }
@@ -89,20 +88,20 @@ public class BufferedTexture2dModule implements RenderModule {
 
 
 
-    @Deprecated public static BufferedTexture2dModule newInstance() {
-        return new BufferedTexture2dModule();
+    @Deprecated public static Texture2Module newInstance() {
+        return new Texture2Module();
     }
 
 
-    @Deprecated public static BufferedTexture2dModule newInstance( BufferedImage im ) {
-        BufferedTexture2dModule ret = new BufferedTexture2dModule();
+    @Deprecated public static Texture2Module newInstance( BufferedImage im ) {
+        Texture2Module ret = new Texture2Module();
         ret.buffer( im );
         return ret;
     }
 
 
-    @Deprecated public static BufferedTexture2dModule newInstance( ByteBuffer buf, int intFormat, int format, int dataType, int w, int h ) {
-        BufferedTexture2dModule ret = new BufferedTexture2dModule();
+    @Deprecated public static Texture2Module newInstance( ByteBuffer buf, int intFormat, int format, int dataType, int w, int h ) {
+        Texture2Module ret = new Texture2Module();
         ret.buffer( buf, intFormat, format, dataType, w, h );
         return ret;
     }

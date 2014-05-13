@@ -132,36 +132,52 @@ public class Images {
      * GL compatible format. If so, it will dump the data directly without conversion
      * via <code>dataToByteBuffer</code>. If not, it will convert the image via
      * <code>imageToBgraBuffer</code>.
-     *  
-     * @param image
-     * @return
+     *
+     * @param optOutFormat  Holds GL enum values for buffe representation. See {@link #glFormatFor}.
+     * @return Directly allocated byte buffer holding image.
      */
-    public static ByteBuffer imageToByteBuffer( BufferedImage image, int[] outFormat ) {
-        if( outFormat == null ) {
-            outFormat = new int[4];
+    public static ByteBuffer imageToByteBuffer( BufferedImage image, int[] optOutFormat ) {
+        return imageToByteBuffer( image, null, optOutFormat );
+    }
+
+    /**
+     * Converts a BufferedImage to a directly allocated java.nio.ByteBuffer.
+     * This method will first check to see if the image can be ported directly to a
+     * GL compatible format. If so, it will dump the data directly without conversion
+     * via <code>dataToByteBuffer</code>. If not, it will convert the image via
+     * <code>imageToBgraBuffer</code>.
+     *
+     * @param optOutFormat  Holds GL enum values for buffe representation. See {@link #glFormatFor}.
+     * @param optWorkspace  Optional array that may be used if <code>workSpace.length &gt;= image.getWidth()</code>.
+     * @return Directly allocated byte buffer holding image.
+     */
+    public static ByteBuffer imageToByteBuffer( BufferedImage image, int[] optWorkspace, int[] optOutFormat ) {
+
+        if( optOutFormat == null || optOutFormat.length < 4 ) {
+            optOutFormat = new int[4];
         }
         
-        if( !glFormatFor( image, outFormat ) ) {
-            outFormat[0] = GL_RGBA;
-            outFormat[1] = GL_BGRA;
-            outFormat[2] = GL_UNSIGNED_BYTE;
-            outFormat[3] = 0;
-            return imageToBgraBuffer( image, null );
+        if( !glFormatFor( image, optOutFormat ) ) {
+            optOutFormat[0] = GL_RGBA;
+            optOutFormat[1] = GL_BGRA;
+            optOutFormat[2] = GL_UNSIGNED_BYTE;
+            optOutFormat[3] = 0;
+            return imageToBgraBuffer( image, optWorkspace );
         }
 
         ByteOrder order;
         
-        if( outFormat[2] == GL_UNSIGNED_BYTE || outFormat[2] == GL_BYTE ) {
-            order = outFormat[3] == 0 ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+        if( optOutFormat[2] == GL_UNSIGNED_BYTE || optOutFormat[2] == GL_BYTE ) {
+            order = optOutFormat[3] == 0 ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
         } else {
-            if( outFormat[3] == 0 ) {
+            if( optOutFormat[3] == 0 ) {
                 order = ByteOrder.nativeOrder();
             } else {
-                outFormat[0] = GL_RGBA;
-                outFormat[1] = GL_BGRA;
-                outFormat[2] = GL_UNSIGNED_BYTE;
-                outFormat[3] = 0;
-                return imageToBgraBuffer( image, null );
+                optOutFormat[0] = GL_RGBA;
+                optOutFormat[1] = GL_BGRA;
+                optOutFormat[2] = GL_UNSIGNED_BYTE;
+                optOutFormat[3] = 0;
+                return imageToBgraBuffer( image, optWorkspace );
             }
         }
         

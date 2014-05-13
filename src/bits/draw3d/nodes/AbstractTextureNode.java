@@ -141,7 +141,6 @@ abstract class AbstractTextureNode implements TextureNode {
     
     public void param( int key, int value ) {
         Integer prev = mParams.put( key, value );
-        
         if( prev == null || prev.intValue() != value ) {
             fireInit();
         }

@@ -13,36 +13,55 @@ import javax.media.opengl.GLAutoDrawable;
 public class DrawNodeList implements DrawNode {
 
 
-    public static DrawNodeList newDepthFirst( Collection<DrawNode> actions ) {
+    public static DrawNodeList createDepthFirst( Collection<DrawNode> actions ) {
         return new DrawNodeList( new ArrayList<DrawNode>( actions ), true );
     }
 
 
-    public static DrawNodeList newDepthFirst( DrawNode... actions ) {
+    public static DrawNodeList createDepthFirst( DrawNode... actions ) {
         return new DrawNodeList( Arrays.asList( actions ), true );
     }
 
 
-    public static DrawNodeList newBreadthFirst( Collection<DrawNode> actions ) {
+    public static DrawNodeList createBreadthFirst( Collection<DrawNode> actions ) {
         return new DrawNodeList( new ArrayList<DrawNode>( actions ), false );
     }
 
 
-    public static DrawNodeList newBreadthFirst( DrawNode... actions ) {
+    public static DrawNodeList createBreadthFirst( DrawNode... actions ) {
         return new DrawNodeList( Arrays.asList( actions ), false );
     }
-    
+
 
 
     private final List<DrawNode> mActions;
     private final boolean mDepthFirst;
 
-    
+
     private DrawNodeList( List<DrawNode> actions, boolean depthFirst ) {
         mActions = actions;
         mDepthFirst = depthFirst;
     }
 
+
+    public boolean isDepthFirst() {
+        return mDepthFirst;
+    }
+
+
+    public boolean isBreadthFirst() {
+        return !mDepthFirst;
+    }
+
+
+    public void add( DrawNode node ) {
+        mActions.add( node );
+    }
+
+
+    public void remove( DrawNode node ) {
+        mActions.remove( node );
+    }
 
 
     public void init( GLAutoDrawable gld ) {
@@ -88,29 +107,45 @@ public class DrawNodeList implements DrawNode {
         }
     }
 
-    
-    
 
-    @Deprecated
-    public static DrawNodeList newDepthFirstInstance( Collection<DrawNode> actions ) {
+
+    @Deprecated public static DrawNodeList newDepthFirst( Collection<DrawNode> actions ) {
         return new DrawNodeList( new ArrayList<DrawNode>( actions ), true );
     }
 
-    @Deprecated
-    public static DrawNodeList newDepthFirstInstance( DrawNode... actions ) {
+
+    @Deprecated public static DrawNodeList newDepthFirst( DrawNode... actions ) {
         return new DrawNodeList( Arrays.asList( actions ), true );
     }
 
-    @Deprecated
-    public static DrawNodeList newBreadthFirstInstance( Collection<DrawNode> actions ) {
+
+    @Deprecated public static DrawNodeList newBreadthFirst( Collection<DrawNode> actions ) {
         return new DrawNodeList( new ArrayList<DrawNode>( actions ), false );
     }
 
-    @Deprecated
-    public static DrawNodeList newBreadthFirstInstance( DrawNode... actions ) {
+
+    @Deprecated public static DrawNodeList newBreadthFirst( DrawNode... actions ) {
         return new DrawNodeList( Arrays.asList( actions ), false );
     }
-    
 
+
+    @Deprecated public static DrawNodeList newDepthFirstInstance( Collection<DrawNode> actions ) {
+        return new DrawNodeList( new ArrayList<DrawNode>( actions ), true );
+    }
+
+
+    @Deprecated public static DrawNodeList newDepthFirstInstance( DrawNode... actions ) {
+        return new DrawNodeList( Arrays.asList( actions ), true );
+    }
+
+
+    @Deprecated public static DrawNodeList newBreadthFirstInstance( Collection<DrawNode> actions ) {
+        return new DrawNodeList( new ArrayList<DrawNode>( actions ), false );
+    }
+
+
+    @Deprecated public static DrawNodeList newBreadthFirstInstance( DrawNode... actions ) {
+        return new DrawNodeList( Arrays.asList( actions ), false );
+    }
     
 }

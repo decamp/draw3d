@@ -6,16 +6,11 @@ import javax.media.opengl.GL;
 
 /**
  * @author decamp
+ * @deprecated Use {@link Texture1Node}.
  */
-public class Texture1dNode extends AbstractTextureNode {
+@Deprecated public class Texture1dNode extends AbstractTextureNode {
     
-    
-    public static Texture1dNode newInstance() {
-        return new Texture1dNode();
-    }
-    
-    
-    Texture1dNode() {
+    public Texture1dNode() {
         super( GL_TEXTURE_1D, GL_TEXTURE_BINDING_1D );
         param( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         param( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -32,6 +27,11 @@ public class Texture1dNode extends AbstractTextureNode {
                        format(),
                        dataType(),
                        null );
+    }
+
+
+    @Deprecated public static Texture1dNode newInstance() {
+        return new Texture1dNode();
     }
 
 }

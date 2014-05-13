@@ -12,12 +12,6 @@ import static javax.media.opengl.GL.*;
  */
 public class FogNode extends DrawNodeAdapter {
 
-
-    public static FogNode newInstance() {
-        return new FogNode();
-    }
-
-
     private final int[] mStateInt     = { 1, GL_EXP };
     private final float[] mStateFloat = { 1f, 0f, 1f, 0f, 0f, 0f, 0f };
     private final int[] mRevertInt;
@@ -164,5 +158,11 @@ public class FogNode extends DrawNodeAdapter {
         gl.glFogfv( GL_FOG_END,     floats, 2 );
         gl.glFogfv( GL_FOG_COLOR,   floats, 3 );
     }
-    
+
+
+    @Deprecated public static FogNode newInstance() {
+        return new FogNode();
+    }
+
+
 }

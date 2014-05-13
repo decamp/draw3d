@@ -11,11 +11,6 @@ import static javax.media.opengl.GL.*;
 public final class FramebufferNode implements DrawNode {
     
     
-    public static FramebufferNode newInstance() {
-        return new FramebufferNode();
-    }
-    
-    
     private final int[] mId = { 0 };
     
     private int mWidth  = -1;
@@ -28,7 +23,7 @@ public final class FramebufferNode implements DrawNode {
     private boolean mNeedsInit  = true;
     
     
-    private FramebufferNode() {}
+    public FramebufferNode() {}
         
     
     public void attach( int attachment, TextureNode node ) {
@@ -331,5 +326,11 @@ public final class FramebufferNode implements DrawNode {
         
         gl.glBindFramebufferEXT( GL_READ_FRAMEBUFFER_EXT, stack.mReadId );
     }
-    
+
+
+    public static FramebufferNode newInstance() {
+        return new FramebufferNode();
+    }
+
+
 }

@@ -12,7 +12,6 @@ import bits.draw3d.model.*;
 import static javax.media.opengl.GL.*;
 
 
-
 /**
  * Renders a given model.
  * 
@@ -21,7 +20,7 @@ import static javax.media.opengl.GL.*;
 public class TrianglesNode implements RenderModule {
 
 
-    public static TrianglesNode newInstance( List<Triangle> trianglesRef, boolean useBuffer ) {
+    public static TrianglesNode create( List<Triangle> trianglesRef, boolean useBuffer ) {
         int texOffset   = 0;
         int normOffset  = 0;
         int colorOffset = 0;
@@ -40,17 +39,14 @@ public class TrianglesNode implements RenderModule {
 
 
         int vertBytes = 12;
-
         if( texOffset >= 0 ) {
             texOffset = vertBytes;
             vertBytes += 8;
         }
-
         if( normOffset >= 0 ) {
             normOffset = vertBytes;
             vertBytes += 12;
         }
-
         if( colorOffset >= 0 ) {
             colorOffset = vertBytes;
             vertBytes += 4;
@@ -58,7 +54,6 @@ public class TrianglesNode implements RenderModule {
 
         ByteBuffer buffer = null;
         DrawBufferParams params = null;
-
 
         if( useBuffer ) {
             int vertCount = trianglesRef.size() * 3;
@@ -100,138 +95,77 @@ public class TrianglesNode implements RenderModule {
             b.flip();
             buffer = b;
 
-            params = DrawBufferParams.newInstance();
-            params.enableVertexPointer( 3, GL_FLOAT, vertBytes, 0 );
+            params = new DrawBufferParams();
+            params.verts( 3, GL_FLOAT, vertBytes, 0 );
 
             if( texOffset >= 0 ) {
-                params.enableTexPointer( 2, GL_FLOAT, vertBytes, texOffset );
+                params.texs( 2, GL_FLOAT, vertBytes, texOffset );
             }
 
             if( normOffset >= 0 ) {
-                params.enableNormPointer( GL_FLOAT, vertBytes, normOffset );
+                params.norms( GL_FLOAT, vertBytes, normOffset );
             }
 
             if( colorOffset >= 0 ) {
-                params.enableColorPointer( 4, GL_UNSIGNED_BYTE, vertBytes, colorOffset );
+                params.colors( 4, GL_UNSIGNED_BYTE, vertBytes, colorOffset );
             }
 
-            params.enableCommand( GL_TRIANGLES, 0, vertCount );
+            params.command( GL_TRIANGLES, 0, vertCount );
         }
 
-        return new TrianglesNode( trianglesRef,
-                                  vertBytes,
-                                  texOffset,
-                                  normOffset,
-                                  colorOffset,
-                                  buffer,
-                                  params );
+        return new TrianglesNode( trianglesRef, buffer, params );
     }
 
 
     private final List<Triangle> mTriangles;
-
-    private final int mVertBytes;
-    // private final int mVertOffset;
-    private final int mTexOffset;
-    private final int mNormOffset;
-    private final int mColorOffset;
-
     private ByteBuffer mDrawBuffer;
     private DrawBufferParams mDrawParams;
     private TriangleRenderer mRenderer = null;
 
-    private boolean mTextureEnabled;
-    private boolean mColorEnabled;
-    private boolean mNormalEnabled;
-
 
     public TrianglesNode( List<Triangle> triangleRef,
-                          int vertBytes,
-                          int texOffset,
-                          int normOffset,
-                          int colorOffset,
                           ByteBuffer drawBuffer,
                           DrawBufferParams drawParams )
     {
         mTriangles = triangleRef;
-        mVertBytes = vertBytes;
-        mTexOffset = texOffset;
-        mNormOffset = normOffset;
-        mColorOffset = colorOffset;
         mDrawBuffer = drawBuffer;
         mDrawParams = drawParams;
-
-        guessParameters();
     }
 
 
-
-    public void guessParameters() {
-        mTextureEnabled = mTexOffset >= 0;
-        mColorEnabled = mColorOffset >= 0 && mTexOffset < 0;
-        mNormalEnabled = mNormOffset >= 0;
-        mRenderer = null;
-    }
-
-
-    public void setBindTextureCoords( boolean enable ) {
-        if( mTexOffset < 0 || mTextureEnabled == enable ) {
+    public void enableTextures( boolean enable ) {
+        enable &= mDrawParams.mTexSize > 0;
+        if( mDrawParams.mTexEnabled == enable ) {
             return;
         }
-
-        mTextureEnabled = enable;
+        mDrawParams.mTexEnabled = enable;
         mRenderer = null;
-
-        if( mDrawParams != null ) {
-            if( enable ) {
-                mDrawParams.enableTexPointer( 2, GL_FLOAT, mVertBytes, mTexOffset );
-            } else {
-                mDrawParams.disableTexPointer();
-            }
-        }
     }
 
 
-    public void setBindColors( boolean enable ) {
-        if( mColorOffset < 0 || mColorEnabled == enable ) {
+    public void enableColors( boolean enable ) {
+        enable &= mDrawParams.mColorSize > 0;
+        if( mDrawParams.mColorEnabled == enable ) {
             return;
         }
-
-        mColorEnabled = enable;
+        mDrawParams.mColorEnabled = enable;
         mRenderer = null;
-
-        if( mDrawParams != null ) {
-            if( enable ) {
-                mDrawParams.enableColorPointer( 4, GL_UNSIGNED_BYTE, mVertBytes, mColorOffset );
-            } else {
-                mDrawParams.disableColorPointer();
-            }
-        }
     }
 
 
-    public void setBindNormals( boolean enable ) {
-        if( mNormOffset < 0 || mNormalEnabled == enable ) {
+    public void enableNormals( boolean enable ) {
+        enable &= mDrawParams.mNormStride > 0;
+        if( mDrawParams.mNormEnabled == enable ) {
             return;
         }
-
-        mNormalEnabled = enable;
+        mDrawParams.mNormEnabled = enable;
         mRenderer = null;
-
-        if( mDrawParams != null ) {
-            if( enable ) {
-                mDrawParams.enableNormPointer( GL_FLOAT, mVertBytes, mNormOffset );
-            } else {
-                mDrawParams.disableNormPointer();
-            }
-        }
     }
 
 
     public List<Triangle> trianglesRef() {
         return mTriangles;
     }
-
 
 
     @Override
@@ -251,29 +185,29 @@ public class TrianglesNode implements RenderModule {
             return rend;
         }
 
-        if( mTextureEnabled ) {
-            if( mColorEnabled ) {
-                if( mNormalEnabled ) {
+        if( mDrawParams.mTexEnabled ) {
+            if( mDrawParams.mColorEnabled ) {
+                if( mDrawParams.mNormEnabled ) {
                     rend = new OnOnOnRenderer();
                 } else {
                     rend = new OnOnOffRenderer();
                 }
             } else {
-                if( mNormalEnabled ) {
+                if( mDrawParams.mNormEnabled ) {
                     rend = new OnOffOnRenderer();
                 } else {
                     rend = new OnOffOffRenderer();
                 }
             }
         } else {
-            if( mColorEnabled ) {
-                if( mNormalEnabled ) {
+            if( mDrawParams.mColorEnabled ) {
+                if( mDrawParams.mNormEnabled ) {
                     rend = new OffOnOnRenderer();
                 } else {
                     rend = new OffOnOffRenderer();
                 }
             } else {
-                if( mNormalEnabled ) {
+                if( mDrawParams.mNormEnabled ) {
                     rend = new OffOffOnRenderer();
                 } else {
                     rend = new OffOffOffRenderer();
@@ -460,6 +394,26 @@ public class TrianglesNode implements RenderModule {
                 }
             }
         }
+    }
+
+
+    @Deprecated public static TrianglesNode newInstance( List<Triangle> trianglesRef, boolean useBuffer ) {
+        return create( trianglesRef, useBuffer );
+    }
+
+
+    @Deprecated public void setBindTextureCoords( boolean enable ) {
+        enableTextures( enable );
+    }
+
+
+    @Deprecated public void setBindColors( boolean enable ) {
+        enableColors( enable );
+    }
+
+
+    @Deprecated public void setBindNormals( boolean enable ) {
+        enableNormals( enable );
     }
 
 }

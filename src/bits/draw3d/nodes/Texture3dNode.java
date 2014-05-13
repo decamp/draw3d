@@ -7,16 +7,12 @@ import javax.media.opengl.GL;
 
 /**
  * @author decamp
+ * @deprecated Use {@link Texture3Node}.
  */
 public final class Texture3dNode extends AbstractTextureNode {
     
     
-    public static Texture3dNode newInstance() {
-        return new Texture3dNode();
-    }
-
-    
-    private Texture3dNode() {
+    public Texture3dNode() {
         super( GL_TEXTURE_3D, GL_TEXTURE_BINDING_3D );
         param( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         param( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -36,5 +32,11 @@ public final class Texture3dNode extends AbstractTextureNode {
                          dataType(),
                          null );
     }
-    
+
+
+    @Deprecated public static Texture3dNode newInstance() {
+        return new Texture3dNode();
+    }
+
+
 }

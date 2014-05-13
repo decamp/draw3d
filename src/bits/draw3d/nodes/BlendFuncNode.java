@@ -9,11 +9,15 @@ import static javax.media.opengl.GL.*;
  */
 public class BlendFuncNode extends DrawNodeAdapter {
 
-    
-    public static BlendFuncNode newSrcOver() {
+
+    public static BlendFuncNode createSrcOver() {
         return new BlendFuncNode( true, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
     }
-    
+
+    @Deprecated public static BlendFuncNode newSrcOver() {
+        return new BlendFuncNode( true, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+    }
+
     
     private boolean mEnable;
     private int mSrcRgb;

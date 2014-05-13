@@ -278,7 +278,7 @@ public class BufferNode extends DrawNodeAdapter {
     {
         final ByteBuffer data = buffer == null ? null : buffer.duplicate();
         NodeFactory<DrawNode> factory = new NodeFactory<DrawNode>() {
-            public DrawNode newInstance( RenderTile tile ) {
+            public DrawNode create( RenderTile tile ) {
                 BufferNode ret = new BufferNode( type, getType, usage );
                 if( data != null ) {
                     ret.buffer( data );

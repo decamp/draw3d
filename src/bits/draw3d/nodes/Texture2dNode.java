@@ -6,16 +6,12 @@ import static javax.media.opengl.GL.*;
 
 /**
  * @author decamp
+ * @deprecated Use {@link Texture2Node}.
  */
-public class Texture2dNode extends AbstractTextureNode {
+@Deprecated public class Texture2dNode extends AbstractTextureNode {
     
-    
-    public static Texture2dNode newInstance() {
-        return new Texture2dNode();
-    }
-    
-    
-    Texture2dNode() {
+
+    public Texture2dNode() {
         super( GL_TEXTURE_2D, GL_TEXTURE_BINDING_2D );
         param( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         param( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -34,6 +30,10 @@ public class Texture2dNode extends AbstractTextureNode {
                        dataType(),
                        null );
     }
-    
-    
+
+
+    @Deprecated public static Texture2dNode newInstance() {
+        return new Texture2dNode();
+    }
+
 }

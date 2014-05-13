@@ -16,7 +16,7 @@ import static javax.media.opengl.GL.*;
 public final class DrawNodes {
     
 
-    public static DrawNode newEnableNode( final int glConstant ) {
+    public static DrawNode createEnable( final int glConstant ) {
         return new DrawNodeAdapter() {
             boolean mRevert = false;
 
@@ -39,7 +39,7 @@ public final class DrawNodes {
     }
 
 
-    public static DrawNode newDisableNode( final int glConstant ) {
+    public static DrawNode createDisable( final int glConstant ) {
         return new DrawNodeAdapter() {
             boolean mRevert = false;
 
@@ -60,7 +60,7 @@ public final class DrawNodes {
     }
 
 
-    public static DrawNode newDepthMaskNode( final boolean enable ) {
+    public static DrawNode createDepthMask( final boolean enable ) {
         return new DrawNodeAdapter() {
             byte[] mPrev = { 0 };
 
@@ -77,10 +77,10 @@ public final class DrawNodes {
     }
 
 
-    public static DrawNode newColorMaskNode( final boolean red,
-            final boolean green,
-            final boolean blue,
-            final boolean alpha )
+    public static DrawNode createColorMask( final boolean red,
+                                            final boolean green,
+                                            final boolean blue,
+                                            final boolean alpha )
     {
         return new DrawNodeAdapter() {
             private final byte[] mRevert = { 0, 0, 0, 0 };
@@ -102,7 +102,7 @@ public final class DrawNodes {
     }
 
 
-    public static DrawNode newPointSizeNode( final float size ) {
+    public static DrawNode createPointSize( final float size ) {
         return new DrawNodeAdapter() {
             float[] mRevert = { 1f };
 
@@ -118,7 +118,7 @@ public final class DrawNodes {
     }
 
 
-    public static DrawNode newLineWidthNode( final float width ) {
+    public static DrawNode createLineWidth( final float width ) {
         return new DrawNodeAdapter() {
             float[] mRevert = { 1f };
 
@@ -134,12 +134,12 @@ public final class DrawNodes {
     }
 
     
-    public static DrawNode newLoadIdentityNode() {
+    public static DrawNode createLoadIdentity() {
         return LOAD_IDENTITY;
     }
     
     
-    public static DrawNode newLoadMatrixNode( final int matrix, final double[] matRef ) {
+    public static DrawNode createLoadMatrix( final int matrix, final double[] matRef ) {
         return new DrawNodeAdapter() {
             @Override
             public void pushDraw( GL gl ) {
@@ -156,31 +156,29 @@ public final class DrawNodes {
         };
     }
     
-    
 
-    public static Object newMaterialNode( TextureNode tex, Material mat ) {
+    public static Object createMaterial( TextureNode tex, Material mat ) {
         if( tex == null ) {
             if( mat == null ) {
                 return null;
             }
-            return MaterialNode.newInstance( mat );
+            return new MaterialNode( mat );
 
         } else if( mat == null ) {
             return tex;
         }
 
-        return Arrays.<Object>asList( tex, MaterialNode.newInstance( mat ) );
+        return Arrays.<Object>asList( tex, new MaterialNode( mat ) );
     }
-
 
 
     public static <N> RenderModule factoryToModule( final Class<N> nodeClass, final NodeFactory<N> factory ) {
         return new RenderModule() {
             public Object getNodes( Class<?> clazz, RenderTile tile ) {
-                if( clazz != nodeClass )
+                if( clazz != nodeClass ) {
                     return null;
-
-                return factory.newInstance( tile );
+                }
+                return factory.create( tile );
             }
         };
     }
@@ -215,61 +213,69 @@ public final class DrawNodes {
 
     
     
-    
-    
 
     /**
      * @deprecated Use CullFaceNode class instance.
      */
-    public static DrawNode newCullFaceNode( final boolean enable, final int face ) {
-        return new DrawNodeAdapter() {
-            private boolean     mRevertEnable = false;
-            private final int[] mRevertFace   = { GL_BACK };
-
-            public void pushDraw( GL gl ) {
-                mRevertEnable = gl.glIsEnabled( GL_CULL_FACE );
-                gl.glGetIntegerv( GL_CULL_FACE_MODE, mRevertFace, 0 );
-
-                if( enable ) {
-                    gl.glEnable( GL_CULL_FACE );
-                } else {
-                    gl.glDisable( GL_CULL_FACE );
-                }
-
-                gl.glCullFace( face );
-            }
-
-
-            public void popDraw( GL gl ) {
-                if( mRevertEnable ) {
-                    gl.glEnable( GL_CULL_FACE );
-                } else {
-                    gl.glDisable( GL_CULL_FACE );
-                }
-
-                gl.glCullFace( mRevertFace[0] );
-            }
-        };
+    @Deprecated public static DrawNode newCullFaceNode( final boolean enable, final int face ) {
+        return new CullFaceNode( enable, face );
     }
 
     /**
-     * @deprecated use PolyOffsetNode class instead.
+     * @deprecated use OffsetNode class instead.
      */
-    public static DrawNode newPolygonOffsetNode( final float factor, final float units ) {
-        return new DrawNodeAdapter() {
-            private final float[] mRevert = { 0, 0 };
+    @Deprecated public static DrawNode newPolygonOffsetNode( final float factor, final float units ) {
+        return OffsetNode.createFillOffset( true, factor, units );
+   }
 
-            public void pushDraw( GL gl ) {
-                gl.glGetFloatv( GL_POLYGON_OFFSET_FACTOR, mRevert, 0 );
-                gl.glGetFloatv( GL_POLYGON_OFFSET_UNITS, mRevert, 1 );
-                gl.glPolygonOffset( factor, units );
-            }
 
-            public void popDraw( GL gl ) {
-                gl.glPolygonOffset( mRevert[0], mRevert[1] );
-            }
-        };
+
+    public static DrawNode newEnableNode( int glConstant ) {
+        return createEnable( glConstant );
     }
 
-    
+
+    public static DrawNode newDisableNode( int glConstant ) {
+        return createDisable( glConstant );
+    }
+
+
+    public static DrawNode newDepthMaskNode( boolean enable ) {
+        return createDepthMask( enable );
+    }
+
+
+    public static DrawNode newColorMaskNode( boolean red,
+                                             boolean green,
+                                             boolean blue,
+                                             final boolean alpha )
+    {
+        return createColorMask( red, green, blue, alpha );
+    }
+
+
+    public static DrawNode newPointSizeNode( float size ) {
+        return createPointSize( size );
+    }
+
+
+    public static DrawNode newLineWidthNode( float width ) {
+        return createLineWidth( width );
+    }
+
+
+    public static DrawNode newLoadIdentityNode() {
+        return LOAD_IDENTITY;
+    }
+
+
+    public static DrawNode newLoadMatrixNode( int matrix, double[] matRef ) {
+        return createLoadMatrix( matrix, matRef );
+    }
+
+
+    public static Object newMaterialNode( TextureNode tex, Material mat ) {
+        return createMaterial( tex, mat );
+    }
+
 }

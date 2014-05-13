@@ -47,11 +47,6 @@ public class CgShaderNode extends DrawNodeAdapter {
     }
 
 
-    public static CgShaderNode newInstance( int profile, CGprogram program ) {
-        return new CgShaderNode( profile, program );
-    }
-
-
 
     private final int mProfile;
     private final CGprogram mProgram;
@@ -59,7 +54,7 @@ public class CgShaderNode extends DrawNodeAdapter {
     private boolean mLoaded = false;
 
 
-    private CgShaderNode( int profile, CGprogram program ) {
+    public CgShaderNode( int profile, CGprogram program ) {
         mProfile = profile;
         mProgram = program;
     }
@@ -105,6 +100,11 @@ public class CgShaderNode extends DrawNodeAdapter {
     private void load() {
         CgGL.cgGLLoadProgram( mProgram );
         mLoaded = true;
+    }
+
+
+    @Deprecated public static CgShaderNode newInstance( int profile, CGprogram program ) {
+        return new CgShaderNode( profile, program );
     }
 
 }
