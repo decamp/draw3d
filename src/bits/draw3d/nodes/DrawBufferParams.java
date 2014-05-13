@@ -1,6 +1,7 @@
 package bits.draw3d.nodes;
 
 import static javax.media.opengl.GL.*;
+
 import javax.media.opengl.GL;
 
 
@@ -9,231 +10,328 @@ import javax.media.opengl.GL;
  */
 public class DrawBufferParams {
 
-    
+
     public static DrawBufferParams newInstance() {
         return new DrawBufferParams();
     }
-    
-    
-    public static DrawBufferParams copy(DrawBufferParams node) {
-        return new DrawBufferParams(node);
+
+
+    public static DrawBufferParams copy( DrawBufferParams node ) {
+        return new DrawBufferParams( node );
     }
 
-    
-    private boolean mVertEnabled  = false;
-    private int mVertSize         = 3;
-    private int mVertType         = GL_FLOAT;
-    private int mVertStride       = 0;
-    private int mVertOffset       = 0;
-    
-    private boolean mTexEnabled   = false;
-    private int mTexSize          = 2;
-    private int mTexType          = GL_FLOAT;
-    private int mTexStride        = 0;
-    private int mTexOffset        = 0;
-    
-    private boolean mNormEnabled  = false;
-    private int mNormType         = GL_FLOAT;
-    private int mNormStride       = 0;
-    private int mNormOffset       = 0;
-    
+
+    private boolean mVertEnabled = false;
+    private int     mVertSize    = 3;
+    private int     mVertType    = GL_FLOAT;
+    private int     mVertStride  = 0;
+    private int     mVertOffset  = 0;
+
+    private boolean mTexEnabled = false;
+    private int     mTexSize    = 2;
+    private int     mTexType    = GL_FLOAT;
+    private int     mTexStride  = 0;
+    private int     mTexOffset  = 0;
+
+    private boolean mNormEnabled = false;
+    private int     mNormType    = GL_FLOAT;
+    private int     mNormStride  = 0;
+    private int     mNormOffset  = 0;
+
     private boolean mColorEnabled = false;
-    private int mColorSize        = 4;
-    private int mColorType        = GL_UNSIGNED_BYTE;
-    private int mColorStride      = 0;
-    private int mColorOffset      = 0;
-    
-    private boolean mIndexEnabled = false;
-    private int mIndexType        = GL_UNSIGNED_INT;
-    private int mIndexStride      = 4;
-    
-    private boolean mCommandEnabled = false;
-    private int mCommandMode        = GL_TRIANGLES;
-    private int mCommandOffset      = 0;
-    private int mCommandCount       = 0;
-    
-    
-    private DrawBufferParams() {}
-    
-    
-    private DrawBufferParams(DrawBufferParams ref) {
-        mVertEnabled    = ref.mVertEnabled;
-        mVertSize       = ref.mVertSize;
-        mVertType       = ref.mVertType;
-        mVertStride     = ref.mVertStride;
-        mVertOffset     = ref.mVertOffset;
-        mTexEnabled     = ref.mTexEnabled;
-        mTexSize        = ref.mTexSize;
-        mTexStride      = ref.mTexStride;
-        mTexOffset      = ref.mTexOffset;
-        mNormEnabled    = ref.mNormEnabled;
-        mNormType       = ref.mNormType;
-        mNormStride     = ref.mNormStride;
-        mNormOffset     = ref.mNormOffset;
-        mColorEnabled   = ref.mColorEnabled;
-        mColorSize      = ref.mColorSize;
-        mColorType      = ref.mColorType;
-        mColorStride    = ref.mColorStride;
-        mColorOffset    = ref.mColorOffset;
-        mIndexEnabled   = ref.mIndexEnabled;
-        mIndexType      = ref.mIndexType;
-        mCommandEnabled = ref.mCommandEnabled;
-        mCommandMode    = ref.mCommandMode;
-        mCommandOffset  = ref.mCommandOffset;
-        mCommandCount   = ref.mCommandCount;
-    }
-    
+    private int     mColorSize    = 4;
+    private int     mColorType    = GL_UNSIGNED_BYTE;
+    private int     mColorStride  = 0;
+    private int     mColorOffset  = 0;
 
-    
-    public void enableCommand(int mode, int offset, int count) {
-        mCommandEnabled = true;
-        mCommandMode    = mode;
-        mCommandOffset  = offset;
-        mCommandCount   = count;
+    private boolean mIndexEnabled = false;
+    private int     mIndexType    = GL_UNSIGNED_INT;
+    private int     mIndexStride  = 4;
+
+    private boolean mCommandEnabled = false;
+    private int     mCommandMode    = GL_TRIANGLES;
+    private int     mCommandOffset  = 0;
+    private int     mCommandCount   = 0;
+
+
+    private DrawBufferParams() {}
+
+
+    private DrawBufferParams( DrawBufferParams copy ) {
+        mVertEnabled = copy.mVertEnabled;
+        mVertSize = copy.mVertSize;
+        mVertType = copy.mVertType;
+        mVertStride = copy.mVertStride;
+        mVertOffset = copy.mVertOffset;
+        mTexEnabled = copy.mTexEnabled;
+        mTexSize = copy.mTexSize;
+        mTexStride = copy.mTexStride;
+        mTexOffset = copy.mTexOffset;
+        mNormEnabled = copy.mNormEnabled;
+        mNormType = copy.mNormType;
+        mNormStride = copy.mNormStride;
+        mNormOffset = copy.mNormOffset;
+        mColorEnabled = copy.mColorEnabled;
+        mColorSize = copy.mColorSize;
+        mColorType = copy.mColorType;
+        mColorStride = copy.mColorStride;
+        mColorOffset = copy.mColorOffset;
+        mIndexEnabled = copy.mIndexEnabled;
+        mIndexType = copy.mIndexType;
+        mCommandEnabled = copy.mCommandEnabled;
+        mCommandMode = copy.mCommandMode;
+        mCommandOffset = copy.mCommandOffset;
+        mCommandCount = copy.mCommandCount;
     }
-    
-    
-    public void disableCommand() {
+
+
+
+    public void command( int mode, int offset, int count ) {
+        mCommandEnabled = true;
+        mCommandMode = mode;
+        mCommandOffset = offset;
+        mCommandCount = count;
+    }
+
+
+    public void noCommand() {
         mCommandEnabled = false;
     }
-    
-    
-    public void enableVertexPointer(int coordCount, int coordType, int stride, int offset) {
+
+
+    public void verts( int coordCount, int coordType, int stride, int offset ) {
         mVertEnabled = true;
-        mVertSize    = coordCount;
-        mVertType    = coordType;
-        mVertStride  = stride;
-        mVertOffset  = offset;
+        mVertSize = coordCount;
+        mVertType = coordType;
+        mVertStride = stride;
+        mVertOffset = offset;
     }
 
-    
-    public void disableVertexPointer() {
+
+    public void noVerts() {
         mVertEnabled = false;
     }
-    
-    
-    public void enableColorPointer(int coordCount, int coordType, int stride, int offset) {
+
+
+    public void colors( int coordCount, int coordType, int stride, int offset ) {
         mColorEnabled = true;
-        mColorSize    = coordCount;
-        mColorType    = coordType;
-        mColorStride  = stride;
-        mColorOffset  = offset;
+        mColorSize = coordCount;
+        mColorType = coordType;
+        mColorStride = stride;
+        mColorOffset = offset;
     }
 
-    
-    public void disableColorPointer() {
+
+    public void noColors() {
         mColorEnabled = false;
     }
-    
-    
-    public void enableNormPointer(int coordType, int stride, int offset) {
+
+
+    public void norms( int coordType, int stride, int offset ) {
         mNormEnabled = true;
         mNormType = coordType;
         mNormStride = stride;
         mNormOffset = offset;
     }
-    
-    
-    public void disableNormPointer() {
+
+
+    public void noNorms() {
         mNormEnabled = false;
     }
-        
-    
-    public void enableTexPointer(int coordCount, int coordType, int stride, int offset) {
+
+
+    public void texs( int coordCount, int coordType, int stride, int offset ) {
         mTexEnabled = true;
         mTexSize = coordCount;
         mTexType = coordType;
         mTexStride = stride;
         mTexOffset = offset;
     }
-    
-    
-    public void disableTexPointer() {
+
+
+    public void noTexs() {
         mTexEnabled = false;
     }
 
 
-    public void enableIndices(int indexType) {
-        
-        switch(indexType) {
+    public void elements( int indexType ) {
+        switch( indexType ) {
         case GL_UNSIGNED_BYTE:
             mIndexStride = 1;
             break;
-            
+
         case GL_UNSIGNED_SHORT:
             mIndexStride = 2;
             break;
-            
+
         case GL_UNSIGNED_INT:
             mIndexStride = 4;
             break;
-            
+
         default:
-            throw new IllegalArgumentException("indexType must be GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT");
+            throw new IllegalArgumentException(
+                    "indexType must be GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT" );
         }
-        
+
         mIndexEnabled = true;
-        mIndexType    = indexType;
+        mIndexType = indexType;
     }
-    
-    
-    public void disableIndices() {
+
+
+    public void noElements() {
         mIndexEnabled = false;
     }
 
-    
-    
-   
-    
-    public void push(GL gl) {
-        if(mVertEnabled) {
-            gl.glEnableClientState(GL_VERTEX_ARRAY);
-            gl.glVertexPointer(mVertSize, mVertType, mVertStride, mVertOffset);
+
+    public void push( GL gl ) {
+        if( mVertEnabled ) {
+            gl.glEnableClientState( GL_VERTEX_ARRAY );
+            gl.glVertexPointer( mVertSize, mVertType, mVertStride, mVertOffset );
         }
-        
-        if(mColorEnabled) {
-            gl.glEnableClientState(GL_COLOR_ARRAY);
-            gl.glColorPointer(mColorSize, mColorType, mColorStride, mColorOffset);
+
+        if( mColorEnabled ) {
+            gl.glEnableClientState( GL_COLOR_ARRAY );
+            gl.glColorPointer( mColorSize, mColorType, mColorStride, mColorOffset );
         }
-        
-        if(mTexEnabled) {
-            gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            gl.glTexCoordPointer(mTexSize, mTexType, mTexStride, mTexOffset);
+
+        if( mTexEnabled ) {
+            gl.glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+            gl.glTexCoordPointer( mTexSize, mTexType, mTexStride, mTexOffset );
         }
-        
-        if(mNormEnabled) {
-            gl.glEnableClientState(GL_NORMAL_ARRAY);
-            gl.glNormalPointer(mNormType, mNormStride, mNormOffset);
+
+        if( mNormEnabled ) {
+            gl.glEnableClientState( GL_NORMAL_ARRAY );
+            gl.glNormalPointer( mNormType, mNormStride, mNormOffset );
         }
-    }
-                                 
-                                 
-    public void pop(GL gl) {
-        gl.glDisableClientState(GL_COLOR_ARRAY);
-        gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        gl.glDisableClientState(GL_NORMAL_ARRAY);
     }
 
-    
-    public void execute(GL gl) {
-        if(!mCommandEnabled)
+
+    public void pop( GL gl ) {
+        gl.glDisableClientState( GL_COLOR_ARRAY );
+        gl.glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+        gl.glDisableClientState( GL_NORMAL_ARRAY );
+    }
+
+
+    public void execute( GL gl ) {
+        if( !mCommandEnabled ) {
             return;
+        }
 
-        if(mIndexEnabled) {
-            gl.glDrawElements(mCommandMode, mCommandCount, mIndexType, mCommandOffset * mIndexStride);
-        }else{
-            gl.glDrawArrays(mCommandMode, mCommandOffset, mCommandCount);
+        if( mIndexEnabled ) {
+            gl.glDrawElements( mCommandMode, mCommandCount, mIndexType, mCommandOffset * mIndexStride );
+        } else {
+            gl.glDrawArrays( mCommandMode, mCommandOffset, mCommandCount );
         }
     }
-    
-    
-    public void execute(GL gl, int mode, int offset, int count) {
-        if(mIndexEnabled) {
-            gl.glDrawElements(mode, count, mIndexType, offset * mIndexStride);
-        }else{
-            gl.glDrawArrays(mode, offset, count);
+
+
+    public void execute( GL gl, int mode, int offset, int count ) {
+        if( mIndexEnabled ) {
+            gl.glDrawElements( mode, count, mIndexType, offset * mIndexStride );
+        } else {
+            gl.glDrawArrays( mode, offset, count );
         }
     }
-    
+
+
+    @Deprecated public void enableCommand( int mode, int offset, int count ) {
+        mCommandEnabled = true;
+        mCommandMode = mode;
+        mCommandOffset = offset;
+        mCommandCount = count;
+    }
+
+
+    @Deprecated public void disableCommand() {
+        mCommandEnabled = false;
+    }
+
+
+    @Deprecated public void enableVertexPointer( int coordCount, int coordType, int stride, int offset ) {
+        mVertEnabled = true;
+        mVertSize = coordCount;
+        mVertType = coordType;
+        mVertStride = stride;
+        mVertOffset = offset;
+    }
+
+
+    @Deprecated public void disableVertexPointer() {
+        mVertEnabled = false;
+    }
+
+
+    @Deprecated public void enableColorPointer( int coordCount, int coordType, int stride, int offset ) {
+        mColorEnabled = true;
+        mColorSize = coordCount;
+        mColorType = coordType;
+        mColorStride = stride;
+        mColorOffset = offset;
+    }
+
+
+    @Deprecated public void disableColorPointer() {
+        mColorEnabled = false;
+    }
+
+
+    @Deprecated public void enableNormPointer( int coordType, int stride, int offset ) {
+        mNormEnabled = true;
+        mNormType = coordType;
+        mNormStride = stride;
+        mNormOffset = offset;
+    }
+
+
+    @Deprecated public void disableNormPointer() {
+        mNormEnabled = false;
+    }
+
+
+    @Deprecated public void enableTexPointer( int coordCount, int coordType, int stride, int offset ) {
+        mTexEnabled = true;
+        mTexSize = coordCount;
+        mTexType = coordType;
+        mTexStride = stride;
+        mTexOffset = offset;
+    }
+
+
+    @Deprecated public void disableTexPointer() {
+        mTexEnabled = false;
+    }
+
+
+    @Deprecated public void enableIndices( int indexType ) {
+
+        switch( indexType ) {
+        case GL_UNSIGNED_BYTE:
+            mIndexStride = 1;
+            break;
+
+        case GL_UNSIGNED_SHORT:
+            mIndexStride = 2;
+            break;
+
+        case GL_UNSIGNED_INT:
+            mIndexStride = 4;
+            break;
+
+        default:
+            throw new IllegalArgumentException(
+                    "indexType must be GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT" );
+        }
+
+        mIndexEnabled = true;
+        mIndexType = indexType;
+    }
+
+
+    @Deprecated public void disableIndices() {
+        mIndexEnabled = false;
+    }
+
+
 }
 

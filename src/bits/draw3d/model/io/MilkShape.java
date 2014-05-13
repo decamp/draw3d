@@ -339,36 +339,39 @@ public class MilkShape {
         List<Group> groups = model.getGroupsRef();
         buf.putShort( (short)groups.size() );
 
-        for( int i = 0; i < groups.size(); i++ ) {
-
+        for( Group group : groups ) {
             if( buf.remaining() < 128 ) {
                 buf.flip();
                 writeBuf( buf, out );
                 buf.clear();
             }
 
-            Group group = groups.get( i );
             buf.put( (byte)0 );
             putName( group.getName(), 32, buf );
 
-            List<Triangle> tri = group.getTriangles();
-            buf.putShort( (short)tri.size() );
+            List<Triangle> tris = group.getTriangles();
+            buf.putShort( (short)tris.size() );
 
-            for( int j = 0; j < tri.size(); j++ ) {
+            for( Triangle tri : tris ) {
                 if( buf.remaining() < 128 ) {
                     buf.flip();
                     writeBuf( buf, out );
                     buf.clear();
                 }
 
-                buf.putShort( triangles.get( tri.get( j ) ).shortValue() );
+                buf.putShort( triangles.get( tri ).shortValue() );
             }
 
-            Material mat = group.getMaterial();
+            ModelMaterial mat = group.createModelMaterial();
             if( mat == null ) {
                 buf.put( (byte)-1 );
             } else {
-                buf.put( materials.get( mat ).byteValue() );
+                Integer index = materials.get( mat );
+                if( index == null ) {
+                    buf.put( (byte)-1 );
+                } else {
+                    buf.put( index.byteValue() );
+                }
             }
         }
 
@@ -383,7 +386,7 @@ public class MilkShape {
                                        ByteBuffer buf,
                                        FileChannel out,
                                        File outDir )
-                                                    throws IOException
+                                       throws IOException
     {
 
         SortedMap<Integer, ModelMaterial> map = new TreeMap<Integer, ModelMaterial>();

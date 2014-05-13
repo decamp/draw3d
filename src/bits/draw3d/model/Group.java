@@ -57,7 +57,6 @@ public class Group {
     }
 
 
-
     public void setMaterial( Material mat ) {
         mMaterial = mat;
     }
@@ -82,8 +81,6 @@ public class Group {
 
     /**
      * Sets list of triangles, making a defensive copy.
-     * 
-     * @param tris
      */
     public void setTriangles( List<Triangle> tris ) {
         if( tris == null )
@@ -94,11 +91,14 @@ public class Group {
 
     /**
      * Sets list of triangles without making a defensive copy.
-     * 
-     * @param tris
      */
     public void setTrianglesRef( List<Triangle> tris ) {
         mTriangles = ( tris == null ? new ArrayList<Triangle>() : tris );
+    }
+
+
+    public ModelMaterial createModelMaterial() {
+        return new ModelMaterial( mTex, mMaterial );
     }
 
 }
