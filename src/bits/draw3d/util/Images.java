@@ -113,16 +113,16 @@ public class Images {
         int w = image.getWidth();
         int h = image.getHeight();
         int[] row = workSpace != null && workSpace.length >= w ? workSpace : new int[w];
-        
+
         ByteBuffer ret = ByteBuffer.allocateDirect( ( w * h ) * 4 );
         ret.order( ByteOrder.LITTLE_ENDIAN );
         IntBuffer ib = ret.asIntBuffer();
-        
+
         for( int i = 0; i < h; i++ ) {
             image.getRGB( 0, i, w, 1, row, 0, w );
             ib.put( row, 0, w );
         }
-        
+
         return ret;
     }
     
@@ -186,8 +186,6 @@ public class Images {
     
     /**
      * Converts a DataBuffer to a directly allocated java.nio.ByteBuffer.
-     * @param image
-     * @return
      */
     public static ByteBuffer dataToByteBuffer( DataBuffer in, ByteOrder order ) {
         int type      = in.getDataType();
@@ -509,10 +507,10 @@ public class Images {
         if( optWork == null || optWork.length < w ) {
             optWork = new int[w];
         }
-        
+
         for( int y = 0; y < h; y++ ) {
             image.getRGB( 0, y, w, 1, optWork, 0, w );
-        
+
             for( int x = 0; x < w; x++ ) {
                 int v = optWork[x];
                 int r = v >> 16 & 0xFF;
@@ -520,9 +518,9 @@ public class Images {
                 int b = v       & 0xFF;
                 optWork[x] = v & 0x00FFFFFF | ( r + g + b ) / 3 << 24;
             }
-            
+
             image.setRGB( 0, y, w, 1, optWork, 0, w );
-       }
+        }
     }
     
     
@@ -537,6 +535,28 @@ public class Images {
             image.getRGB( 0, y, w, 1, optWork, 0, w );
             for( int x = 0; x < w; x++ ) {
                 optWork[x] = ( optWork[x] >>> 24 ) * 0x01010101;
+            }
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+    }
+
+
+    public static void multRgb( BufferedImage image, int value, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                int v = optWork[x];
+                int a = v >>> 24;
+                int r = ( v >> 16 & 0xFF ) * value / 0xFF;
+                int g = ( v >>  8 & 0xFF ) * value / 0xFF;
+                int b = ( v       & 0xFF ) * value / 0xFF;
+                optWork[x] = a << 24 | r << 16 | g << 8 | b;
             }
             image.setRGB( 0, y, w, 1, optWork, 0, w );
         }
@@ -601,8 +621,7 @@ public class Images {
         }
     }
 
-    
-    
+
     public static void fillTransparentRgb( BufferedImage image, int rgb, int[] optWork ) {
         final int w = image.getWidth();
         final int h = image.getHeight();
@@ -621,7 +640,29 @@ public class Images {
             image.setRGB( 0, y, w, 1, optWork, 0, w );
         }
     }
-    
+
+
+    public static void desaturate( BufferedImage image, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < w ) {
+            optWork = new int[w];
+        }
+
+        for( int y = 0; y < h; y++ ) {
+            image.getRGB( 0, y, w, 1, optWork, 0, w );
+            for( int x = 0; x < w; x++ ) {
+                int v = optWork[x];
+                int r = v >> 16 & 0xFF;
+                int g = v >>  8 & 0xFF;
+                int b = v       & 0xFF;
+                optWork[x] = v & 0xFF000000 | ( ( r + g + b ) / 3 * 0x00010101 );
+            }
+
+            image.setRGB( 0, y, w, 1, optWork, 0, w );
+        }
+    }
+
     
     public static void swapRedBlue( BufferedImage image, int[] optWork ) {
         final int w = image.getWidth();

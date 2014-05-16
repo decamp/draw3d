@@ -1,8 +1,10 @@
 package bits.draw3d.nodes;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import static javax.media.opengl.GL.*;
 
 import bits.blob.Blob;
 import bits.draw3d.model.*;
@@ -76,18 +78,23 @@ public class ModelGraphBuilder {
 
     public void addModel( MeshModel model ) {
         for( Group g : model.getGroupsRef() ) {
-            GroupInfo info = new GroupInfo();
-            info.mTriangles = g.getTriangles();
-            info.mMaterial = g.getMaterial();
+            addModelGroup( g );
+       }
+    }
 
-            mGroupList.add( info );
-        }
+
+    public void addModelGroup( Group group ) {
+        GroupInfo info  = new GroupInfo();
+        info.mTriangles = group.getTriangles();
+        info.mMaterial  = group.getMaterial();
+        info.mTexture   = group.getTexture();
+        mGroupList.add( info );
     }
 
 
     public void addTriangles( List<Triangle> triangles, Object materialNode ) {
-        GroupInfo info = new GroupInfo();
-        info.mTriangles = new ArrayList<Triangle>( triangles );
+        GroupInfo info     = new GroupInfo();
+        info.mTriangles    = new ArrayList<Triangle>( triangles );
         info.mMaterialNode = materialNode;
         mGroupList.add( info );
     }
@@ -126,28 +133,57 @@ public class ModelGraphBuilder {
 
 
     public ModelGraph build() {
-        List<TrianglesNode> nodeList = new ArrayList<TrianglesNode>( mGroupList.size() );
+        Map<BufferedImage,Texture2Node> texMap = new HashMap<BufferedImage,Texture2Node>();
+        Map<Material,MaterialNode> matMap      = new HashMap<Material,MaterialNode>();
+
         List<Object> matList = new ArrayList<Object>( mGroupList.size() );
+        List<TrianglesNode> nodeList = new ArrayList<TrianglesNode>( mGroupList.size() );
 
         for( GroupInfo info : mGroupList ) {
             nodeList.add( newTrianglesNode( info.mTriangles ) );
 
-            if( mEnableMaterials ) {
-                if( info.mMaterialNode != null ) {
-                    matList.add( info.mMaterialNode );
-                } else if( info.mMaterial != null ) {
-                    matList.add( DrawNodes.newMaterialNode( info.mTexture, info.mMaterial ) );
-                } else {
-                    matList.add( null );
-                }
-            } else {
+            if( !mEnableTex && !mEnableMaterials ) {
                 matList.add( null );
+                continue;
+            }
+
+            if( info.mMaterialNode != null ) {
+                matList.add( info.mMaterialNode );
+                continue;
+            }
+
+            Texture2Node texNode = null;
+            MaterialNode matNode = null;
+
+            if( mEnableTex && info.mTexture != null ) {
+                texNode = texMap.get( info.mTexture );
+                if( texNode == null ) {
+                    texNode = new Texture2Node();
+                    texNode.buffer( info.mTexture );
+                    texMap.put( info.mTexture, texNode );
+                }
+            }
+
+            if( mEnableMaterials && info.mMaterial != null ) {
+                matNode = matMap.get( info.mMaterial );
+                if( matNode == null ) {
+                    matNode = new MaterialNode( info.mMaterial );
+                    matMap.put( info.mMaterial, matNode );
+                }
+            }
+
+            if( texNode == null ) {
+                matList.add( matNode );
+            } else if( matNode == null ) {
+                matList.add( texNode );
+            } else {
+                matList.add( Arrays.asList( texNode, matNode ) );
             }
         }
 
         ActorNode motionNode = null;
         if( mEnableMotion ) {
-            motionNode = ActorNode.newInstance( null, mBaseTransform );
+            motionNode = new ActorNode( null, mBaseTransform );
         }
 
         return new ModelGraph( motionNode, matList, nodeList );
@@ -155,18 +191,18 @@ public class ModelGraphBuilder {
 
 
     private TrianglesNode newTrianglesNode( List<Triangle> t ) {
-        TrianglesNode node = TrianglesNode.newInstance( t, true );
+        TrianglesNode node = TrianglesNode.create( t, true );
 
         if( mEnableTex != null ) {
             node.enableTextures( mEnableTex );
         }
 
         if( mEnableNormals != null ) {
-            node.setBindNormals( mEnableNormals );
+            node.enableNormals( mEnableNormals );
         }
 
         if( mEnableColor != null ) {
-            node.setBindColors( mEnableColor );
+            node.enableColors( mEnableColor );
         }
 
         return node;
@@ -175,9 +211,10 @@ public class ModelGraphBuilder {
 
     private static class GroupInfo {
         List<Triangle> mTriangles    = null;
-        TextureNode    mTexture      = null;
+        BufferedImage  mTexture      = null;
         Material       mMaterial     = null;
         Object         mMaterialNode = null;
     }
 
 }
+

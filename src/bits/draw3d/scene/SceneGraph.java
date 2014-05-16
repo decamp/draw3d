@@ -67,10 +67,8 @@ public class SceneGraph {
      * Replaces a node with a new object, while retaining all existing
      * connections.
      * 
-     * @param oldNode
-     *            Node to be replaced
-     * @param newNode
-     *            New node.
+     * @param oldNode Node to be replaced
+     * @param newNode New node.
      * @return true if oldNode is contained in graph and successfully replaced.
      */
     public boolean replace( Object oldNode, Object newNode ) {
@@ -445,7 +443,6 @@ public class SceneGraph {
     }
 
 
-
     private NodeInfo getNodeInfo( Object node ) {
         if( node == null ) {
             throw new IllegalArgumentException( "Cannot place null objects in scene graph." );
@@ -556,7 +553,6 @@ public class SceneGraph {
             }
         }
     }
-
 
 
     private static final class NodeInfo {

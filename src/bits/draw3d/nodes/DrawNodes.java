@@ -157,18 +157,18 @@ public final class DrawNodes {
     }
     
 
-    public static Object createMaterial( TextureNode tex, Material mat ) {
-        if( tex == null ) {
-            if( mat == null ) {
+    public static Object createMaterial( TextureNode optTex, Material optMat ) {
+        if( optTex == null ) {
+            if( optMat == null ) {
                 return null;
             }
-            return new MaterialNode( mat );
+            return new MaterialNode( optMat );
 
-        } else if( mat == null ) {
-            return tex;
+        } else if( optMat == null ) {
+            return optTex;
         }
 
-        return Arrays.<Object>asList( tex, new MaterialNode( mat ) );
+        return Arrays.<Object>asList( optTex, new MaterialNode( optMat ) );
     }
 
 

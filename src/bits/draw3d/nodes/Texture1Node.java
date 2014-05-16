@@ -19,6 +19,7 @@ public final class Texture1Node extends AbstractTextureNode {
 
     public Texture1Node() {
         super( GL_TEXTURE_1D, GL_TEXTURE_BINDING_1D );
+        param( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     }
 
 

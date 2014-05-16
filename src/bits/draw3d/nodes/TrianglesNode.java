@@ -134,7 +134,7 @@ public class TrianglesNode implements RenderModule {
 
 
     public void enableTextures( boolean enable ) {
-        enable &= mDrawParams.mTexSize > 0;
+        enable &= mDrawParams.mTexStride > 0;
         if( mDrawParams.mTexEnabled == enable ) {
             return;
         }
@@ -144,7 +144,7 @@ public class TrianglesNode implements RenderModule {
 
 
     public void enableColors( boolean enable ) {
-        enable &= mDrawParams.mColorSize > 0;
+        enable &= mDrawParams.mColorStride > 0;
         if( mDrawParams.mColorEnabled == enable ) {
             return;
         }
@@ -167,13 +167,11 @@ public class TrianglesNode implements RenderModule {
         return mTriangles;
     }
 
-
     @Override
     public Object getNodes( Class<?> nodeClass, RenderTile tile ) {
         if( nodeClass == DrawNode.class ) {
             return new DrawHandler( tile == null || tile.isLast() );
         }
-
         return null;
     }
 

@@ -6,10 +6,13 @@ package bits.draw3d.model;
 public class Triangle implements Cloneable {
 
 
-    private double[][] mVerts;
-    private double[][] mNorm;
-    private double[][] mTex;
-    private double[][] mColor;
+    public double[][] mVerts;
+    public double[][] mNorm;
+    public double[][] mTex;
+    public double[][] mColor;
+
+
+    public Triangle() {}
 
 
     public Triangle( double[][] vertices, double[][] norm, double[][] texCoord ) {
@@ -18,6 +21,7 @@ public class Triangle implements Cloneable {
         mTex = texCoord;
         mColor = null;
     }
+
 
     public Triangle( double[][] vertices, double[][] norm, double[][] texCoord, double[][] color ) {
         mVerts = vertices;
@@ -32,29 +36,36 @@ public class Triangle implements Cloneable {
         return mVerts;
     }
 
+
     public final double[] vertex( int n ) {
         return mVerts[n];
     }
+
 
     public final double[][] normalRef() {
         return mNorm;
     }
 
+
     public final double[] normalRef( int n ) {
         return mNorm[n];
     }
+
 
     public final double[][] texRef() {
         return mTex;
     }
 
+
     public final double[] texRef( int n ) {
         return mTex[n];
     }
 
+
     public final double[][] colorRef() {
         return mColor;
     }
+
 
     public final double[] colorRef( int n ) {
         return mColor[n];
@@ -65,14 +76,15 @@ public class Triangle implements Cloneable {
         mNorm = n;
     }
 
+
     public void setTexRef( double[][] t ) {
         mTex = t;
     }
 
+
     public void setColorRef( double[][] c ) {
         mColor = c;
     }
-
 
 
     public void reverseOrientation() {
@@ -111,6 +123,7 @@ public class Triangle implements Cloneable {
                               mVerts[2][0], mVerts[2][1], mVerts[2][2] );
 
     }
+
 
     public Triangle safeCopy() {
         double[][] v = { mVerts[0].clone(), mVerts[1].clone(), mVerts[2].clone() };

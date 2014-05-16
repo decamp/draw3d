@@ -11,59 +11,57 @@ import bits.draw3d.nodes.*;
 import bits.draw3d.scene.*;
 
 
-
 /**
  * @author decamp
  */
 public class RenderUtil {
-    
-    
-    public static <N> GraphPath<N> modulePathToNodePath(GraphPath<?> path, Class<N> actionClass, RenderTile tile) {
+
+    public static <N> GraphPath<N> modulePathToNodePath( GraphPath<?> path, Class<N> actionClass, RenderTile tile ) {
         GraphPath<N> ret = new GraphPath<N>();
-        Map<Object,List<N>> cache = new HashMap<Object,List<N>>();
-        
-        for(GraphStep<?> step: path) {
+        Map<Object, List<N>> cache = new HashMap<Object, List<N>>();
+
+        for( GraphStep<?> step : path ) {
             final GraphActionType action = step.type();
-            final Object target          = step.target();
-            
-            List<N> nodes = cache.get(target);
-            
-            if(nodes == null) {
-                nodes = extractNodes(target, actionClass, tile);
-                cache.put(target, nodes);
+            final Object target = step.target();
+
+            List<N> nodes = cache.get( target );
+
+            if( nodes == null ) {
+                nodes = extractNodes( target, actionClass, tile );
+                cache.put( target, nodes );
             }
-            
-            if(nodes.isEmpty())
+
+            if( nodes.isEmpty() ) {
                 continue;
-            
-            if(action == GraphActionType.PUSH) {
-                for(N node: nodes) {
-                    ret.add(new GraphStep<N>(GraphActionType.PUSH, node));
+            }
+
+            if( action == GraphActionType.PUSH ) {
+                for( N node : nodes ) {
+                    ret.add( new GraphStep<N>( GraphActionType.PUSH, node ) );
                 }
-            }else{
-                ListIterator<N> iter = nodes.listIterator(nodes.size());
-                
-                while(iter.hasPrevious()) {
+            } else {
+                ListIterator<N> iter = nodes.listIterator( nodes.size() );
+                while( iter.hasPrevious() ) {
                     N node = iter.previous();
-                    ret.add(new GraphStep<N>(GraphActionType.POP, node));
+                    ret.add( new GraphStep<N>( GraphActionType.POP, node ) );
                 }
             }
         }
-        
+
         return ret;
     }
 
-    
-    public static FramebufferNode framebufferForCaps(GLCapabilities caps) {
-        FramebufferNode fbo           = FramebufferNode.newInstance();
-        Texture2dNode colorFrame      = Texture2dNode.newInstance();
-        RenderbufferNode depthFrame   = null;
+
+    public static FramebufferNode framebufferForCaps( GLCapabilities caps ) {
+        FramebufferNode fbo = FramebufferNode.newInstance();
+        Texture2dNode colorFrame = Texture2dNode.newInstance();
+        RenderbufferNode depthFrame = null;
         RenderbufferNode stencilFrame = null;
-        
+
         colorFrame.format( GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE );
-        
-        if(caps != null) {
-            switch(caps.getDepthBits()) {
+
+        if( caps != null ) {
+            switch( caps.getDepthBits() ) {
             case 0:
                 break;
             case 16:
@@ -81,9 +79,9 @@ public class RenderUtil {
                 break;
             }
         }
-        
-        if(caps != null) {
-            switch(caps.getStencilBits()) {
+
+        if( caps != null ) {
+            switch( caps.getStencilBits() ) {
             case 0:
                 break;
             case 1:
@@ -104,98 +102,95 @@ public class RenderUtil {
                 break;
             }
         }
-        
+
         fbo.attach( GL_COLOR_ATTACHMENT0_EXT, colorFrame );
-        
-        if(depthFrame != null) {
-            fbo.attach(GL_DEPTH_ATTACHMENT_EXT, depthFrame);
+
+        if( depthFrame != null ) {
+            fbo.attach( GL_DEPTH_ATTACHMENT_EXT, depthFrame );
         }
-        
-        if(stencilFrame != null) {
-            fbo.attach(GL_STENCIL_ATTACHMENT_EXT, stencilFrame);
+
+        if( stencilFrame != null ) {
+            fbo.attach( GL_STENCIL_ATTACHMENT_EXT, stencilFrame );
         }
-        
+
         return fbo;
     }
-    
-    
-    public static int bufferBits(GLCapabilities caps) {
+
+
+    public static int bufferBits( GLCapabilities caps ) {
         int ret = 0;
-        
-        if(caps == null)
+        if( caps == null ) {
             return 0;
-        
-        if(caps.getAccumAlphaBits() > 0) 
+        }
+
+        if( caps.getAccumAlphaBits() > 0 ) {
             ret |= GL_ACCUM_BUFFER_BIT;
-        
-        if( caps.getAlphaBits() > 0 || 
-            caps.getRedBits() > 0 || 
-            caps.getGreenBits() > 0 || 
-            caps.getBlueBits() > 0) 
+        }
+
+        if( caps.getAlphaBits() > 0 ||
+            caps.getRedBits() > 0 ||
+            caps.getGreenBits() > 0 ||
+            caps.getBlueBits() > 0 )
         {
             ret |= GL_COLOR_BUFFER_BIT;
         }
-        
-        if(caps.getDepthBits() > 0) 
+
+        if( caps.getDepthBits() > 0 ) {
             ret |= GL_DEPTH_BUFFER_BIT;
-        
-        if(caps.getStencilBits() > 0)
+        }
+
+        if( caps.getStencilBits() > 0 ) {
             ret |= GL_STENCIL_BUFFER_BIT;
-        
+        }
+
         return ret;
     }
-    
-    
-    
+
+
     @SuppressWarnings("unchecked")
-    private static <N> List<N> extractNodes(Object target, Class<N> nodeClass, RenderTile tile) {
-        while(target instanceof RenderModule) {
-            target = ((RenderModule)target).getNodes(nodeClass, tile);
+    private static <N> List<N> extractNodes( Object target, Class<N> nodeClass, RenderTile tile ) {
+        while( target instanceof RenderModule ) {
+            target = ((RenderModule)target).getNodes( nodeClass, tile );
         }
-        
-        
-        if(target == null) {
-            return new ArrayList<N>(0);
+
+        if( target == null ) {
+            return new ArrayList<N>( 0 );
         }
-        
-        
-        if(nodeClass.isAssignableFrom(target.getClass())) {
-            ArrayList<N> ret = new ArrayList<N>(1);
-            ret.add((N)target);
+
+        if( nodeClass.isAssignableFrom( target.getClass() ) ) {
+            ArrayList<N> ret = new ArrayList<N>( 1 );
+            ret.add( (N)target );
             return ret;
         }
-        
-        
-        if(target instanceof Iterable) {
-            List<N> ret = new ArrayList<N>(4);
-            
-            for(Object obj: (Iterable<Object>)target) {
-                if(obj != null && nodeClass.isAssignableFrom(obj.getClass())) {
-                    ret.add((N)obj);
+
+        if( target instanceof Iterable ) {
+            List<N> ret = new ArrayList<N>( 4 );
+            for( Object obj : (Iterable<Object>)target ) {
+                if( obj != null && nodeClass.isAssignableFrom( obj.getClass() ) ) {
+                    ret.add( (N)obj );
                 }
             }
-            
             return ret;
         }
-        
-        
-        if(target.getClass().isArray()) {
-            if(!Object[].class.isAssignableFrom(target.getClass()))
-                return new ArrayList<N>(0);
-            
+
+        if( target.getClass().isArray() ) {
+            if( !Object[].class.isAssignableFrom( target.getClass() ) ) {
+                return new ArrayList<N>( 0 );
+            }
+
             Object[] arr = (Object[])target;
-            List<N> ret = new ArrayList<N>(arr.length);
-            
-            for(Object obj: arr) {
-                if(obj != null && nodeClass.isAssignableFrom(obj.getClass())) {
-                    ret.add((N)obj);
+            List<N> ret = new ArrayList<N>( arr.length );
+
+            for( Object obj : arr ) {
+                if( obj != null && nodeClass.isAssignableFrom( obj.getClass() ) ) {
+                    ret.add( (N)obj );
                 }
             }
-            
+
             return ret;
         }
-        
-        return new ArrayList<N>(0);
+
+        return new ArrayList<N>( 0 );
     }
-    
+
 }

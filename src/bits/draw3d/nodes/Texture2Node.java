@@ -22,6 +22,7 @@ public final class Texture2Node extends AbstractTextureNode {
 
     public Texture2Node() {
         super( GL_TEXTURE_2D, GL_TEXTURE_BINDING_2D );
+        param( GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     }
 
 
@@ -35,7 +36,7 @@ public final class Texture2Node extends AbstractTextureNode {
         }
     }
 
-    
+
     public synchronized void buffer( ByteBuffer buf,
                                      int intFormat,
                                      int format,
@@ -55,7 +56,7 @@ public final class Texture2Node extends AbstractTextureNode {
             super.size( w, h );
             mBuf = buf.duplicate();
         }
-        
+
         fireAlloc();
     }
 

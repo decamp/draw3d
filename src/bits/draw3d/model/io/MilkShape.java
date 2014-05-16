@@ -13,7 +13,7 @@ import javax.imageio.ImageIO;
 
 import bits.draw3d.model.*;
 import bits.draw3d.pick.*;
-
+import bits.util.Files;
 
 
 /**
@@ -187,7 +187,7 @@ public class MilkShape {
         saveVertices( model, vertices, buf, out );
         saveTriangles( model, vertices, triangles, buf, out );
         saveGroups( model, triangles, materials, buf, out );
-        saveMaterials( model, materials, buf, out, outFile.getParentFile() );
+        saveMaterials( model, materials, buf, out, outFile );
         saveJoints( model, buf, out );
 
         out.close();
@@ -385,7 +385,7 @@ public class MilkShape {
                                        Map<ModelMaterial, Integer> materials,
                                        ByteBuffer buf,
                                        FileChannel out,
-                                       File outDir )
+                                       File outFile )
                                        throws IOException
     {
 
@@ -441,15 +441,20 @@ public class MilkShape {
             buf.putFloat( alpha );
             buf.put( (byte)0 );
 
+            if( tm.mTex == null ) {
+                putName( null, 128, buf );
+                putName( null, 128, buf );
+            } else {
+                // TODO: Fix implementation of save milkeshape.
+                // (If still broken.)
+                File dir = outFile.getParentFile();
+                String baseName = Files.baseName( outFile );
+                File matFile = genOutputFileName( dir, baseName, "png", 128 );
+                ImageIO.write( tm.mTex, "png", matFile );
 
-            // TODO: Fix implementation of save milkeshape.
-            // if(mat instanceof ImageMaterial)
-            // image = ((ImageMaterial)mat).getImage();
-            // BufferedImage image = null;
-            // if( image == null ) {
-            putName( null, 128, buf );
-            putName( null, 128, buf );
-            // }
+                putName( matFile.getName(), 128, buf );
+                putName( matFile.getName(), 128, buf );
+            }
         }
 
         buf.flip();
@@ -501,5 +506,40 @@ public class MilkShape {
         }
     }
 
+
+    private static File genOutputFileName( File outDir, String baseName, String suffix, int maxLen ) {
+        StringBuilder s = new StringBuilder();
+
+        for( int attempt = 0;; attempt++ ) {
+            String num = attempt == 0 ? "" : String.format( "_%d", attempt );
+            //Reduce base name length to max.
+            int len = baseName.length() + num.length() + 1 + suffix.length();
+
+
+            if( len > maxLen ) {
+                // First shorten base name.
+                int n = Math.min( baseName.length(), len - maxLen );
+                baseName = baseName.substring( 0, n );
+                len -= n;
+
+                if( len > maxLen ) {
+                    // Then shorten extension.
+                    n = Math.min( suffix.length(), len - maxLen );
+                    suffix = suffix.substring( 0, n );
+                }
+            }
+
+            s.setLength( 0 );
+            s.append( baseName );
+            s.append( num );
+            s.append( '.' );
+            s.append( suffix );
+            File file = new File( outDir, s.toString() );
+
+            if( !file.exists() ) {
+                return file;
+            }
+        }
+    }
 
 }
