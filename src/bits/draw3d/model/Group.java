@@ -1,8 +1,7 @@
 package bits.draw3d.model;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 
 /**
@@ -10,16 +9,16 @@ import java.util.ArrayList;
  */
 public class Group {
 
-    private String mName = "";
-    private BufferedImage mTex = null;
-    private Material mMaterial = null;
-    private List<Triangle> mTriangles;
+    public String        mName     = "";
+    public BufferedImage mTex      = null;
+    public Material      mMaterial = null;
+    public List<Triangle> mTris;
 
 
     public Group() {
         mName = "";
         mMaterial = null;
-        mTriangles = new ArrayList<Triangle>();
+        mTris = new ArrayList<Triangle>();
     }
 
 
@@ -27,37 +26,51 @@ public class Group {
         mName = (name == null ? "" : name);
         mTex = tex;
         mMaterial = mat;
-        mTriangles = (listRef == null ? new ArrayList<Triangle>() : listRef);
+        mTris = (listRef == null ? new ArrayList<Triangle>() : listRef);
+    }
+
+
+    public void collectVerts( Collection<double[]> out ) {
+        for( Triangle t: mTris ) {
+            out.add( t.mVerts[0] );
+            out.add( t.mVerts[0] );
+            out.add( t.mVerts[0] );
+        }
+    }
+
+
+    public ModelMaterial createModelMaterial() {
+        return new ModelMaterial( mTex, mMaterial );
     }
 
 
 
-    public String getName() {
+    @Deprecated public String getName() {
         return mName;
     }
 
 
-    public void setName( String name ) {
+    @Deprecated public void setName( String name ) {
         mName = name;
     }
 
 
-    public Material getMaterial() {
+    @Deprecated public Material getMaterial() {
         return mMaterial;
     }
 
 
-    public BufferedImage getTexture() {
+    @Deprecated public BufferedImage getTexture() {
         return mTex;
     }
 
 
-    public void setTexture( BufferedImage tex ) {
+    @Deprecated public void setTexture( BufferedImage tex ) {
         mTex = tex;
     }
 
 
-    public void setMaterial( Material mat ) {
+    @Deprecated public void setMaterial( Material mat ) {
         mMaterial = mat;
     }
 
@@ -66,8 +79,8 @@ public class Group {
      * 
      * @return triangles
      */
-    public List<Triangle> getTriangles() {
-        return new ArrayList<Triangle>( mTriangles );
+    @Deprecated public List<Triangle> getTriangles() {
+        return new ArrayList<Triangle>( mTris );
     }
 
     /**
@@ -75,30 +88,25 @@ public class Group {
      * 
      * @return triangles
      */
-    public List<Triangle> getTrianglesRef() {
-        return mTriangles;
+    @Deprecated public List<Triangle> getTrianglesRef() {
+        return mTris;
     }
 
     /**
      * Sets list of triangles, making a defensive copy.
      */
-    public void setTriangles( List<Triangle> tris ) {
+    @Deprecated public void setTriangles( List<Triangle> tris ) {
         if( tris == null )
             throw new NullPointerException();
 
-        mTriangles = new ArrayList<Triangle>( tris );
+        mTris = new ArrayList<Triangle>( tris );
     }
 
     /**
      * Sets list of triangles without making a defensive copy.
      */
-    public void setTrianglesRef( List<Triangle> tris ) {
-        mTriangles = ( tris == null ? new ArrayList<Triangle>() : tris );
-    }
-
-
-    public ModelMaterial createModelMaterial() {
-        return new ModelMaterial( mTex, mMaterial );
+    @Deprecated public void setTrianglesRef( List<Triangle> tris ) {
+        mTris = ( tris == null ? new ArrayList<Triangle>() : tris );
     }
 
 }

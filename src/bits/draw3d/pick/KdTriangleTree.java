@@ -398,9 +398,9 @@ public final class KdTriangleTree implements RayPicker {
                 triMark[e.mTriIndex] = NONE; // Leave indication that new events
                                              // have now been generated.
                 Triangle t = tris[e.mTriIndex];
-                verts[0] = t.vertex( 0 );
-                verts[1] = t.vertex( 1 );
-                verts[2] = t.vertex( 2 );
+                verts[0] = t.mVerts[0];
+                verts[1] = t.mVerts[1];
+                verts[2] = t.mVerts[2];
 
                 if( Box3.clipPlanar( verts, 0, 3, leftVoxel, loop ) ) {
                     

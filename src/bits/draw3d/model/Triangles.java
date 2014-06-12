@@ -14,7 +14,23 @@ import static java.lang.Double.POSITIVE_INFINITY;
  */
 public class Triangles {
 
-    
+
+    public static void createQuad( double[] a, double[] b, double[] c, double[] d,  List<Triangle> out ) {
+        out.add( new Triangle( new double[][]{ a, b, c }, null, null ) );
+        out.add( new Triangle( new double[][]{ c, d, a }, null, null ) );
+    }
+
+
+    public static void createQuad( double[] a, double[] b, double[] c, double[] d,
+                                   double[] texa, double[] texb, double[] texc, double[] texd,
+                                   List<Triangle> out )
+    {
+        out.add( new Triangle( new double[][]{ a, b, c }, null, new double[][]{ texa, texb, texc } ) );
+        out.add( new Triangle( new double[][]{ c, d, a }, null, new double[][]{ texc, texd, texa } ) );
+    }
+
+
+
     /**
      * Computes the perpendicular distance between triangle (p0,p1,p2) and point (x).
      * This value may be positive or negative, depending on orientation of triangle.
@@ -25,9 +41,8 @@ public class Triangles {
      * @param x Any point
      * @return distance between point <i>x</i> and triangle <i>(p0,p1,p2)</i>.
      */
-    public static double computePerpDistance(double[] p0, double[] p1, double[] p2, double[] x) {
-        
-        double a = p0[1] * (p1[2] - p2[2]) + 
+    public static double computePerpDistance( double[] p0, double[] p1, double[] p2, double[] x ) {
+        double a = p0[1] * (p1[2] - p2[2]) +
                    p1[1] * (p2[2] - p0[2]) + 
                    p2[1] * (p0[2] - p1[2]);
 
@@ -50,13 +65,13 @@ public class Triangles {
     /**
      * Computes center point of triangle.
      */
-    public static void computeCenter(double[] p0, double[] p1, double[] p2, double[] out) {
+    public static void computeCenter( double[] p0, double[] p1, double[] p2, double[] out ) {
         out[0] = (p0[0] + p1[0] + p2[0]) / 3.0;
         out[1] = (p0[1] + p1[1] + p2[1]) / 3.0;
         out[2] = (p0[2] + p1[2] + p2[2]) / 3.0;
     }
-    
-    
+
+
     /**
      * Compute intersection point between triangle and line segment
      * @param v0 vertex 0 of triangle
@@ -89,7 +104,7 @@ public class Triangles {
             return 0;
         }
         
-        double t = (norm[0]*(e0[0]-v0[0]) + norm[1]*(e0[1]-v0[1]) + norm[2]*(e0[2]-v0[2])) / -dot;
+        double t = ( norm[0] * ( e0[0] - v0[0]) + norm[1] * ( e0[1] - v0[1] ) + norm[2] * ( e0[2]-v0[2] ) ) / -dot;
         if(t < lineTolerance || t > (1.0 - lineTolerance)) {
             return 0;
         }
@@ -204,7 +219,7 @@ public class Triangles {
                                                     double[] e0, 
                                                     double[] e1,
                                                     double lineTolerance,
-                                                    double[] out) 
+                                                    double[] out )
     {
         double[] norm = new double[3];
         Vectors.cross(v0, v1, v2, norm);
@@ -237,7 +252,7 @@ public class Triangles {
      * @param tris List of triangles.
      * @return smallest possible cuboid that contains all triangles entirely.
      */
-    public static Aabb computeBounds(Iterable<? extends Triangle> tris) {
+    public static Aabb computeBounds( Iterable<? extends Triangle> tris ) {
         double x0 = Double.POSITIVE_INFINITY;
         double y0 = Double.POSITIVE_INFINITY;
         double z0 = Double.POSITIVE_INFINITY;
@@ -246,8 +261,8 @@ public class Triangles {
         double z1 = Double.NEGATIVE_INFINITY;
         boolean first = true;
         
-        for(Triangle t: tris) {
-            for(double[] vv: t.vertexRef()) {
+        for( Triangle t: tris ) {
+            for( double[] vv: t.mVerts ) {
                 if(first) {
                     first = false;
                     x0 = x1 = vv[0];
@@ -276,7 +291,7 @@ public class Triangles {
             }
         }
         
-        return Aabb.fromEdges(x0, y0, z0, x1, y1, z1);
+        return Aabb.fromEdges( x0, y0, z0, x1, y1, z1 );
     }
     
     
@@ -310,6 +325,7 @@ public class Triangles {
      * @param outAabb length-6 array to hold output bounds.  Undefined if triangle doesn't intersect clip volume.
      * @return true iff triangle intersects clip volume.
      */
+    @Deprecated
     public static boolean computeClippedAabb( double[] v0, 
                                               double[] v1, 
                                               double[] v2, 
@@ -428,260 +444,22 @@ public class Triangles {
     }
     
 
-    /**
-     * Constructs triangle from three vertices.
-     * 
-     * @param v1
-     * @param v2
-     * @param v3
-     * @return
-     */
-    public static Triangle triangleFromVertices(double[] v1, double[] v2, double[] v3, boolean computeNorm) {
-        double[][] norm = null;
-        
-        if(computeNorm) {
-            norm = new double[3][];
-            norm[0] = new double[3];
-            Vectors.cross(v1, v2, v3, norm[0]);
-            Vectors.normalize(norm[0], 1.0);
-            norm[1] = norm[0].clone();
-            norm[2] = norm[0].clone();
-        }
-        
-        return new Triangle(new double[][]{v1, v2, v3}, norm, null);
-    }
-    
-    
-    /**
-     * Splits a triangle into two smaller triangles using a cutting edge that
-     * passes through one vertex and one edge.
-     * 
-     * @param t Triangle to split
-     * @param i0 index of vertex & edge through which the cutting plane passes
-     * @param p distance ratio between (i0+1)%3 and (i0+2)%3 where cutting pane passes.  0 &lt p &lt 1.
-     * @return array of two triangles
-     */
-    public static Triangle[] splitTriangle1(Triangle t, int i0, double p) {
-        final int i1 = (i0+1)%3;
-        final int i2 = (i0+2)%3;
-        
-        double[][] verts0 = new double[3][];
-        double[][] verts1 = new double[3][];
-        double[][] norms0 = null;
-        double[][] norms1 = null;
-        double[][] texs0 = null;
-        double[][] texs1 = null;
-        double[][] colors0 = null;
-        double[][] colors1 = null;
-        
-        {
-            double[] v0 = t.vertex(i0);
-            double[] v1 = t.vertex(i1);
-            double[] v2 = t.vertex(i2);
-            
-            verts0[0] = v0;
-            verts0[1] = v1;
-            verts0[2] = interp(v1, v2, p);
-            verts1[0] = v0;
-            verts1[1] = verts0[2];
-            verts1[2] = v2;
-        }
-        
-        double[][] r = t.normalRef();
-        
-        if(r != null) {
-            double[] n0 = r[i0];
-            double[] n1 = r[i1];
-            double[] n2 = r[i2];
-            
-            norms0 = new double[3][];
-            norms1 = new double[3][];
-            norms0[0] = n0.clone();
-            norms0[1] = n1.clone();
-            norms0[2] = interp(n1, n2, p);
-            norms1[0] = n0.clone();
-            norms1[1] = norms0[2].clone();
-            norms1[2] = n2.clone();
-        }
-        
-        r = t.texRef();
-        
-        if(r != null) {
-            double[] n0 = r[i0];
-            double[] n1 = r[i1];
-            double[] n2 = r[i2];
-            
-            texs0 = new double[3][];
-            texs1 = new double[3][];
-            texs0[0] = n0.clone();
-            texs0[1] = n1.clone();
-            texs0[2] = interp(n1, n2, p);
-            texs1[0] = n0.clone();
-            texs1[1] = texs0[2].clone();
-            texs1[2] = n2.clone();
-        }
-        
-        r = t.colorRef();
-        
-        if(r != null) {
-            double[] n0 = r[i0];
-            double[] n1 = r[i1];
-            double[] n2 = r[i2];
-            
-            colors0 = new double[3][];
-            colors1 = new double[3][];
-            colors0[0] = n0.clone();
-            colors0[1] = n1.clone();
-            colors0[2] = interp(n1, n2, p);
-            colors1[0] = n0.clone();
-            colors1[1] = colors0[2].clone();
-            colors1[2] = n2.clone();
-        }
-        
-        return new Triangle[] {
-                new Triangle(verts0, norms0, texs0, colors0),
-                new Triangle(verts1, norms1, texs1, colors1)};
-    }
-
 
     /**
-     * Splits a triangle into three smaller triangles using a cutting plane
-     * that passes through two edges.
-     * 
-     * @param t Triangle to split
-     * @param i0 index of vertex connected to the two edges to be cut.
-     * @param p1 distance ratio between vertex i0 and (i0+1)%3 where cutting pane passes.  0 &lt p1 %lt 1.
-     * @param p2 distance ratio between vertex i0 and (i0+2)%3 where cutting pane passes.  0 &lt p2 %lt 1.
-     * @return array of three triangles.
-     * 
-     */
-    public static Triangle[] splitTriangle2(Triangle t, int i0, double p1, double p2) {
-        
-        final int i1 = (i0 + 1) % 3;
-        final int i2 = (i0 + 2) % 3;
-        
-        double[][] verts0  = new double[3][];
-        double[][] verts1  = new double[3][];
-        double[][] verts2  = new double[3][];
-        double[][] norms0  = null;
-        double[][] norms1  = null;
-        double[][] norms2  = null;
-        double[][] texs0   = null;
-        double[][] texs1   = null;
-        double[][] texs2   = null;
-        double[][] colors0 = null;
-        double[][] colors1 = null;
-        double[][] colors2 = null;
-        
-        {
-            double[] v0 = t.vertex(i0);
-            double[] v1 = t.vertex(i1);
-            double[] v2 = t.vertex(i2);
-            
-            verts0[0] = v0;
-            verts0[1] = interp(v0, v1, p1);
-            verts0[2] = interp(v0, v2, p2);
-            verts1[0] = v1;
-            verts1[1] = verts0[2];
-            verts1[2] = verts0[1];
-            verts2[0] = v2;
-            verts2[1] = verts0[2];
-            verts2[2] = v1;
-        }
-        
-        double[][] r = t.normalRef();
-        
-        if(r != null) {
-            double[] v0 = r[i0];
-            double[] v1 = r[i1];
-            double[] v2 = r[i2];
-            
-            norms0 = new double[3][];
-            norms1 = new double[3][];
-            norms2 = new double[3][];            
-    
-            norms0[0] = v0.clone();
-            norms0[1] = interp(v0, v1, p1);
-            norms0[2] = interp(v0, v2, p2);
-            norms1[0] = v1.clone();
-            norms1[1] = norms0[2].clone();
-            norms1[2] = norms0[1].clone();
-            norms2[0] = v2.clone();
-            norms2[1] = norms0[2].clone();
-            norms2[2] = v1.clone();
-        }
-        
-        r = t.texRef();
-        
-        if(r != null) {
-            double[] v0 = r[i0];
-            double[] v1 = r[i1];
-            double[] v2 = r[i2];
-            
-            texs0 = new double[3][];
-            texs1 = new double[3][];
-            texs2 = new double[3][];            
-    
-            texs0[0] = v0.clone();
-            texs0[1] = interp(v0, v1, p1);
-            texs0[2] = interp(v0, v2, p2);
-            texs1[0] = v1.clone();
-            texs1[1] = texs0[2].clone();
-            texs1[2] = texs0[1].clone();
-            texs2[0] = v2.clone();
-            texs2[1] = texs0[2].clone();
-            texs2[2] = v1.clone();
-        }
-        
-        
-        r = t.colorRef();
-        
-        if(r != null) {
-            double[] v0 = r[i0];
-            double[] v1 = r[i1];
-            double[] v2 = r[i2];
-            
-            colors0 = new double[3][];
-            colors1 = new double[3][];
-            colors2 = new double[3][];            
-    
-            colors0[0] = v0.clone();
-            colors0[1] = interp(v0, v1, p1);
-            colors0[2] = interp(v0, v2, p2);
-            colors1[0] = v1.clone();
-            colors1[1] = colors0[2].clone();
-            colors1[2] = colors0[1].clone();
-            colors2[0] = v2.clone();
-            colors2[1] = colors0[2].clone();
-            colors2[2] = v1.clone();
-        }
-        
-        return new Triangle[] {
-                new Triangle(verts0, norms0, texs0, colors0),
-                new Triangle(verts1, norms1, texs1, colors1),
-                new Triangle(verts2, norms2, texs2, colors2)
-        };
-        
-    }
-
-
-    /**
-     * Still has issues if the edge of one triangle intersects the through the center vertex then hits the opposite edge exactly.
+     * Still has issues if the edge of one triangle intersects through the center vertex and hits the opposite edge exactly.
      * 
      * @param tri Triangle to subdivide.
      * @param cut Cutting triangle that defines subdivision plane and bounds.
      * @param tolerance Distance by which <b>tri</b> must extend past <b>cut</b> to cause division.
      * @return null if no intersection, otherwise subdivided triangle.
      */
-    public static Triangle[] splitTriangle(Triangle tri, Triangle cut, double tolerance) {
-        
+    public static Triangle[] splitTriangle( Triangle tri, Triangle cut, double tolerance ) {
         double[] cutPoint1 = new double[3];
-        double[][] tv = tri.vertexRef();
-        double[][] cv = cut.vertexRef();
+        double[][] tv = tri.mVerts;
+        double[][] cv = cut.mVerts;
         int edge1 = Integer.MIN_VALUE;
-        
-        
-        for(int i = 0; i < 3; i++) {
+
+        for( int i = 0; i < 3; i++ ) {
             int c = computeTriangleLineIntersection( cv[0], 
                                                      cv[1], 
                                                      cv[2],
@@ -690,7 +468,7 @@ public class Triangles {
                                                      tolerance,
                                                      cutPoint1);
             
-            if(c != 0) {
+            if( c != 0 ) {
                 edge1 = i;
                 break;
             }
@@ -703,36 +481,38 @@ public class Triangles {
                                                  tolerance,
                                                  cutPoint1);
             
-            if(c != 0) {
+            if( c != 0 ) {
                 edge1 = -1;
                 break;
             }
             
         }
         
-        if(edge1 == Integer.MIN_VALUE)
+        if( edge1 == Integer.MIN_VALUE ) {
             return null;
+        }
         
         //Find edges and cut points.
         int edge2 = -1;
         
-        if(edge1 == -1) {
-            for(int i = 0; i < 3; i++) {
+        if( edge1 == -1 ) {
+            for( int i = 0; i < 3; i++ ) {
                 int c = computePlaneLineIntersection( cv[0], 
                                                       cv[1], 
                                                       cv[2], 
                                                       tv[(i+1)%3], 
                                                       tv[(i+2)%3], 
                                                       tolerance, 
-                                                      cutPoint1);
-                if(c != 0) {
+                                                      cutPoint1 );
+                if( c != 0 ) {
                     edge1 = i;
                     break;
                 }
             }
             
-            if(edge1 == -1)
+            if( edge1 == -1 ) {
                 return null;
+            }
         }
         
         double[] cutPoint2 = new double[3];
@@ -752,8 +532,8 @@ public class Triangles {
             }
         }
         
-        
-        if(edge2 < 0) {
+
+        if( edge2 < 0 ) {
             //Only found one intersecting edge.
             final int vi0 = edge1;
             final int vi1 = (vi0+1)%3;
@@ -761,28 +541,242 @@ public class Triangles {
             final double r = distanceRatio(tv[vi1], tv[vi2], cutPoint1);
             return splitTriangle1(tri, vi0, r);
             
-        }else{
+        } else {
             //Find point that connects both edges being cut.
             final int vi0 = 3 - edge1 - edge2;
-            final int vi1 = (vi0+1)%3;
-            final int vi2 = (vi0+2)%3;
+            final int vi1 = ( vi0 + 1 )%3;
+            final int vi2 = ( vi0 + 2 )%3;
             
             //Check if we need to swap cutpoints.
-            if((vi0+2) % 3 == edge1) {
+            if( ( vi0 + 2 ) % 3 == edge1 ) {
                 double[] temp = cutPoint2;
                 cutPoint2 = cutPoint1;
                 cutPoint1 = temp;
             }
             
-            double r1 = distanceRatio(tv[vi0], tv[vi1], cutPoint2);
-            double r2 = distanceRatio(tv[vi0], tv[vi2], cutPoint1);
+            double r1 = distanceRatio( tv[vi0], tv[vi1], cutPoint2 );
+            double r2 = distanceRatio( tv[vi0], tv[vi2], cutPoint1 );
 
-            return splitTriangle2(tri, vi0, r1, r2);
+            return splitTriangle2( tri, vi0, r1, r2 );
         }
     }
-    
 
-    public static List<Triangle> splitLongEdges(List<Triangle> tris, double maxLength, int depth) {
+
+    /**
+     * Splits a triangle into two smaller triangles using a cutting edge that
+     * passes through one vertex and one edge.
+     *
+     * @param t Triangle to split
+     * @param i0 index of vertex & edge through which the cutting plane passes
+     * @param p distance ratio between (i0+1)%3 and (i0+2)%3 where cutting pane passes.  0 &lt p &lt 1.
+     * @return array of two triangles
+     */
+    static Triangle[] splitTriangle1(Triangle t, int i0, double p) {
+        final int i1 = (i0+1)%3;
+        final int i2 = (i0+2)%3;
+
+        double[][] verts0 = new double[3][];
+        double[][] verts1 = new double[3][];
+        double[][] norms0 = null;
+        double[][] norms1 = null;
+        double[][] texs0 = null;
+        double[][] texs1 = null;
+        double[][] colors0 = null;
+        double[][] colors1 = null;
+
+        {
+            double[] v0 = t.mVerts[ i0 ];
+            double[] v1 = t.mVerts[ i1 ];
+            double[] v2 = t.mVerts[ i2 ];
+
+            verts0[0] = v0;
+            verts0[1] = v1;
+            verts0[2] = interp(v1, v2, p);
+            verts1[0] = v0;
+            verts1[1] = verts0[2];
+            verts1[2] = v2;
+        }
+
+        double[][] r = t.mNorms;
+
+        if(r != null) {
+            double[] n0 = r[i0];
+            double[] n1 = r[i1];
+            double[] n2 = r[i2];
+
+            norms0 = new double[3][];
+            norms1 = new double[3][];
+            norms0[0] = n0.clone();
+            norms0[1] = n1.clone();
+            norms0[2] = interp(n1, n2, p);
+            norms1[0] = n0.clone();
+            norms1[1] = norms0[2].clone();
+            norms1[2] = n2.clone();
+        }
+
+        r = t.mTexs;
+
+        if(r != null) {
+            double[] n0 = r[i0];
+            double[] n1 = r[i1];
+            double[] n2 = r[i2];
+
+            texs0 = new double[3][];
+            texs1 = new double[3][];
+            texs0[0] = n0.clone();
+            texs0[1] = n1.clone();
+            texs0[2] = interp(n1, n2, p);
+            texs1[0] = n0.clone();
+            texs1[1] = texs0[2].clone();
+            texs1[2] = n2.clone();
+        }
+
+        r = t.mColors;
+
+        if(r != null) {
+            double[] n0 = r[i0];
+            double[] n1 = r[i1];
+            double[] n2 = r[i2];
+
+            colors0 = new double[3][];
+            colors1 = new double[3][];
+            colors0[0] = n0.clone();
+            colors0[1] = n1.clone();
+            colors0[2] = interp(n1, n2, p);
+            colors1[0] = n0.clone();
+            colors1[1] = colors0[2].clone();
+            colors1[2] = n2.clone();
+        }
+
+        return new Triangle[] {
+                new Triangle(verts0, norms0, texs0, colors0),
+                new Triangle(verts1, norms1, texs1, colors1)};
+    }
+
+
+    /**
+     * Splits a triangle into three smaller triangles using a cutting plane
+     * that passes through two edges.
+     *
+     * @param t Triangle to split
+     * @param i0 index of vertex connected to the two edges to be cut.
+     * @param p1 distance ratio between vertex i0 and (i0+1)%3 where cutting pane passes.  0 &lt p1 %lt 1.
+     * @param p2 distance ratio between vertex i0 and (i0+2)%3 where cutting pane passes.  0 &lt p2 %lt 1.
+     * @return array of three triangles.
+     *
+     */
+    static Triangle[] splitTriangle2(Triangle t, int i0, double p1, double p2) {
+
+        final int i1 = (i0 + 1) % 3;
+        final int i2 = (i0 + 2) % 3;
+
+        double[][] verts0  = new double[3][];
+        double[][] verts1  = new double[3][];
+        double[][] verts2  = new double[3][];
+        double[][] norms0  = null;
+        double[][] norms1  = null;
+        double[][] norms2  = null;
+        double[][] texs0   = null;
+        double[][] texs1   = null;
+        double[][] texs2   = null;
+        double[][] colors0 = null;
+        double[][] colors1 = null;
+        double[][] colors2 = null;
+
+        {
+            double[] v0 = t.mVerts[ i0 ];
+            double[] v1 = t.mVerts[ i1 ];
+            double[] v2 = t.mVerts[ i2 ];
+
+            verts0[0] = v0;
+            verts0[1] = interp(v0, v1, p1);
+            verts0[2] = interp(v0, v2, p2);
+            verts1[0] = v1;
+            verts1[1] = verts0[2];
+            verts1[2] = verts0[1];
+            verts2[0] = v2;
+            verts2[1] = verts0[2];
+            verts2[2] = v1;
+        }
+
+        double[][] r = t.mNorms;
+
+        if(r != null) {
+            double[] v0 = r[i0];
+            double[] v1 = r[i1];
+            double[] v2 = r[i2];
+
+            norms0 = new double[3][];
+            norms1 = new double[3][];
+            norms2 = new double[3][];
+
+            norms0[0] = v0.clone();
+            norms0[1] = interp(v0, v1, p1);
+            norms0[2] = interp(v0, v2, p2);
+            norms1[0] = v1.clone();
+            norms1[1] = norms0[2].clone();
+            norms1[2] = norms0[1].clone();
+            norms2[0] = v2.clone();
+            norms2[1] = norms0[2].clone();
+            norms2[2] = v1.clone();
+        }
+
+        r = t.mTexs;
+
+        if(r != null) {
+            double[] v0 = r[i0];
+            double[] v1 = r[i1];
+            double[] v2 = r[i2];
+
+            texs0 = new double[3][];
+            texs1 = new double[3][];
+            texs2 = new double[3][];
+
+            texs0[0] = v0.clone();
+            texs0[1] = interp(v0, v1, p1);
+            texs0[2] = interp(v0, v2, p2);
+            texs1[0] = v1.clone();
+            texs1[1] = texs0[2].clone();
+            texs1[2] = texs0[1].clone();
+            texs2[0] = v2.clone();
+            texs2[1] = texs0[2].clone();
+            texs2[2] = v1.clone();
+        }
+
+
+        r = t.mColors;
+
+        if(r != null) {
+            double[] v0 = r[i0];
+            double[] v1 = r[i1];
+            double[] v2 = r[i2];
+
+            colors0 = new double[3][];
+            colors1 = new double[3][];
+            colors2 = new double[3][];
+
+            colors0[0] = v0.clone();
+            colors0[1] = interp(v0, v1, p1);
+            colors0[2] = interp(v0, v2, p2);
+            colors1[0] = v1.clone();
+            colors1[1] = colors0[2].clone();
+            colors1[2] = colors0[1].clone();
+            colors2[0] = v2.clone();
+            colors2[1] = colors0[2].clone();
+            colors2[2] = v1.clone();
+        }
+
+        return new Triangle[] {
+                new Triangle(verts0, norms0, texs0, colors0),
+                new Triangle(verts1, norms1, texs1, colors1),
+                new Triangle(verts2, norms2, texs2, colors2)
+        };
+
+    }
+
+
+
+    public static List<Triangle> splitLongEdges( List<Triangle> tris, double maxLength, int depth ) {
         List<Triangle> ret = new ArrayList<Triangle>(tris.size());
         double[] len = new double[3];
         
@@ -792,7 +786,7 @@ public class Triangles {
             int e0 = 0, e1 = 0, e2 = 0;
             
             for(int i = 0; i < 3; i++) {
-                len[i] = Vectors.dist(t.vertex(i), t.vertex((i + 1) % 3));
+                len[i] = Vectors.dist( t.mVerts[i], t.mVerts[ (i + 1) % 3 ] );
                 if(len[i] > maxEdge) {
                     maxEdge = len[i];
                     e0 = i;
@@ -821,11 +815,11 @@ public class Triangles {
     
             if(e1 - e0 > e2 - e1) {
                 Triangle[] chips = splitTriangle1(t, e0, 0.5);
-                ret.addAll(splitLongEdges(Arrays.asList(chips), maxLength, depth + 1));
+                ret.addAll( splitLongEdges( Arrays.asList( chips ), maxLength, depth + 1 ) );
                 
             }else{
-                Triangle[] chips = splitTriangle2(t, e2, 0.5, 0.5);
-                ret.addAll(splitLongEdges(Arrays.asList(chips), maxLength, depth + 1));
+                Triangle[] chips = splitTriangle2( t, e2, 0.5, 0.5 );
+                ret.addAll( splitLongEdges( Arrays.asList( chips ), maxLength, depth + 1 ) );
             }
         }
         
@@ -834,49 +828,21 @@ public class Triangles {
     
 
     
-    public static Triangle scale(Triangle tri, double s) {
-        return scale(tri, s, s, s);
+    public static Triangle scale( Triangle tri, double s ) {
+        return scale( tri, s, s, s );
     }
 
 
-    public static Triangle scale(Triangle tri, double sx, double sy, double sz) {
+
+    public static Triangle scale( Triangle tri, double sx, double sy, double sz ) {
         Triangle copy = tri.safeCopy();
-        
-        double[][] v = copy.vertexRef();
+        double[][] v = copy.mVerts;
         v[0][0] *= sx; v[0][1] *= sy; v[0][2] *= sz;
         v[1][0] *= sx; v[1][1] *= sy; v[1][2] *= sz;
         v[2][0] *= sx; v[2][1] *= sy; v[2][2] *= sz;
-        
         return copy;
     }
 
-
-    static double distanceRatio(double[] x0, double[] x1, double[] c) {
-        double d0 = Math.sqrt((x0[0]-c[0])*(x0[0]-c[0]) + (x0[1]-c[1])*(x0[1]-c[1]) + (x0[2]-c[2])*(x0[2]-c[2]));
-        double d1 = Math.sqrt((x1[0]-c[0])*(x1[0]-c[0]) + (x1[1]-c[1])*(x1[1]-c[1]) + (x1[2]-c[2])*(x1[2]-c[2]));
-        return d0 / (d0 + d1); 
-    }
-    
-
-    /**
-     * Perform linear interpolation between two vectors.
-     * 
-     * @param a Vector a
-     * @param b Vertor b
-     * @param p Distance ratio 
-     * @return a * (1 - p) + b * p
-     */
-    static double[] interp(double[] a, double[] b, double p) {
-        double[] ret = new double[a.length];
-        
-        for(int i = 0; i < a.length; i++) {
-            ret[i] = a[i] * (1.0 - p) + b[i] * p;
-        }
-        
-        return ret;
-    }
-
-    
 
     /**
      * Computes normal of triangle <i>(p0, p1, p2)</i>, without normalizing length.
@@ -887,7 +853,7 @@ public class Triangles {
      * @param out
      * @deprecated
      */
-    public static void computeNorm(double[] p0, double[] p1, double[] p2, double[] out) {
+    @Deprecated public static void computeNorm( double[] p0, double[] p1, double[] p2, double[] out ) {
         out[0] = (((p1[1] - p0[1]) * (p2[2] - p0[2])) - ((p2[1] - p0[1]) * (p1[2] - p0[2])));
         out[1] = (((p1[2] - p0[2]) * (p2[0] - p0[0])) - ((p2[2] - p0[2]) * (p1[0] - p0[0])));
         out[2] = (((p1[0] - p0[0]) * (p2[1] - p0[1])) - ((p2[0] - p0[0]) * (p1[1] - p0[1])));
@@ -903,7 +869,7 @@ public class Triangles {
      * @param out
      * @deprecated
      */
-    public static void computeUnitNorm(double[] p0, double[] p1, double[] p2, double[] out) {
+    @Deprecated public static void computeUnitNorm(double[] p0, double[] p1, double[] p2, double[] out) {
         Vectors.cross( p0, p1, p2, out );
         Vectors.normalize( out, 1.0 );
     }
@@ -917,9 +883,56 @@ public class Triangles {
      * @return radians
      * @deprecated Use Vectors.ang()
      */
-    public static double computeAngle(double[] p0, double[] p1, double[] p2) {
+    @Deprecated public static double computeAngle(double[] p0, double[] p1, double[] p2) {
         return Vectors.ang( p0, p1, p2 );
     }
-  
-    
+
+
+    static double distanceRatio( double[] x0, double[] x1, double[] c ) {
+        double d0 = Math.sqrt((x0[0]-c[0])*(x0[0]-c[0]) + (x0[1]-c[1])*(x0[1]-c[1]) + (x0[2]-c[2])*(x0[2]-c[2]));
+        double d1 = Math.sqrt((x1[0]-c[0])*(x1[0]-c[0]) + (x1[1]-c[1])*(x1[1]-c[1]) + (x1[2]-c[2])*(x1[2]-c[2]));
+        return d0 / ( d0 + d1 );
+    }
+
+    /**
+     * Perform linear interpolation between two vectors.
+     *
+     * @param a Vector a
+     * @param b Vertor b
+     * @param p Distance ratio
+     * @return a * (1 - p) + b * p
+     */
+    static double[] interp( double[] a, double[] b, double p ) {
+        double[] ret = new double[a.length];
+        for(int i = 0; i < a.length; i++) {
+            ret[i] = a[i] * (1.0 - p) + b[i] * p;
+        }
+
+        return ret;
+    }
+
+
+
+    /**
+     * Constructs triangle from three vertices.
+     *
+     * @param v1
+     * @param v2
+     * @param v3
+     * @return
+     */
+    @Deprecated public static Triangle triangleFromVertices( double[] v1, double[] v2, double[] v3, boolean computeNorm ) {
+        double[][] norm = null;
+        if( computeNorm ) {
+            norm = new double[3][];
+            norm[0] = new double[3];
+            Vectors.cross(v1, v2, v3, norm[0]);
+            Vectors.normalize(norm[0], 1.0);
+            norm[1] = norm[0].clone();
+            norm[2] = norm[0].clone();
+        }
+
+        return new Triangle(new double[][]{v1, v2, v3}, norm, null);
+    }
+
 }

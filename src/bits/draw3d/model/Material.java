@@ -15,7 +15,27 @@ public class Material {
                                               GL_EMISSION,
                                               GL_SHININESS };
 
-    
+
+    public static Material newDull( float... color ) {
+        if( color == null ) {
+            return null;
+        }
+        float[] black = { 0f, 0f, 0f, 1f };
+        return new Material( color, color, black, black, 0f );
+    }
+
+
+    public static Material newEmit( float... color ) {
+        if( color == null ) {
+            return null;
+        }
+        float[] black = { 0f, 0f, 0f, 1f };
+        return new Material( black, black, black, color, 0f );
+    }
+
+
+
+
     private String mName = "";
     private final float[][] mValues = new float[5][];
     
@@ -38,7 +58,15 @@ public class Material {
         mValues[4] = new float[]{shininess};
     }
     
-    
+
+    public Material( Material copy ) {
+        mName = copy.mName;
+        for( int i = 0; i < mValues.length; i++ ) {
+            mValues[i] = copy.mValues[i].clone();
+        }
+    }
+
+
     public float[] ambientRef() {
         return mValues[0];
     }

@@ -3,11 +3,11 @@ package bits.draw3d.model;
 import java.awt.image.BufferedImage;
 
 public class ModelMaterial {
-    
+
+    public String mName = "";
     public BufferedImage mTex;
     public Material mMat;
-    
-    
+
     public ModelMaterial() {}
     
     public ModelMaterial( BufferedImage tex, Material mat ) {

@@ -10,6 +10,7 @@ import bits.math3d.geom.*;
 
 /**
  * @author Philip DeCamp
+ * @deprecated Use Meshes
  */
 public final class Models {
 
@@ -141,7 +142,6 @@ public final class Models {
 
 
     public static void correctPolygonOrientation( MeshModel model ) {
-
         Aabb bounds = computeBounds( model );
         double centerX = bounds.centerX();
         double centerY = bounds.centerY();
@@ -149,7 +149,6 @@ public final class Models {
         double[] center = { centerX, centerY, centerZ };
 
         for( Group g : model.getGroups() ) {
-
             Set<Triangle> set = new HashSet<Triangle>();
             List<Triangle> t = g.getTrianglesRef();
 
@@ -496,7 +495,7 @@ COMPARE_TRIANGLES:
             out = new ArrayList<Triangle>();
         }
 
-        if( cuts.size() == 0 ) {
+        if( cuts.isEmpty() ) {
             out.addAll( tris );
             return out;
         }
@@ -524,10 +523,7 @@ COMPARE_TRIANGLES:
 
             if( i == cuts.size() - 1 ) {
                 b = out;
-                listA = null;
-                listB = null;
             }
-
 
             Triangle cut = cuts.get( i );
 
@@ -557,7 +553,6 @@ COMPARE_TRIANGLES:
         List<Group> groups = new ArrayList<Group>();
 
         for( Group g : m.getGroupsRef() ) {
-
             List<Triangle> scaledTris = new ArrayList<Triangle>();
             for( Triangle t : g.getTrianglesRef() ) {
                 scaledTris.add( Triangles.scale( t, sx, sy, sz ) );

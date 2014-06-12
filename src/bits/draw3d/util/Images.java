@@ -433,9 +433,27 @@ public class Images {
 
         return optOut;
     }
-    
-    
-    
+
+
+
+    public static void flipVertical( BufferedImage image, int[] optWork ) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+        if( optWork == null || optWork.length < 2 * w ) {
+            optWork = new int[2 * w];
+        }
+
+        for( int y0 = 0; y0 < h / 2; y0++ ) {
+            int y1 = h - y0 - 1;
+            image.getRGB( 0, y0, w, 1, optWork, 0, w );
+            image.getRGB( 0, y1, w, 1, optWork, w, w );
+            image.setRGB( 0, y0, w, 1, optWork, w, w );
+            image.setRGB( 0, y1, w, 1, optWork, 0, w );
+        }
+    }
+
+
+
     public static void invert( BufferedImage image, int[] optWork ) {
         final int w = image.getWidth();
         final int h = image.getHeight();

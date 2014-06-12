@@ -25,7 +25,8 @@ public class MilkShape {
     private static final Logger sLog = Logger.getLogger( MilkShape.class.getCanonicalName() );
 
 
-    public static MeshModel loadModel( URL inputURL ) throws IOException {
+
+    public static MeshModel read( URL inputURL ) throws IOException {
         ByteBuffer buf = ModelIO.bufferStream( inputURL.openStream() );
         buf.order( ByteOrder.LITTLE_ENDIAN );
 
@@ -163,8 +164,8 @@ public class MilkShape {
                 ModelMaterial tm = material[idx];
                 if( tm != null ) {
                     Group g = groupList.get( i );
-                    g.setTexture( tm.mTex );
-                    g.setMaterial( tm.mMat );
+                    g.mTex = tm.mTex;
+                    g.mMaterial = tm.mMat;
                 }
             }
         }
@@ -173,15 +174,14 @@ public class MilkShape {
     }
 
 
-    @SuppressWarnings( "resource" )
-    public static void saveModel( MeshModel model, File outFile ) throws IOException {
+    public static void write( MeshModel model, File outFile ) throws IOException {
         FileChannel out = new FileOutputStream( outFile ).getChannel();
         ByteBuffer buf = ByteBuffer.allocate( 1024 * 8 );
         buf.order( ByteOrder.LITTLE_ENDIAN );
 
-        KdPointTree<IndexedVertex> vertices = Models.indexVertices( model );
-        Map<Triangle, Integer> triangles = Models.indexTriangles( model );
-        Map<ModelMaterial, Integer> materials = Models.indexTexMaterials( model );
+        KdPointTree<LabelVert> vertices   = Meshes.labelVerts( model );
+        Map<Triangle, Integer> triangles      = Meshes.labelTris( model );
+        Map<ModelMaterial, Integer> materials = Meshes.labelMaterials( model );
 
         saveHeader( model, buf, out );
         saveVertices( model, vertices, buf, out );
@@ -198,7 +198,7 @@ public class MilkShape {
     private static void saveHeader( MeshModel model,
                                     ByteBuffer buf,
                                     FileChannel out )
-                                                     throws IOException
+                                    throws IOException
     {
         buf.put( (byte)'M' );
         buf.put( (byte)'S' );
@@ -219,24 +219,23 @@ public class MilkShape {
 
 
     private static void saveVertices( MeshModel model,
-                                      Collection<IndexedVertex> vertices,
+                                      Collection<LabelVert> verts,
                                       ByteBuffer buf,
                                       FileChannel out )
-                                                       throws IOException
+                                      throws IOException
     {
-        buf.putShort( (short)(vertices.size()) );
-        SortedSet<IndexedVertex> set = new TreeSet<IndexedVertex>( IndexedVertex.ORDER );
-        set.addAll( vertices );
+        buf.putShort( (short)(verts.size()) );
+        SortedSet<LabelVert> set = new TreeSet<LabelVert>( LabelVert.ORDER );
+        set.addAll( verts );
 
-        for( IndexedVertex iv : set ) {
-
+        for( LabelVert iv : set ) {
             if( buf.remaining() < 15 ) {
                 buf.flip();
                 writeBuf( buf, out );
                 buf.clear();
             }
 
-            double[] v = iv.vertex();
+            double[] v = iv.mVert;
             buf.put( (byte)0 );
             buf.putFloat( (float)v[0] );
             buf.putFloat( (float)v[1] );
@@ -252,7 +251,7 @@ public class MilkShape {
 
 
     private static void saveTriangles( MeshModel model,
-                                       KdPointTree<IndexedVertex> vertices,
+                                       KdPointTree<LabelVert> vertices,
                                        Map<Triangle, Integer> triangles,
                                        ByteBuffer buf,
                                        FileChannel out )
@@ -261,7 +260,7 @@ public class MilkShape {
 
         buf.putShort( (short)triangles.size() );
 
-        PointPickResult<IndexedVertex> result = vertices.newPointPickResult();
+        PointPickResult<LabelVert> result = vertices.newPointPickResult();
         SortedMap<Integer, Triangle> map = new TreeMap<Integer, Triangle>();
         Map<Triangle, Integer> groupMap = Models.indexTriangleGroups( model );
 
@@ -270,7 +269,6 @@ public class MilkShape {
         }
 
         for( Triangle t : map.values() ) {
-
             if( buf.remaining() < 70 ) {
                 buf.flip();
                 writeBuf( buf, out );
@@ -280,16 +278,15 @@ public class MilkShape {
             buf.putShort( (short)0 );
 
             for( int i = 0; i < 3; i++ ) {
-                IndexedVertex iv = new IndexedVertex( 0, t.vertex( i ) );
+                LabelVert iv = new LabelVert( 0, t.vertex( i ) );
                 if( !vertices.pick( iv, result ) ) {
                     throw new IOException( "Failed to index vertices." );
                 }
 
-                buf.putShort( (short)(result.pickedPoint().index()) );
+                buf.putShort( (short)( result.pickedPoint().mLabel ) );
             }
 
-            double[][] r = t.normalRef();
-
+            double[][] r = t.mNorms;
             if( r != null ) {
                 for( int i = 0; i < 3; i++ ) {
                     for( int j = 0; j < 3; j++ ) {
@@ -302,8 +299,7 @@ public class MilkShape {
                 }
             }
 
-            r = t.texRef();
-
+            r = t.mTexs;
             if( r == null ) {
                 for( int i = 0; i < 6; i++ ) {
                     buf.putFloat( 0 );
@@ -336,7 +332,7 @@ public class MilkShape {
                                     FileChannel out )
                                                      throws IOException
     {
-        List<Group> groups = model.getGroupsRef();
+        List<Group> groups = model.mGroups;
         buf.putShort( (short)groups.size() );
 
         for( Group group : groups ) {
@@ -347,9 +343,9 @@ public class MilkShape {
             }
 
             buf.put( (byte)0 );
-            putName( group.getName(), 32, buf );
+            putName( group.mName, 32, buf );
 
-            List<Triangle> tris = group.getTriangles();
+            List<Triangle> tris = group.mTris;
             buf.putShort( (short)tris.size() );
 
             for( Triangle tri : tris ) {
@@ -540,6 +536,16 @@ public class MilkShape {
                 return file;
             }
         }
+    }
+
+
+    @Deprecated public static void saveModel( MeshModel model, File outFile ) throws IOException {
+        write( model, outFile );
+    }
+
+
+    @Deprecated public static MeshModel loadModel( URL inputURL ) throws IOException {
+        return read( inputURL );
     }
 
 }
