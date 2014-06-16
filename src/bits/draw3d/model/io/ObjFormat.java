@@ -82,6 +82,7 @@ public class ObjFormat {
         for( Group g: model.mGroups ) {
             out.print( "g " );
             out.println( g.mName );
+            out.println( "s off" );
             ModelMaterial modMat = g.createModelMaterial();
             if( modMat != null ) {
                 out.println( "usemtl " + modMat.mName );
@@ -131,9 +132,13 @@ public class ObjFormat {
             float alpha = 1f;
 
             if( mat.mMat != null ) {
-                format( "Ka", mat.mMat.ambientRef(), 3, out );
-                format( "Kd", mat.mMat.diffuseRef(), 3, out );
-                format( "Ks", mat.mMat.specularRef(), 3, out );
+                float[] color = new float[3];
+                LinearRGBConverter.linearToSrgb( mat.mMat.ambientRef(), color );
+                format( "Ka", color, 3, out );
+                LinearRGBConverter.linearToSrgb( mat.mMat.diffuseRef(), color );
+                format( "Kd", color, 3, out );
+                LinearRGBConverter.linearToSrgb( mat.mMat.specularRef(), color );
+                format( "Ks", color, 3, out );
 
                 alpha = mat.mMat.ambientRef()[3];
                 if( alpha < 1f ) {
