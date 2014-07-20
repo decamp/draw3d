@@ -133,11 +133,11 @@ public class ObjFormat {
 
             if( mat.mMat != null ) {
                 float[] color = new float[3];
-                LinearRGBConverter.linearToSrgb( mat.mMat.ambientRef(), color );
+                LinearRGBConverter.srgbToLinear( mat.mMat.ambientRef(), color );
                 format( "Ka", color, 3, out );
-                LinearRGBConverter.linearToSrgb( mat.mMat.diffuseRef(), color );
+                LinearRGBConverter.srgbToLinear( mat.mMat.diffuseRef(), color );
                 format( "Kd", color, 3, out );
-                LinearRGBConverter.linearToSrgb( mat.mMat.specularRef(), color );
+                LinearRGBConverter.srgbToLinear( mat.mMat.specularRef(), color );
                 format( "Ks", color, 3, out );
 
                 alpha = mat.mMat.ambientRef()[3];
