@@ -31,13 +31,8 @@ public class Mipmap2Node extends AbstractTextureNode {
             buffer( null, 0, 0, 0, -1, -1 );
         } else {
             int[] format = new int[4];
-            ByteBuffer buf = Images.imageToBgraBuffer( image, format );
-            buffer( buf,
-                    format[0],
-                    format[1],
-                    format[2],
-                    image.getWidth(),
-                    image.getHeight() );
+            ByteBuffer buf = Images.imageToByteBuffer( image, null, format );
+            buffer( buf, format[0], format[1], format[2], image.getWidth(), image.getHeight() );
         }
     }
 

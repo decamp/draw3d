@@ -23,9 +23,9 @@ public class Images {
      * the DataBuffer component values must be reversed to achieve a GL-compatible format.
      * 
      * @param image Some image 
-     * @param out4  Length-4 array to hold output. On return: <br/>
-     *              out3[0] will hold INPUT FORMAT for image. <br/>
-     *              out3[1] will hold FORMAT for image. <br/>
+     * @param out4  Length-4 array to hold output. On return: <br>
+     *              out3[0] will hold INPUT FORMAT for image. <br>
+     *              out3[1] will hold FORMAT for image. <br>
      *              out3[2] will hold DATA TYPE for image.
      *              out3[3] will equal 1 if component values must be swapped (reverse-ordered), otherwise 0. 
      * @return true if equivalent format and data type were found
@@ -105,14 +105,14 @@ public class Images {
      * Converts a BufferedImage to a 32-bit BGRA format and places it into
      * a directly allocated java.nio.ByteBuffer.
      * 
-     * @param image      Input image to convert.
-     * @param workSpace  Optional array that may be used if <code>workSpace.length &gt;= image.getWidth()</code>.
+     * @param image    Input image to convert.
+     * @param optWork  [Optional] array that may be used if {@code workSpace.length >= image.getWidth() }.
      * @return Directly allocated ByteBuffer containing pixels in BGRA format and sRGB color space.
      */
-    public static ByteBuffer imageToBgraBuffer( BufferedImage image, int[] workSpace ) {
+    public static ByteBuffer imageToBgraBuffer( BufferedImage image, int[] optWork ) {
         int w = image.getWidth();
         int h = image.getHeight();
-        int[] row = workSpace != null && workSpace.length >= w ? workSpace : new int[w];
+        int[] row = optWork != null && optWork.length >= w ? optWork : new int[w];
 
         ByteBuffer ret = ByteBuffer.allocateDirect( ( w * h ) * 4 );
         ret.order( ByteOrder.LITTLE_ENDIAN );
@@ -130,8 +130,8 @@ public class Images {
      * Converts a BufferedImage to a directly allocated java.nio.ByteBuffer.
      * This method will first check to see if the image can be ported directly to a
      * GL compatible format. If so, it will dump the data directly without conversion
-     * via <code>dataToByteBuffer</code>. If not, it will convert the image via
-     * <code>imageToBgraBuffer</code>.
+     * via {@link #dataToByteBuffer}. If not, it will convert the image via
+     * {@link #imageToBgraBuffer}.
      *
      * @param optOutFormat  Holds GL enum values for buffe representation. See {@link #glFormatFor}.
      * @return Directly allocated byte buffer holding image.
@@ -144,8 +144,8 @@ public class Images {
      * Converts a BufferedImage to a directly allocated java.nio.ByteBuffer.
      * This method will first check to see if the image can be ported directly to a
      * GL compatible format. If so, it will dump the data directly without conversion
-     * via <code>dataToByteBuffer</code>. If not, it will convert the image via
-     * <code>imageToBgraBuffer</code>.
+     * via {@link #dataToByteBuffer}. If not, it will convert the image via
+     * {@link #imageToBgraBuffer}.
      *
      * @param optOutFormat  Holds GL enum values for buffe representation. See {@link #glFormatFor}.
      * @param optWorkspace  Optional array that may be used if <code>workSpace.length &gt;= image.getWidth()</code>.

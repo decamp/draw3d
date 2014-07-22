@@ -35,8 +35,7 @@ import bits.draw3d.util.Images;
         if( image == null ) {
             buffer( null, 0, 0, 0, -1, -1 );
         } else {
-            int[] format = new int[4];
-            ByteBuffer buf = Images.imageToBgraBuffer( image, format );
+            ByteBuffer buf = Images.imageToBgraBuffer( image, null );
             buffer( buf,
                     GL_RGBA,
                     GL_BGRA,
