@@ -52,32 +52,37 @@ public class DrawBufferParams {
 
 
     public DrawBufferParams( DrawBufferParams copy ) {
-        mVertEnabled = copy.mVertEnabled;
-        mVertSize = copy.mVertSize;
-        mVertType = copy.mVertType;
-        mVertStride = copy.mVertStride;
-        mVertOffset = copy.mVertOffset;
-        mTexEnabled = copy.mTexEnabled;
-        mTexSize = copy.mTexSize;
-        mTexStride = copy.mTexStride;
-        mTexOffset = copy.mTexOffset;
-        mNormEnabled = copy.mNormEnabled;
-        mNormType = copy.mNormType;
-        mNormStride = copy.mNormStride;
-        mNormOffset = copy.mNormOffset;
-        mColorEnabled = copy.mColorEnabled;
-        mColorSize = copy.mColorSize;
-        mColorType = copy.mColorType;
-        mColorStride = copy.mColorStride;
-        mColorOffset = copy.mColorOffset;
-        mIndexEnabled = copy.mIndexEnabled;
-        mIndexType = copy.mIndexType;
-        mCommandEnabled = copy.mCommandEnabled;
-        mCommandMode = copy.mCommandMode;
-        mCommandOffset = copy.mCommandOffset;
-        mCommandCount = copy.mCommandCount;
+        set( copy );
     }
 
+
+
+    public void set( DrawBufferParams p ) {
+        mVertEnabled    = p.mVertEnabled;
+        mVertSize       = p.mVertSize;
+        mVertType       = p.mVertType;
+        mVertStride     = p.mVertStride;
+        mVertOffset     = p.mVertOffset;
+        mTexEnabled     = p.mTexEnabled;
+        mTexSize        = p.mTexSize;
+        mTexStride      = p.mTexStride;
+        mTexOffset      = p.mTexOffset;
+        mNormEnabled    = p.mNormEnabled;
+        mNormType       = p.mNormType;
+        mNormStride     = p.mNormStride;
+        mNormOffset     = p.mNormOffset;
+        mColorEnabled   = p.mColorEnabled;
+        mColorSize      = p.mColorSize;
+        mColorType      = p.mColorType;
+        mColorStride    = p.mColorStride;
+        mColorOffset    = p.mColorOffset;
+        mIndexEnabled   = p.mIndexEnabled;
+        mIndexType      = p.mIndexType;
+        mCommandEnabled = p.mCommandEnabled;
+        mCommandMode    = p.mCommandMode;
+        mCommandOffset  = p.mCommandOffset;
+        mCommandCount   = p.mCommandCount;
+    }
 
 
     public void command( int mode, int offset, int count ) {

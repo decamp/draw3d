@@ -61,12 +61,6 @@ public final class Texture2Node extends AbstractTextureNode {
     }
 
     @Override
-    public void format( int intFormat, int format, int dataType ) {}
-
-    @Override
-    public void size( int w, int h ) {}
-
-    @Override
     public void dispose( GL gl ) {
         super.dispose( gl );
         mBuf = null;
