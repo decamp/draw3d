@@ -12,14 +12,15 @@ import java.util.*;
 public class SceneGraph {
 
     private static final int CONNECT_FIRST = 0;
-    private static final int CONNECT_LAST = 1;
-    private static final int CONNECT_ALL = 2;
-    private static final int CONNECT_NONE = 3;
+    private static final int CONNECT_LAST  = 1;
+    private static final int CONNECT_ALL   = 2;
+    private static final int CONNECT_NONE  = 3;
 
-    private static final int EMBED_GRAPH_ROOTS = CONNECT_ALL;
+    private static final int EMBED_GRAPH_ROOTS  = CONNECT_ALL;
     private static final int EMBED_GRAPH_LEAVES = CONNECT_LAST;
 
     private final Map<Object, NodeInfo> mModuleMap = new LinkedHashMap<Object, NodeInfo>();
+    private NodeInfo mPrev = null;
 
 
     public SceneGraph() {}
@@ -34,7 +35,7 @@ public class SceneGraph {
 
 
     public void add( Object node ) {
-        getNodeInfo( node );
+        mPrev = getNodeInfo( node );
     }
 
 
@@ -42,6 +43,10 @@ public class SceneGraph {
         NodeInfo info = mModuleMap.remove( node );
         if( info == null ) {
             return;
+        }
+
+        if( mPrev == info ) {
+            mPrev = null;
         }
 
         for( GraphEdge e : info.mParentEdges ) {
@@ -62,7 +67,6 @@ public class SceneGraph {
 
     }
 
-
     /**
      * Replaces a node with a new object, while retaining all existing
      * connections.
@@ -78,6 +82,7 @@ public class SceneGraph {
         }
 
         NodeInfo newInfo = getNodeInfo( newNode );
+        mPrev = newInfo;
 
         for( GraphEdge oldEdge : oldInfo.mParentEdges ) {
             NodeInfo parentInfo = mModuleMap.get( oldEdge.parent() );
@@ -116,7 +121,7 @@ public class SceneGraph {
 
     public GraphEdge connect( Object parent, Object child, int order ) {
         NodeInfo parentInfo = getNodeInfo( parent );
-        NodeInfo childInfo = getNodeInfo( child );
+        NodeInfo childInfo  = mPrev = getNodeInfo( child );
         GraphEdge e = new GraphEdge( parent, child, order );
 
         parentInfo.mChildEdges.add( e );
@@ -128,7 +133,7 @@ public class SceneGraph {
 
     public GraphEdge connectFirst( Object parent, Object child ) {
         NodeInfo parentInfo = getNodeInfo( parent );
-        NodeInfo childInfo = getNodeInfo( child );
+        NodeInfo childInfo  = mPrev = getNodeInfo( child );
 
         GraphEdge edge;
 
@@ -136,7 +141,6 @@ public class SceneGraph {
             edge = new GraphEdge( parent, child, 0 );
         } else {
             GraphEdge first = parentInfo.mChildEdges.first();
-
             if( first.order() < Integer.MIN_VALUE + 10 ) {
                 edge = new GraphEdge( parent, child, Integer.MIN_VALUE );
             } else {
@@ -150,10 +154,29 @@ public class SceneGraph {
         return edge;
     }
 
+    /**
+     * Like {@code #connectFirst(Object,Object)}, but implicitly uses the last node added as the parent.
+
+     * @param node Node to add.
+     * @return Edge connecting last added-node with {@code node}.
+     */
+    public GraphEdge connectFirst( Object node ) {
+        if( mPrev == null ) {
+            add( node );
+            return null;
+        }
+
+        if( mPrev.mNode == node ) {
+            return null;
+        }
+
+        return connectFirst( mPrev.mNode, node );
+    }
+
 
     public GraphEdge connectLast( Object parent, Object child ) {
         NodeInfo parentInfo = getNodeInfo( parent );
-        NodeInfo childInfo = getNodeInfo( child );
+        NodeInfo childInfo  = mPrev = getNodeInfo( child );
 
         GraphEdge edge;
 
@@ -174,6 +197,25 @@ public class SceneGraph {
 
         return edge;
 
+    }
+
+    /**
+     * Like {@code #connectLast(Object,Object)}, but implicitly uses the last node added as the parent.
+
+     * @param node Node to add.
+     * @return Edge connecting last added-node with {@code node}.
+     */
+    public GraphEdge connectLast( Object node ) {
+        if( mPrev == null ) {
+            add( node );
+            return null;
+        }
+
+        if( mPrev.mNode == node ) {
+            return null;
+        }
+
+        return connectLast( mPrev.mNode, node );
     }
 
 
@@ -260,7 +302,6 @@ public class SceneGraph {
 
         return ret;
     }
-
 
     @SuppressWarnings( "unchecked" )
     public <T> GraphPath<T> compilePath( Class<T> nodeClass ) {
