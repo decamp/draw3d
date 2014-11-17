@@ -117,9 +117,9 @@ public class BasicShaderConfig {
                 out.mColor      = true;
                 out.mNorm       = false;
                 out.mTexCompNum = 0;
-                out.mVertShader = "ColorGeom.vert";
-                out.mGeomShader = "ColorLinesToQuads.geom";
-                out.mFragShader = "Color.frag";
+                out.mVertShader = "glsl/bits/draw3d/shader/ColorGeom.vert";
+                out.mGeomShader = "glsl/bits/draw3d/shader/ColorLinesToQuads.geom";
+                out.mFragShader = "glsl/bits/draw3d/shader/Color.frag";
                 break;
             }
             // FALL-THROUGH
@@ -134,39 +134,33 @@ public class BasicShaderConfig {
         {
             if( mTexCompNum == 0 ) {
                 out.mNorm = false;
-                out.mVertShader = "Color.vert";
+                out.mVertShader = "glsl/bits/draw3d/shader/Color.vert";
                 out.mGeomShader = null;
-                out.mFragShader = "Color.frag";
+                out.mFragShader = "glsl/bits/draw3d/shader/Color.frag";
             } else {
                 if( mColor ) {
                     if( mNorm ) {
-                        out.mVertShader = "ColorNormTex.vert";
+                        out.mVertShader = "glsl/bits/draw3d/shader/ColorNormTex.vert";
                         out.mGeomShader = null;
-                        out.mFragShader = "ColorTex.frag";
+                        out.mFragShader = "glsl/bits/draw3d/shader/ColorTex.frag";
                     } else {
-                        out.mVertShader = "ColorTex.vert";
+                        out.mVertShader = "glsl/bits/draw3d/shader/ColorTex.vert";
                         out.mGeomShader = null;
-                        out.mFragShader = "ColorTex.frag";
+                        out.mFragShader = "glsl/bits/draw3d/shader/ColorTex.frag";
                     }
                 } else {
                     if( mNorm ) {
-                        out.mVertShader = "NormTex.vert";
+                        out.mVertShader = "glsl/bits/draw3d/shader/NormTex.vert";
                         out.mGeomShader = null;
-                        out.mFragShader = "Tex.frag";
+                        out.mFragShader = "glsl/bits/draw3d/shader/Tex.frag";
                     } else {
-                        out.mVertShader = "Tex.vert";
+                        out.mVertShader = "glsl/bits/draw3d/shader/Tex.vert";
                         out.mGeomShader = null;
-                        out.mFragShader = "Tex.frag";
+                        out.mFragShader = "glsl/bits/draw3d/shader/Tex.frag";
                     }
                 }
             }
         }}
-
-        out.mVertShader = SHADER_PATH + '/' + out.mVertShader;
-        if( out.mGeomShader != null ) {
-            out.mGeomShader = SHADER_PATH + '/' + out.mGeomShader;
-        }
-        out.mFragShader = SHADER_PATH + '/' + out.mFragShader;
     }
 
 

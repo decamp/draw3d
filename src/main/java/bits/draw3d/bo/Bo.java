@@ -50,6 +50,7 @@ public class Bo extends DrawUnitAdapter implements DrawNode {
     }
 
 
+
     /**
      * Changes Buffer Object capacity. Causes previous
      * data to be erased. Buffer Object may not be updated
@@ -148,7 +149,7 @@ public class Bo extends DrawUnitAdapter implements DrawNode {
     @Override
     public void init( DrawEnv d ) {
         doInit( d );
-        d.mGl.glBindBuffer( mType, 0 );
+        unbind( d );
     }
 
     @Override
@@ -163,7 +164,7 @@ public class Bo extends DrawUnitAdapter implements DrawNode {
     }
 
     @Override
-    public void  bind( DrawEnv d ) {
+    public void bind( DrawEnv d ) {
         if( !mNeedInit ) {
             d.mGl.glBindBuffer( mType, mId[0] );
         } else {

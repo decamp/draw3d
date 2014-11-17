@@ -215,17 +215,17 @@ public class BasicShaders {
         public void attributes( Vao out ) {
             int stride = bytesPerElem();
             out.addAttribute( 0, 3, GL_FLOAT, false, stride, 0 );
-            out.addAttribute( 1, mTexDim, GL_FLOAT, false, stride, 12 );
-            out.addAttribute( 2, 4, GL_UNSIGNED_BYTE, true, stride, 12 + 4 * mTexDim );
+            out.addAttribute( 1, 4, GL_UNSIGNED_BYTE, true, stride, 12 );
+            out.addAttribute( 2, mTexDim, GL_FLOAT, false, stride, 12 + 4 );
         }
 
         @Override
         public void write( DrawVert vert, ByteBuffer bo ) {
             Vec.put( vert.mPos, bo );
+            bo.putInt( TypeConverter.toUbytes( vert.mColor ) );
             for( int i = 0; i < mTexDim; i++ ) {
                 bo.putFloat( vert.mTex[i] );
             }
-            bo.putInt( TypeConverter.toUbytes( vert.mColor ) );
         }
     }
 
@@ -245,18 +245,18 @@ public class BasicShaders {
         @Override
         public void attributes( Vao out ) {
             int stride = bytesPerElem();
-            out.addAttribute( 0, 3,       GL_FLOAT, false, stride, 0                );
-            out.addAttribute( 1, mTexDim, GL_FLOAT, false, stride, 12               );
-            out.addAttribute( 2, 3,       GL_FLOAT, false, stride, 12 + 4 * mTexDim );
+            out.addAttribute( 0, 3,       GL_FLOAT, false, stride, 0       );
+            out.addAttribute( 1, 3,       GL_FLOAT, false, stride, 12      );
+            out.addAttribute( 2, mTexDim, GL_FLOAT, false, stride, 12 + 12 );
         }
 
         @Override
         public void write( DrawVert vert, ByteBuffer vbo ) {
             Vec.put( vert.mPos, vbo );
+            Vec.put( vert.mNorm, vbo );
             for( int i = 0; i < mTexDim; i++ ) {
                 vbo.putFloat( vert.mTex[i] );
             }
-            Vec.put( vert.mNorm, vbo );
         }
     }
 
@@ -276,20 +276,20 @@ public class BasicShaders {
         @Override
         public void attributes( Vao out ) {
             int stride = bytesPerElem();
-            out.addAttribute( 0, 3,       GL_FLOAT,         false, stride, 0                     );
-            out.addAttribute( 1, mTexDim, GL_FLOAT,         false, stride, 12                    );
-            out.addAttribute( 2, 3,       GL_FLOAT,         false, stride, 12 + 4 * mTexDim      );
-            out.addAttribute( 3, 4,       GL_UNSIGNED_BYTE, true,  stride, 12 + 4 * mTexDim + 12 );
+            out.addAttribute( 0, 3,       GL_FLOAT,         false, stride, 0           );
+            out.addAttribute( 1, 4,       GL_UNSIGNED_BYTE, true,  stride, 12          );
+            out.addAttribute( 2, 3,       GL_FLOAT,         false, stride, 12 + 4      );
+            out.addAttribute( 3, mTexDim, GL_FLOAT,         false, stride, 12 + 4 + 12 );
          }
 
         @Override
         public void write( DrawVert vert, ByteBuffer vbo ) {
             Vec.put( vert.mPos, vbo );
+            vbo.putInt( TypeConverter.toUbytes( vert.mColor ) );
+            Vec.put( vert.mNorm, vbo );
             for( int i = 0; i < mTexDim; i++ ) {
                 vbo.putFloat( vert.mTex[i] );
             }
-            Vec.put( vert.mNorm, vbo );
-            vbo.putInt( TypeConverter.toUbytes( vert.mColor ) );
         }
     }
 

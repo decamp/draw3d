@@ -126,7 +126,14 @@
       <include name="LICENSE.TXT" />
     </fileset>
 
+    <fileset id="jar.glsl" dir="src/main">
+      <include name="glsl/**/*.vert" />
+      <include name="glsl/**/*.geom" />
+      <include name="glsl/**/*.frag" />
+    </fileset>
+
     <jar jarfile="${jar.file}" basedir="${build.dir}" manifest="${manifest.path}" >
+      <fileset refid="jar.glsl" />
       <metainf refid="jar.meta.root" />
       <metainf refid="jar.meta.gen" />
     </jar>

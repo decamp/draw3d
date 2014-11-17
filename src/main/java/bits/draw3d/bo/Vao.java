@@ -128,7 +128,6 @@ public class Vao implements DrawUnit {
     @Override
     public void init( DrawEnv d ) {
         doInit( d );
-        unbind( d );
     }
 
     @Override
@@ -161,12 +160,11 @@ public class Vao implements DrawUnit {
         }
 
         gl.glBindVertexArray( mId[0] );
+
         if( mVbo != null ) {
             mVbo.bind( d );
-            if( mVbo.id() != 0 ) {
-                for( VertAttribute va: mAttribs ) {
-                    va.enable( gl );
-                }
+            for( VertAttribute va: mAttribs ) {
+                va.enable( gl );
             }
         } else {
             gl.glBindBuffer( GL_ARRAY_BUFFER, 0 );

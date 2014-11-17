@@ -28,8 +28,8 @@ public class DrawStream {
 
     private static final int DEFAULT_BUF_SIZE = 64 * 1024;
 
-    private final int[] mVbo = { 0 };
-    private final int[] mIbo = { 0 };
+    private final Bo mVbo = Bo.createArrayBuffer( GL_STREAM_DRAW );
+    private final Bo mIbo = Bo.createElementBuffer( GL_STREAM_DRAW );
     private final ByteBuffer mVertBuf;
     private final ByteBuffer mIndBuf;
 
@@ -64,20 +64,14 @@ public class DrawStream {
         mG = g;
         GL3 gl = g.mGl;
 
-        if( mVbo[0] != 0 ) {
+        if( mVbo.id() != 0 ) {
             return;
         }
 
-        gl.glGenBuffers( 1, mVbo, 0 );
-        gl.glBindBuffer( GL_ARRAY_BUFFER, mVbo[0] );
-        gl.glBufferData( GL_ARRAY_BUFFER, mVertBuf.capacity(), null, GL_STREAM_DRAW );
-        gl.glBindBuffer( GL_ARRAY_BUFFER, 0 );
-        DrawUtil.checkErr( gl );
-
-        gl.glGenBuffers( 1, mIbo, 0 );
-        gl.glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mIbo[0] );
-        gl.glBufferData( GL_ELEMENT_ARRAY_BUFFER, mIndBuf.capacity(), null, GL_STREAM_DRAW );
-        gl.glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+        mVbo.alloc( mVertBuf.capacity() );
+        mVbo.init( g );
+        mIbo.alloc( mIndBuf.capacity() );
+        mIbo.init( g );
         DrawUtil.checkErr( gl );
     }
 
@@ -157,7 +151,7 @@ public class DrawStream {
         if( indexer != null ) {
             indexer.reset();
             mIndBuf.clear();
-            mG.mGl.glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mIbo[0] );
+            mIbo.bind( mG );
         }
 
         DrawUtil.checkErr( mG.mGl );
@@ -292,7 +286,7 @@ public class DrawStream {
 
 
     public void vert( float x, float y ) {
-        Vec.put( x, y, 0f, mVert.mPos );
+        vert( x, y, 0f );
     }
 
 
@@ -303,11 +297,19 @@ public class DrawStream {
 
     public void vert( float x, float y, float z ) {
         Vec.put( x, y, z, mVert.mPos );
+        mActiveWriter.mVertWriter.write( mVert, mVertBuf );
+        if( mActiveIndexer != null ) {
+            mActiveIndexer.write( mActivePos, mIndBuf );
+        }
+        if( ++mActivePos < mActiveCap ) {
+            return;
+        }
+        flush();
     }
 
 
     public void vert( Vec3 v ) {
-        Vec.put( v, mVert.mPos );
+        vert( v.x, v.y, v.z );
     }
 
 
@@ -318,6 +320,7 @@ public class DrawStream {
 
 
     private Writer getWriter() {
+        mConfig.lineWidth( mG.mLineWidth.mValue );
         mConfig.chooseAvailable( mChosenConfig );
         Writer writer = mWriters.get( mChosenConfig );
         if( writer != null ) {
@@ -326,12 +329,13 @@ public class DrawStream {
 
         BoProgram<DrawVert,?> prog = BasicShaders.createProgram( mChosenConfig, mG.mShaderMan );
         writer = new Writer();
-        writer.mProgram = prog.mProgram;
+
+        writer.mProgram    = prog.mProgram;
         writer.mVertWriter = prog.mVertWriter;
-        writer.mVao = new Vao();
+        writer.mVao        = new Vao( mVbo, null );
+
+        writer.mProgram.init( mG );
         writer.mVertWriter.attributes( writer.mVao );
-        writer.mVao.bind( mG );
-        mG.mGl.glBindBuffer( GL_ARRAY_BUFFER, mVbo[0] );
 
         mWriters.put( mChosenConfig, writer );
         mChosenConfig = new BasicShaderConfig();
@@ -341,14 +345,17 @@ public class DrawStream {
 
 
     private void flush() {
-        mVertBuf.clear();
+        mVertBuf.flip();
         mG.mGl.glBufferSubData( GL_ARRAY_BUFFER, 0, mVertBuf.remaining(), mVertBuf );
+        mVertBuf.clear();
+
         if( mActiveIndexer == null ) {
             mG.mGl.glDrawArrays( mActiveMode, 0, mActivePos );
         } else {
-            mIndBuf.clear();
+            mIndBuf.flip();
             mG.mGl.glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, 0, mIndBuf.remaining(), mIndBuf );
             mG.mGl.glDrawElements( mActiveMode, mActiveIndexer.count(), GL_UNSIGNED_INT, 0 );
+            mIndBuf.clear();
         }
         mActivePos = 0;
     }
