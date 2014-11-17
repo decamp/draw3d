@@ -6,9 +6,8 @@
 # IDE project files. 
 *.iml
 
-/scratch/
-/target/
-/ext/
-/dist/
-/build/
-/build_test/
+scratch/
+target/
+ext/
+
+ant
