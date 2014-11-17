@@ -1,4 +1,4 @@
-package bits.draw3d.geom;
+package bits.draw3d.model;
 
 import java.util.ArrayList;
 import java.util.List;

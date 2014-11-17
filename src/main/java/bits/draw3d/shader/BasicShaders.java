@@ -1,8 +1,8 @@
 package bits.draw3d.shader;
 
 import bits.draw3d.bo.*;
-import bits.draw3d.geom.DrawTri;
-import bits.draw3d.geom.DrawVert;
+import bits.draw3d.model.DrawTri;
+import bits.draw3d.model.DrawVert;
 import bits.draw3d.util.TypeConverter;
 import bits.math3d.Vec;
 import bits.math3d.Vec4;

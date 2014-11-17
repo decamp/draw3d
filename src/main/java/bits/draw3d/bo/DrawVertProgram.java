@@ -1,6 +1,6 @@
 package bits.draw3d.bo;
 
-import bits.draw3d.geom.DrawVert;
+import bits.draw3d.model.DrawVert;
 
 /**
  * @author Philip DeCamp

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.*;
 
 import bits.blob.Blob;
-import bits.draw3d.geom.*;
+import bits.draw3d.model.*;
 import bits.draw3d.model.io.ModelIO;
 import bits.draw3d.shader.ShaderManager;
 import bits.draw3d.tex.Material;

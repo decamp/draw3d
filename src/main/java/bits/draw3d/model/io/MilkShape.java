@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 
-import bits.draw3d.geom.*;
+import bits.draw3d.model.*;
 import bits.draw3d.tex.Material;
 import bits.math3d.Vec;
 import bits.math3d.Vec3;

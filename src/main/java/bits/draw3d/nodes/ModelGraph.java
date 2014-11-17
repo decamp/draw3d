@@ -3,7 +3,7 @@ package bits.draw3d.nodes;
 import java.util.*;
 
 import bits.draw3d.actors.Actor;
-import bits.draw3d.geom.DrawTri;
+import bits.draw3d.model.DrawTri;
 import bits.draw3d.pick.*;
 import bits.draw3d.scene.*;
 

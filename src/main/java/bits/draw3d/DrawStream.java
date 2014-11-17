@@ -1,7 +1,7 @@
 package bits.draw3d;
 
 import bits.draw3d.bo.*;
-import bits.draw3d.geom.DrawVert;
+import bits.draw3d.model.DrawVert;
 import bits.draw3d.shader.*;
 import bits.math3d.*;
 
@@ -27,11 +27,7 @@ public class DrawStream {
     private final ByteBuffer mVertBuf;
     private final ByteBuffer mIndBuf;
 
-
-    private final DrawVert          mVert         = new DrawVert( new Vec3(),
-                                                                  new float[4],
-                                                                  new Vec3(),
-                                                                  new Vec4( 0, 0, 0, 1 ) );
+    private final DrawVert mVert = new DrawVert( new Vec3(), new float[4], new Vec3(), new Vec4( 0, 0, 0, 1 ) );
     private final BasicShaderConfig mConfig       = new BasicShaderConfig();
     private       BasicShaderConfig mChosenConfig = new BasicShaderConfig();
 

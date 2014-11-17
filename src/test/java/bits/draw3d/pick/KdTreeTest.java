@@ -3,7 +3,7 @@ package bits.draw3d.pick;
 import java.io.*;
 import java.util.*;
 
-import bits.draw3d.geom.*;
+import bits.draw3d.model.*;
 import bits.math3d.*;
 import org.junit.*;
 import static org.junit.Assert.*;

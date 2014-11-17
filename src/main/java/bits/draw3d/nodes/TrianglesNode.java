@@ -5,8 +5,8 @@ import static javax.media.opengl.GL.*;
 
 import bits.draw3d.*;
 import bits.draw3d.bo.*;
-import bits.draw3d.geom.DrawTri;
-import bits.draw3d.geom.DrawVert;
+import bits.draw3d.model.DrawTri;
+import bits.draw3d.model.DrawVert;
 import bits.draw3d.shader.*;
 
 

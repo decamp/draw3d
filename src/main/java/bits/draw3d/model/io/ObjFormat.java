@@ -1,6 +1,6 @@
 package bits.draw3d.model.io;
 
-import bits.draw3d.geom.*;
+import bits.draw3d.model.*;
 import bits.math3d.Vec3;
 import bits.math3d.Vec4;
 import bits.util.Files;

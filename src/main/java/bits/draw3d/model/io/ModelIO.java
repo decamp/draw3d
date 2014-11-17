@@ -5,10 +5,9 @@ import java.net.URL;
 import java.nio.*;
 
 import bits.blob.Blob;
-import bits.draw3d.geom.ModelMaterial;
-import bits.draw3d.geom.TriModel;
+import bits.draw3d.model.ModelMaterial;
+import bits.draw3d.model.TriModel;
 import bits.draw3d.tex.Material;
-import bits.draw3d.model.io.*;
 import bits.math3d.Vec4;
 
 

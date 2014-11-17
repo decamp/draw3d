@@ -7,7 +7,7 @@ import java.util.*;
 
 import javax.imageio.ImageIO;
 
-import bits.draw3d.geom.*;
+import bits.draw3d.model.*;
 import bits.draw3d.tex.Material;
 import bits.math3d.Vec3;
 import bits.math3d.Vec4;

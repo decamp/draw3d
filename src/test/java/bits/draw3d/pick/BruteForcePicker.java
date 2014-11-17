@@ -1,6 +1,6 @@
 package bits.draw3d.pick;
 
-import bits.draw3d.geom.DrawTri;
+import bits.draw3d.model.DrawTri;
 import bits.math3d.Vec;
 import bits.math3d.Vec3;
 

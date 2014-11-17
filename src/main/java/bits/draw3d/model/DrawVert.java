@@ -1,4 +1,4 @@
-package bits.draw3d.geom;
+package bits.draw3d.model;
 
 import bits.draw3d.PosObject;
 import bits.math3d.*;

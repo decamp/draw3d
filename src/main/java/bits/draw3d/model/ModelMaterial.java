@@ -1,4 +1,4 @@
-package bits.draw3d.geom;
+package bits.draw3d.model;
 
 import bits.draw3d.tex.Material;
 import bits.draw3d.tex.Texture;
@@ -9,6 +9,7 @@ public class ModelMaterial {
 
     public String        mName     = "";
     public BufferedImage mImage    = null;
+
     public Texture       mTex      = null;
     public Material      mMaterial = null;
 
