@@ -3,6 +3,7 @@
  * Released under the BSD 2-Clause License
  * http://opensource.org/licenses/BSD-2-Clause
  */
+
 package bits.draw3d.actors;
 
 import bits.math3d.*;
