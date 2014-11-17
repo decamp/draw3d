@@ -33,10 +33,10 @@ public class ObjParser {
         List<Vec3>     verts  = new ArrayList<Vec3>();
         List<Vec3>     norms  = new ArrayList<Vec3>();
         List<float[]>  texes  = new ArrayList<float[]>();
-        Map<String, ModelMaterial> materialMap = new LinkedHashMap<String, ModelMaterial>();
+        Map<String, DrawMaterial> materialMap = new LinkedHashMap<String, DrawMaterial>();
 
         String nextGroupName = null;
-        ModelMaterial nextMat = null;
+        DrawMaterial nextMat = null;
 
         for( String k = in.readLine(); k != null; k = in.readLine() ) {
             String[] tok = k.split( "\\s++" );
@@ -170,17 +170,17 @@ public class ObjParser {
     }
 
 
-    public static Map<String, ModelMaterial> readMaterials( URL url,
-                                                            Map<String, ModelMaterial> out )
+    public static Map<String, DrawMaterial> readMaterials( URL url,
+                                                            Map<String, DrawMaterial> out )
                                                             throws IOException
     {
         if( out == null ) {
-            out = new LinkedHashMap<String, ModelMaterial>();
+            out = new LinkedHashMap<String, DrawMaterial>();
         }
 
         BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
         BufferedImage im  = null;
-        ModelMaterial material = null;
+        DrawMaterial material = null;
         String[] names = null;
 
         for( String k = in.readLine(); k != null; k = in.readLine() ) {
@@ -192,14 +192,14 @@ public class ObjParser {
             if( tok[0].equals( "newmtl" ) ) {
                 if( material != null ) {
                     for( String name: names ) {
-                        ModelMaterial copy = new ModelMaterial( material );
+                        DrawMaterial copy = new DrawMaterial( material );
                         copy.mName     = name;
                         copy.mMaterial = new Material( material.mMaterial );
                         out.put( name, material );
                     }
                 }
 
-                material = new ModelMaterial();
+                material = new DrawMaterial();
                 names = Arrays.copyOfRange( tok, 1, tok.length );
                 material.mName = tok.length > 1 ? tok[1] : "";
                 material.mMaterial = new Material();
@@ -253,7 +253,7 @@ public class ObjParser {
 
         if( material != null ) {
             for( String name: names ) {
-                ModelMaterial copy = new ModelMaterial( material );
+                DrawMaterial copy = new DrawMaterial( material );
                 copy.mName     = name;
                 copy.mMaterial = new Material( material.mMaterial );
                 out.put( name, material );

@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * @author Philip DeCamp
  */
-public class GeomUtil {
+public class Models {
 
 
     public static Iterator<DrawVert> vertIterator( Collection<? extends DrawTri> tris ) {
@@ -32,7 +32,7 @@ public class GeomUtil {
     }
 
 
-    public static Iterator<ModelMaterial> materialIterator( TriModel model ) {
+    public static Iterator<DrawMaterial> materialIterator( TriModel model ) {
         return new ModelMaterialIter( model.mGroups );
     }
 
@@ -105,7 +105,7 @@ public class GeomUtil {
     }
 
 
-    public static void getMaterials( TriModel model, Collection<? super ModelMaterial> out ) {
+    public static void getMaterials( TriModel model, Collection<? super DrawMaterial> out ) {
         for( TriGroup g: model.mGroups ) {
             out.add( g.mMaterial );
         }
@@ -126,10 +126,10 @@ public class GeomUtil {
     }
 
 
-    public static List<ModelMaterial> listUniqueMaterials( TriModel model ) {
-        Set<ModelMaterial> set = new HashSet<ModelMaterial>();
+    public static List<DrawMaterial> listUniqueMaterials( TriModel model ) {
+        Set<DrawMaterial> set = new HashSet<DrawMaterial>();
         getMaterials( model, set );
-        return new ArrayList<ModelMaterial>( set );
+        return new ArrayList<DrawMaterial>( set );
     }
 
 
@@ -333,10 +333,10 @@ public class GeomUtil {
     }
 
 
-    static class ModelMaterialIter implements Iterator<ModelMaterial> {
+    static class ModelMaterialIter implements Iterator<DrawMaterial> {
 
         private final Iterator<TriGroup> mIter;
-        private ModelMaterial mNext = null;
+        private DrawMaterial mNext = null;
 
         public ModelMaterialIter( List<TriGroup> list ) {
             mIter = list.iterator();
@@ -350,8 +350,8 @@ public class GeomUtil {
         }
 
         @Override
-        public ModelMaterial next() {
-            ModelMaterial ret = mNext;
+        public DrawMaterial next() {
+            DrawMaterial ret = mNext;
             queue();
             return ret;
         }
@@ -369,6 +369,5 @@ public class GeomUtil {
         }
 
     }
-
 
 }

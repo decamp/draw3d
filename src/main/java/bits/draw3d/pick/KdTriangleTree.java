@@ -65,7 +65,7 @@ public final class KdTriangleTree implements RayPicker {
 
     public static KdTriangleTree build( List<? extends DrawTri> triList ) {
         Box3 box = new Box3();
-        GeomUtil.computeBounds( GeomUtil.vertIterator( triList ), box );
+        Models.computeBounds( Models.vertIterator( triList ), box );
         float[] vox = { box.x0, box.y0, box.z0, box.x1, box.y1, box.z1 };
 
         // Generate events.

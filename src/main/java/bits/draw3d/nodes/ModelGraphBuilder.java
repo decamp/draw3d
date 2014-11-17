@@ -86,11 +86,11 @@ import bits.util.Files;
 
     public void parseModelBlob( File baseDir, Blob blob ) throws IOException {
         //Find any override materials specified in blob.
-        Map<String, ModelMaterial> materialMap = new HashMap<String, ModelMaterial>();
+        Map<String, DrawMaterial> materialMap = new HashMap<String, DrawMaterial>();
         if( blob.containsKey( "materials" ) ) {
             for( Object obj : blob.keySet( "materials" ) ) {
                 String name = obj.toString();
-                ModelMaterial mat = ModelIO.readMaterialBlob( name, blob.slice( "materials", obj ) );
+                DrawMaterial mat = ModelIO.readMaterialBlob( name, blob.slice( "materials", obj ) );
                 materialMap.put( name, mat );
             }
         }
@@ -109,7 +109,7 @@ import bits.util.Files;
             //Override materials if necessary.
             for( TriGroup g : model.mGroups ) {
                 String n = g.mName;
-                ModelMaterial mat = materialMap.get( n );
+                DrawMaterial mat = materialMap.get( n );
                 if( mat == null ) {
                     mat = materialMap.get( "all" );
                 }

@@ -11,7 +11,7 @@ import java.net.URL;
 import java.nio.*;
 
 import bits.blob.Blob;
-import bits.draw3d.model.ModelMaterial;
+import bits.draw3d.model.DrawMaterial;
 import bits.draw3d.model.TriModel;
 import bits.draw3d.tex.Material;
 import bits.math3d.Vec4;
@@ -62,7 +62,7 @@ public final class ModelIO {
     }
 
 
-    public static ModelMaterial readMaterialBlob( String name, Blob blob ) {
+    public static DrawMaterial readMaterialBlob( String name, Blob blob ) {
         Vec4 ambient;
         Vec4 diffuse;
         Vec4 specular;
@@ -97,7 +97,7 @@ public final class ModelIO {
         diffuse.z *= blob.tryGetFloat( 1f, "alpha" );
 
         Material matr = new Material( ambient, diffuse, specular, emissive, shininess );
-        ModelMaterial ret = new ModelMaterial( name, null, null, matr );
+        DrawMaterial ret = new DrawMaterial( name, null, null, matr );
 
         return ret;
     }

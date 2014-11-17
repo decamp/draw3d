@@ -29,7 +29,7 @@ public class KdTreeTest {
     @Test public void validatePickPointsTest() throws IOException {
         List<DrawTri> tris = newGeometry();
         Box3 bounds = new Box3();
-        GeomUtil.computeBounds( GeomUtil.vertIterator( tris ), bounds );
+        Models.computeBounds( Models.vertIterator( tris ), bounds );
 
         System.out.println( "Triangle Count: " + tris.size() + "\t" + bounds );
 
@@ -86,7 +86,7 @@ public class KdTreeTest {
     @Ignore @Test public void pickSpeedTest() throws IOException {
         List<DrawTri> tris = newGeometry();
         Box3 bounds = new Box3();
-        GeomUtil.computeBounds( GeomUtil.vertIterator( tris ), bounds );
+        Models.computeBounds( Models.vertIterator( tris ), bounds );
 
         Box.inflate( bounds, 1.5f, 1.5f, 1.5f, bounds );
         float[] boundSpan = { bounds.x1 - bounds.x0, bounds.y1 - bounds.y0, bounds.z1 - bounds.z0 };
@@ -125,7 +125,7 @@ public class KdTreeTest {
     @Ignore @Test public void buildSpeedTest() throws IOException {
         List<DrawTri> tris = newGeometry();
         Box3 bounds = new Box3();
-        GeomUtil.computeBounds( GeomUtil.vertIterator( tris ), bounds );
+        Models.computeBounds( Models.vertIterator( tris ), bounds );
 
         final int BUILD_COUNT = 10;
 
@@ -189,7 +189,7 @@ public class KdTreeTest {
 
     private static List<DrawTri> newGeometry() throws IOException {
         TriModel model = ModelIO.read( new File( MODEL_PATH ) );
-        return GeomUtil.listUniqueTris( model );
+        return Models.listUniqueTris( model );
     }
 
 

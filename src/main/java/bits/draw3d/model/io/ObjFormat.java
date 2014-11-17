@@ -84,7 +84,7 @@ public class ObjFormat {
             out.print( "g " );
             out.println( g.mName );
             out.println( "s off" );
-            ModelMaterial modMat = g.mMaterial;
+            DrawMaterial modMat = g.mMaterial;
             if( modMat != null ) {
                 out.println( "usemtl " + modMat.mName );
             }
@@ -122,7 +122,7 @@ public class ObjFormat {
         Map<BufferedImage,File> texMap = new HashMap<BufferedImage,File>();
 
         for( TriGroup g: model.mGroups ) {
-            ModelMaterial mat = g.mMaterial;
+            DrawMaterial mat = g.mMaterial;
             if( mat.mName == null || mat.mName.isEmpty() || !complete.add( mat.mName ) ) {
                 continue;
             }
@@ -177,23 +177,23 @@ public class ObjFormat {
         Renamer groupNamer = new Renamer();
         Renamer matNamer   = new Renamer();
 
-        Map<ModelMaterial,ModelMaterial> matMap = new HashMap<ModelMaterial,ModelMaterial>();
+        Map<DrawMaterial,DrawMaterial> matMap = new HashMap<DrawMaterial,DrawMaterial>();
 
         for( TriGroup g: model.mGroups ) {
             String groupName = groupNamer.rename( g.mName );
-            ModelMaterial m = g.mMaterial;
+            DrawMaterial m = g.mMaterial;
             if( m == null ) {
                 continue;
             }
 
-            ModelMaterial prev = matMap.put( m, m );
+            DrawMaterial prev = matMap.put( m, m );
             if( prev != null ) {
                 matMap.put( prev, prev );
                 m = prev;
 
             } else {
                 prev = m;
-                m = new ModelMaterial( prev );
+                m = new DrawMaterial( prev );
                 if( !prev.mName.isEmpty() ) {
                     m.mName = matNamer.rename( prev.mName );
                 } else {

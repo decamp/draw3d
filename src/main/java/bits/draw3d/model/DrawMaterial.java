@@ -11,7 +11,7 @@ import bits.draw3d.tex.Texture;
 
 import java.awt.image.BufferedImage;
 
-public class ModelMaterial {
+public class DrawMaterial {
 
     public String        mName     = "";
     public BufferedImage mImage    = null;
@@ -20,10 +20,10 @@ public class ModelMaterial {
     public Material      mMaterial = null;
 
 
-    public ModelMaterial() {}
+    public DrawMaterial() {}
 
 
-    public ModelMaterial( String name, BufferedImage im, Texture tex, Material matr ) {
+    public DrawMaterial( String name, BufferedImage im, Texture tex, Material matr ) {
         mName     = name;
         mImage    = im;
         mTex      = tex;
@@ -31,7 +31,7 @@ public class ModelMaterial {
     }
 
 
-    public ModelMaterial( ModelMaterial copy ) {
+    public DrawMaterial( DrawMaterial copy ) {
         mName     = copy.mName;
         mImage    = copy.mImage;
         mTex      = copy.mTex;
@@ -48,11 +48,11 @@ public class ModelMaterial {
 
 
     public boolean equals( Object obj ) {
-        if( !( obj instanceof ModelMaterial ) ) {
+        if( !( obj instanceof DrawMaterial) ) {
             return false;
         }
 
-        ModelMaterial tm = (ModelMaterial)obj;
+        DrawMaterial tm = (DrawMaterial)obj;
         return this == tm ||
                eq( mImage, tm.mImage ) &&
                eq( mTex, tm.mTex ) &&

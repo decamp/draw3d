@@ -76,13 +76,13 @@ public class MilkShape {
         }
 
         // Read materials.
-        ModelMaterial[] materialArr = readMaterials( buf, inputUrl );
+        DrawMaterial[] materialArr = readMaterials( buf, inputUrl );
 
         // Assign materials to groups.
         for( int i = 0; i < groupList.size(); i++ ) {
             int idx = groupMaterialIndex[i];
             if( idx < materialArr.length ) {
-                ModelMaterial tm = materialArr[idx];
+                DrawMaterial tm = materialArr[idx];
                 if( tm != null ) {
                     TriGroup g = groupList.get( i );
                     g.mMaterial = tm;
@@ -99,9 +99,9 @@ public class MilkShape {
         ByteBuffer buf = ByteBuffer.allocate( 1024 * 8 );
         buf.order( ByteOrder.LITTLE_ENDIAN );
 
-        final List<DrawVert> verts          = GeomUtil.listUniqueVerts( model );
-        final List<DrawTri>  tris           = GeomUtil.listUniqueTris( model );
-        final List<ModelMaterial> materials = GeomUtil.listUniqueMaterials( model );
+        final List<DrawVert> verts          = Models.listUniqueVerts( model );
+        final List<DrawTri>  tris           = Models.listUniqueTris( model );
+        final List<DrawMaterial> materials = Models.listUniqueMaterials( model );
 
         writeHeader( buf, out );
         writeVerts( verts, buf, out );
@@ -160,14 +160,14 @@ public class MilkShape {
     }
 
 
-    private static ModelMaterial[] readMaterials( ByteBuffer buf, URL inputUrl ) throws IOException {
+    private static DrawMaterial[] readMaterials( ByteBuffer buf, URL inputUrl ) throws IOException {
         final byte[] temp = new byte[128];
         final int materialNum = (buf.getShort() & 0xFFFF);
-        final ModelMaterial[] materialArr = new ModelMaterial[materialNum];
+        final DrawMaterial[] materialArr = new DrawMaterial[materialNum];
 
         for( int i = 0; i < materialNum; i++ ) {
             String name = readName( buf, 0, 32, temp );
-            ModelMaterial matr = new ModelMaterial( name, null, null, new Material() );
+            DrawMaterial matr = new DrawMaterial( name, null, null, new Material() );
 
             // Read material parameters.
             Vec.put( buf, matr.mMaterial.mAmbient  );
@@ -266,7 +266,7 @@ public class MilkShape {
                                    FileChannel out )
                                        throws IOException
     {
-        Map<DrawVert,Integer> vertIndex = GeomUtil.index( verts.iterator() );
+        Map<DrawVert,Integer> vertIndex = Models.index( verts.iterator() );
 
         int triCount = 0;
         for( int groupInd = 0; groupInd < model.mGroups.size(); groupInd++ ) {
@@ -323,14 +323,14 @@ public class MilkShape {
 
 
     private static void writeGroups( TriModel model,
-                                     List<ModelMaterial> allMaterials,
+                                     List<DrawMaterial> allMaterials,
                                      List<DrawTri> allTris,
                                      ByteBuffer buf,
                                      FileChannel out )
                                     throws IOException
     {
-        Map<DrawTri,Integer> triIndex = GeomUtil.index( allTris );
-        Map<ModelMaterial,Integer> materialIndex = GeomUtil.index( allMaterials );
+        Map<DrawTri,Integer> triIndex = Models.index( allTris );
+        Map<DrawMaterial,Integer> materialIndex = Models.index( allMaterials );
 
         buf.putShort( (short)model.mGroups.size() );
         for( TriGroup group: model.mGroups ) {
@@ -369,7 +369,7 @@ public class MilkShape {
 
 
     private static void writeMaterials( TriModel model,
-                                        List<ModelMaterial> materials,
+                                        List<DrawMaterial> materials,
                                         ByteBuffer buf,
                                         FileChannel out,
                                         File outFile )
@@ -377,7 +377,7 @@ public class MilkShape {
     {
         buf.putShort( (short)materials.size() );
 
-        for( ModelMaterial tm : materials ) {
+        for( DrawMaterial tm : materials ) {
             if( buf.remaining() < 361 ) {
                 buf.flip();
                 writeBuf( buf, out );
