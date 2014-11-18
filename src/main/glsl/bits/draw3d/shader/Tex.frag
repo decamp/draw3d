@@ -12,6 +12,8 @@ float mipmapLevel( in vec2 tex ) {
 }
 
 void main() {
-	//fragColor = textureLod( texUnit0, tex.st, mipmapLevel( tex.st ) );
-	fragColor = texture( TEX_UNIT0, tex0.st );
+	fragColor = textureLod( TEX_UNIT0, tex0.st, mipmapLevel( tex0.st ) );
+	if( fragColor.a <= 0.0 ) {
+		discard;
+	}
 }
