@@ -102,11 +102,11 @@ public class UniformLoaders {
     public static void setDefaultTexUnits( DrawEnv d, Collection<ProgramResource> uniforms ) {
         for( ProgramResource res: uniforms ) {
             String name = res.mName;
-            if( !name.startsWith( "texUnit" ) ) {
+            if( !name.startsWith( "TEX_UNIT" ) ) {
                 continue;
             }
             try {
-                int n = Integer.parseInt( name.substring( 7 ) );
+                int n = Integer.parseInt( name.substring( 8 ) );
                 d.mGl.glUniform1i( res.mLocation, n );
                 d.checkErr();
             } catch( NumberFormatException ignored ) {}
