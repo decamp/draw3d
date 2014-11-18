@@ -9,7 +9,6 @@ package bits.draw3d.text;
 import bits.draw3d.tex.Mipmap2;
 import bits.draw3d.*;
 
-import javax.media.opengl.glu.GLU;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.image.*;
@@ -44,7 +43,7 @@ import static javax.media.opengl.GL3.*;
  */
 public class FontTexture implements DrawUnit {
 
-    private static final GLU GLU_INST = new GLU();
+    //private static final GLU GLU_INST = new GLU();
 
 
     private final Font        mFont;

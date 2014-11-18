@@ -12,7 +12,7 @@ public class GraphStep<T> {
     private final T mTarget;
     
     
-    public GraphStep(GraphActionType action, T target) {
+    public GraphStep( GraphActionType action, T target ) {
         mTarget = target;
         mAction = action;
     }

@@ -183,7 +183,6 @@ public class SceneGraph {
     public GraphEdge connectLast( Object parent, Object child ) {
         NodeInfo parentInfo = getNodeInfo( parent );
         NodeInfo childInfo  = mPrev = getNodeInfo( child );
-
         GraphEdge edge;
 
         if( parentInfo.mChildEdges.isEmpty() ) {
@@ -216,11 +215,9 @@ public class SceneGraph {
             add( node );
             return null;
         }
-
         if( mPrev.mNode == node ) {
             return null;
         }
-
         return connectLast( mPrev.mNode, node );
     }
 
@@ -284,11 +281,9 @@ public class SceneGraph {
 
     public List<GraphEdge> listEdges() {
         List<GraphEdge> ret = new ArrayList<GraphEdge>();
-
         for( NodeInfo n : mModuleMap.values() ) {
             ret.addAll( n.mChildEdges );
         }
-
         return ret;
     }
 
