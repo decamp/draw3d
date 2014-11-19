@@ -23,11 +23,13 @@ public class BasicShaderConfig {
     private int     mTexCompNum = 0;
     private boolean mNorm       = false;
     private boolean mColor      = false;
-    public float    mLineWidth  = 1f;
+    private float   mLineWidth  = 1f;
 
     private String mVertShader;
     private String mFragShader;
     private String mGeomShader;
+
+    private int mHash = 0;
 
 
     public BasicShaderConfig() {}
@@ -73,6 +75,7 @@ public class BasicShaderConfig {
 
     public void texComponentNum( int texCompNum ) {
         mTexCompNum = texCompNum;
+        rehash();
     }
 
 
@@ -100,6 +103,7 @@ public class BasicShaderConfig {
 
     public void lineWidth( float v ) {
         mLineWidth = v;
+        rehash();
     }
 
 
@@ -161,6 +165,8 @@ public class BasicShaderConfig {
                 }
             }
         }}
+
+        out.rehash();
     }
 
 
@@ -192,10 +198,15 @@ public class BasicShaderConfig {
 
     @Override
     public int hashCode() {
-        return hash( mVertShader ) ^
-               hash( mGeomShader ) ^
-               hash( mFragShader ) ^
-               mTexCompNum;
+        return mHash;
+    }
+
+
+    private void rehash() {
+        mHash = hash( mVertShader ) ^
+                hash( mGeomShader ) ^
+                hash( mFragShader ) ^
+                mTexCompNum;
     }
 
 

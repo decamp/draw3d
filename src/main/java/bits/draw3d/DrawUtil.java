@@ -174,7 +174,7 @@ public class DrawUtil {
      *
      * @param image    Input image to convert.
      * @param optWork  [Optional] array that may be used if {@code workSpace.length >= image.getWidth() }.
-     * @return Directly allocated ByteBuffer containing pixels in BGRA format and sRGB color space.
+     * @return Directly allocated ByteBuffer containing pixels in BGRA format and sRGB colorub space.
      */
     public static ByteBuffer imageToBgraBuffer( BufferedImage image, int[] optWork ) {
         int w = image.getWidth();

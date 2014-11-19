@@ -298,22 +298,18 @@ public class CameraNode implements DrawNode, ReshapeListener {
 
     private void triggerUpdates( int triggers ) {
         boolean updated = false;
-
         if( ( mViewTriggers & triggers ) != 0 ) {
             doUpdateView();
             updated = true;
         }
-
         if( ( mProjTriggers & triggers ) != 0 ) {
             doUpdateProj();
             updated = true;
         }
-
         if( ( mViewportTriggers & triggers ) != 0 ) {
             doUpdateViewport();
             updated = true;
         }
-
         if( updated ) {
             doUpdateComposites();
         }
@@ -325,7 +321,7 @@ public class CameraNode implements DrawNode, ReshapeListener {
         Mat.put( mCamera.mRot, mCamRot );
         mViewFunc.computeViewMat( mCamera, mViewMat );
         Mat.invert( mViewMat, mInvViewMat );
-        Mat.invert( mCamRot, mCamRotInv );
+        Mat.transpose( mCamRot, mCamRotInv );
     }
 
 
@@ -346,7 +342,7 @@ public class CameraNode implements DrawNode, ReshapeListener {
         if( tile == viewport ) {
             tile = null;
         }
-        mViewportFunc.computeViewportMat( viewportRef(), tileViewportRef(), mViewportMat );
+        mViewportFunc.computeViewportMat( viewport, tile, mViewportMat );
         Mat.invert( mViewportMat, mInvViewportMat );
     }
 

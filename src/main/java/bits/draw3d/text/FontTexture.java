@@ -268,7 +268,7 @@ public class FontTexture implements DrawUnit {
      * as the start of the baseline.
      * <p>
      * You MUST push the FontTexture before calling this method.
-     * The characters will be rendered using the current GL color.
+     * The characters will be rendered using the current GL colorub.
      */
     public void renderChars( DrawEnv g, char[] chars, int off, int len ) {
         renderChars( g, 0.0f, 0.0f, 0.0f, chars, off, len );
@@ -279,7 +279,7 @@ public class FontTexture implements DrawUnit {
      * as the start of the baseline.
      * <p> 
      * You MUST push the FontTexture before calling this method.
-     * The characters will be rendered using the current GL color.
+     * The characters will be rendered using the current GL colorub.
      */
     public void renderChars( DrawEnv gg,
                              float x, 
@@ -322,7 +322,7 @@ public class FontTexture implements DrawUnit {
      * as the start of the baseline.
      * <p>
      * You MUST push the FontTexture before calling this method.
-     * The characters will be rendered using the current GL color.
+     * The characters will be rendered using the current GL colorub.
      */
     public void renderChars( DrawEnv g, CharSequence chars ) {
         renderChars( g, 0.0f, 0.0f, 0.0f, chars );
@@ -333,7 +333,7 @@ public class FontTexture implements DrawUnit {
      * as the start of the baseline.
      * <p> 
      * You MUST push the FontTexture before calling this method.
-     * The characters will be rendered using the current GL color.
+     * The characters will be rendered using the current GL colorub.
      */
     public void renderChars( DrawEnv gg, float x, float y, float z, CharSequence chars ) {
         final int len = chars.length();
@@ -377,7 +377,7 @@ public class FontTexture implements DrawUnit {
      * so if you're using depth testing, you might want to use a poly
      * offset on your boxes.
      * <p>
-     * Rect will be rendered using current GL color.
+     * Rect will be rendered using current GL colorub.
      * 
      * @param margin  Margin by with box will exceed bounds of text.
      */
@@ -393,7 +393,7 @@ public class FontTexture implements DrawUnit {
      * so if you're using depth testing, you might want to use a poly
      * offset on your boxes.
      * <p>
-     * Rect will be rendered using current GL color.
+     * Rect will be rendered using current GL colorub.
      */
     public void renderBox( DrawEnv g, float x, float y, float z, CharSequence s, float margin ) {
         renderBox( g, x, y, z, getCharsWidth( s ), margin );
@@ -407,7 +407,7 @@ public class FontTexture implements DrawUnit {
      * so if you're using depth testing, you might want to use a poly
      * offset on your boxes.
      * <p>
-     * Rect will be rendered using current GL color.
+     * Rect will be rendered using current GL colorub.
      */
     public void renderBox( DrawEnv g, char[] chars, int off, int len, float margin ) {
         float width = getCharsWidth( chars, off, len );
@@ -422,7 +422,7 @@ public class FontTexture implements DrawUnit {
      * so if you're using depth testing, you might want to use a poly
      * offset on your boxes.
      * <p>
-     * Rect will be rendered using current GL color.
+     * Rect will be rendered using current GL colorub.
      */
     public void renderBox( DrawEnv g, float x, float y, float z, char[] chars, int off, int len, float margin ) {
         renderBox( g, x, y, z, getCharsWidth( chars, off, len ), margin );
@@ -436,7 +436,7 @@ public class FontTexture implements DrawUnit {
      * so if you're using depth testing, you might want to use a poly
      * offset on your boxes.
      * <p>
-     * Rect will be rendered using current GL color.
+     * Rect will be rendered using current GL colorub.
      */
     public void renderBox( DrawEnv g, float width, float margin ) {
         renderBox( g, 0.0f, 0.0f, 0.0f, width, margin );
@@ -450,7 +450,7 @@ public class FontTexture implements DrawUnit {
      * so if you're using depth testing, you might want to use a poly
      * offset on your boxes.
      * <p>
-     * Rect will be rendered using current GL color.
+     * Rect will be rendered using current GL colorub.
      */
     public void renderBox( DrawEnv g, float x, float y, float z, float width, float margin ) {
         DrawStream s = g.drawStream();

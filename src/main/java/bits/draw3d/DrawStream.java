@@ -175,12 +175,12 @@ public class DrawStream {
     }
 
 
-    public void color( int red, int green, int blue ) {
-        color( red, green, blue, 0xFF );
+    public void colorub( int red, int green, int blue ) {
+        colorub( red, green, blue, 0xFF );
     }
 
 
-    public void color( int red, int green, int blue, int alpha ) {
+    public void colorub( int red, int green, int blue, int alpha ) {
         Vec4 c = mVert.mColor;
         c.x = red   / 255f;
         c.y = green / 255f;

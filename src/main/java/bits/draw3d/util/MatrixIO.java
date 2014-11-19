@@ -62,7 +62,7 @@ import bits.math3d.*;
             float[] scale = new float[3];
             readFloats( blob, 1, scale, 0, 3 );
             Mat4 mat = new Mat4();
-            Mat.getScale( scale[0], scale[1], scale[2], mat );
+            Mat.getScale( scale[0], scale[1], scale[2], 1f, mat );
             return mat;
         }
 

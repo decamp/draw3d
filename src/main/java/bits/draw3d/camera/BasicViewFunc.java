@@ -15,6 +15,7 @@ public class BasicViewFunc implements ViewFunc {
 
     private final Mat3   mActorToCameraMat;
     private final Trans3 mWorkTrans = new Trans3();
+    private final Mat4   mWork = new Mat4();
 
 
     public BasicViewFunc() {
@@ -22,17 +23,27 @@ public class BasicViewFunc implements ViewFunc {
     }
 
 
-    public BasicViewFunc( Mat3 actorToCameraMat ) {
-        mActorToCameraMat = actorToCameraMat;
+    public BasicViewFunc( Mat3 actorToCameraMatRef ) {
+        mActorToCameraMat = actorToCameraMatRef;
     }
 
     @Override
     public void computeViewMat( Actor camera, Mat4 out ) {
-        Trans.invert( camera, mWorkTrans );
+        Mat.transpose( camera.mRot, mWorkTrans.mRot );
         if( mActorToCameraMat != null ) {
             Mat.mult( mActorToCameraMat, mWorkTrans.mRot, mWorkTrans.mRot );
         }
-        Trans.transToMat( mWorkTrans, out );
+
+        Mat.put( mWorkTrans.mRot, mWork );
+        Vec3 pos = camera.mPos;
+        Mat.translate( mWork, -pos.x, -pos.y, -pos.z, out );
+
+
+        //Trans.invert( camera, mWorkTrans );
+        //if( mActorToCameraMat != null ) {
+        //    Mat.mult( mActorToCameraMat, mWorkTrans.mRot, mWorkTrans.mRot );
+        //}
+        //Trans.transToMat( mWorkTrans, out );
     }
 
 }
