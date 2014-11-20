@@ -492,11 +492,11 @@ public interface DrawSetting {
 
 
         public void set( boolean fillOn, boolean lineOn, boolean pointOn, float factor, float units ) {
-            mFillOn = fillOn;
-            mLineOn = lineOn;
+            mFillOn  = fillOn;
+            mLineOn  = lineOn;
             mPointOn = pointOn;
-            mFactor = factor;
-            mUnits = units;
+            mFactor  = factor;
+            mUnits   = units;
             apply();
         }
 
