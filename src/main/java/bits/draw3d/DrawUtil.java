@@ -211,7 +211,7 @@ public class DrawUtil {
      * Converts a BufferedImage to a directly allocated java.nio.ByteBuffer.
      * This method will first check to see if the image can be ported directly to a
      * GL compatible format. If so, it will dump the data directly without conversion
-     * via {@link #dataToByteBuffer}. If not, it will convert the image via
+     * via {@link bits.util.gui.Images#dataToByteBuffer}. If not, it will convert the image via
      * {@link #imageToBgraBuffer}.
      *
      * @param optOutFormat  Holds GL enum values for buffe representation. See {@link #getTextureFormat}.
