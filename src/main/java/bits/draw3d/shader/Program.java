@@ -56,6 +56,9 @@ public class Program implements DrawUnit {
 
 
     public void bind( DrawEnv d ) {
+        if( mId == 0 ) {
+            init( d );
+        }
         d.mGl.glUseProgram( mId );
     }
 

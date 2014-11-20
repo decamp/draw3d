@@ -152,11 +152,15 @@ public interface Texture extends DrawUnit, ReshapeListener {
 
     /**
      * Makes specified texture unit active and binds this texture to that unit.
+     *
+     * @param unit Number of texture unit. 0 is TEX_UNIT0.
      */
-    public void bind( DrawEnv g, int unit );
+    public void bind( DrawEnv d, int unit );
 
     /**
      * Makes specified texture unit active and unbinds this texture from that unit.
+     *
+     * @param unit Number of texture unit. 0 is TEX_UNIT0.
      */
     public void unbind( DrawEnv g, int unit );
 
