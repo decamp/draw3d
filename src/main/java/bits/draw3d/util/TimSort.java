@@ -11,7 +11,9 @@ import java.util.Comparator;
 /**
  * This is the same TimSort used in JavaSDK, but made public and modified
  * to use persistent storage. This allows in instance to be reused without
- * allocating memory on every sort. 
+ * allocating memory on every sort. -decamp
+ *
+ *
  * 
  * A stable, adaptive, iterative mergesort that requires far fewer than
  * n lg(n) comparisons when running on partially sorted arrays, while
