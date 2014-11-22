@@ -83,7 +83,7 @@ public class Actor extends Trans3 implements DepthSortable, TransObject {
     /**
      * Scales the object size by the specified amount.
      */
-    public void scale( double sx, double sy, double sz ) {
+    public void scale( float sx, float sy, float sz ) {
         mScale.x *= sx;
         mScale.y *= sy;
         mScale.z *= sz;
