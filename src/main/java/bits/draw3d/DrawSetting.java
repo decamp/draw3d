@@ -6,8 +6,11 @@
 
 package bits.draw3d;
 
+import bits.draw3d.nodes.FogParams;
 import bits.draw3d.tex.Light;
 import bits.draw3d.tex.Material;
+import bits.math3d.Vec;
+import bits.math3d.Vec4;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL3;
@@ -338,8 +341,59 @@ public interface DrawSetting {
     }
 
 
+    public static class Fog extends Stack<Fog> {
+        public       boolean mOn      = false;
+        public final Vec4    mColor   = new Vec4( 0, 0, 0, 0 );
+        public       float   mStart   = 0f;
+        public       float   mDensity = 0f;
+
+
+        public Fog() {}
+
+
+        public Fog( DrawEnv d ) {}
+
+
+        public void set( boolean on ) {
+            mOn = on;
+            apply();
+        }
+
+
+        public void set( boolean on, Vec4 color, float start, float density ) {
+            mOn = on;
+            Vec.put( color, mColor );
+            mStart = start;
+            mDensity = density;
+            apply();
+        }
+
+
+        public void set( FogParams params ) {
+            set( params.mOn, params.mColor, params.mStart, params.mDensity );
+        }
+
+
+        @Override
+        Fog alloc() {
+            return new Fog();
+        }
+
+        @Override
+        void copy( Fog item ) {
+            mOn = item.mOn;
+            Vec.put( item.mColor, mColor );
+            mStart = item.mStart;
+            mDensity = item.mDensity;
+        }
+
+        @Override
+        public void apply() {}
+    }
+
+
     public static class Lighting extends Stack<Lighting> {
-        public boolean mOn = false;
+        public       boolean     mOn     = false;
         public final List<Light> mLights = new ArrayList<Light>( 8 );
 
         private final DrawEnv mG;
@@ -492,11 +546,11 @@ public interface DrawSetting {
 
 
         public void set( boolean fillOn, boolean lineOn, boolean pointOn, float factor, float units ) {
-            mFillOn  = fillOn;
-            mLineOn  = lineOn;
+            mFillOn = fillOn;
+            mLineOn = lineOn;
             mPointOn = pointOn;
-            mFactor  = factor;
-            mUnits   = units;
+            mFactor = factor;
+            mUnits = units;
             apply();
         }
 
