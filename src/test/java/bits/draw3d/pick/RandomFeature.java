@@ -12,9 +12,9 @@ import java.util.Random;
 /**
  * @author Philip DeCamp
  */
-public class RandomFeature {
+class RandomFeature {
 
-    private final double[] mVector;
+    final float[] mVector;
     
     
     public RandomFeature( int dimCount ) {
@@ -22,26 +22,24 @@ public class RandomFeature {
     }
     
     public RandomFeature( int dimCount, Random rand ) {
-        mVector = new double[dimCount];
+        mVector = new float[dimCount];
         for( int i = 0; i < dimCount; i++ ) {
-            mVector[i] = rand.nextDouble();
+            mVector[i] = rand.nextFloat();
         }
     }
 
 
-    public double[] vectorRef() {
+    public float[] vectorRef() {
         return mVector;
     }
 
     public double distance( RandomFeature f ) {
-        double[] vec = f.vectorRef();
-
+        float[] vec = f.vectorRef();
         if( vec.length != mVector.length ) {
             throw new IllegalArgumentException();
         }
 
-        float dist = 0f;
-
+        double dist = 0f;
         for( int i = 0; i < mVector.length; i++ ) {
             double d = mVector[i] - vec[i];
             dist += d * d;

@@ -11,6 +11,8 @@
 
 package bits.draw3d.pick;
 
+import bits.math3d.VecView;
+
 import java.util.*;
 
 
@@ -24,8 +26,7 @@ import java.util.*;
  */
 public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
 
-
-    private final DimComparator<? super P> mComp;
+    private final VecView<? super P> mComp;
 
     private Node mRoot = null;
     private int mSize = 0;
@@ -37,7 +38,7 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
     private int mModCount = 0;
 
 
-    public KdPointTree( DimComparator<? super P> comp ) {
+    public KdPointTree( VecView<? super P> comp ) {
         mComp = comp;
     }
 
@@ -57,8 +58,8 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
 
         do {
             int dim = node.mDim;
-            double val1 = mComp.value( point, dim );
-            double val2 = mComp.value( node.mFeature, dim );
+            double val1 = mComp.get( point, dim );
+            double val2 = mComp.get( node.mFeature, dim );
 
             if( val1 < val2 ) {
                 mBounds.mMax[dim] = val2;
@@ -86,7 +87,6 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         } while( true );
     }
 
-
     @Override
     public boolean addAll( Collection<? extends P> c ) {
         boolean ret = false;
@@ -96,14 +96,12 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         return ret;
     }
 
-
     @Override
     public void clear() {
         mModCount++;
         mRoot = null;
         mSize = 0;
     }
-
 
     @Override
     @SuppressWarnings( "unchecked" )
@@ -115,7 +113,7 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         Node node = mRoot;
         try {
             while( node != null ) {
-                double val = mComp.value( (P)o, node.mDim );
+                double val = mComp.get( (P)o, node.mDim );
                 if( val < node.mVal ) {
                     node = node.mLess;
 
@@ -135,7 +133,6 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         return false;
     }
 
-
     @Override
     public boolean containsAll( Collection<?> c ) {
         for( Object o : c ) {
@@ -146,18 +143,15 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         return true;
     }
 
-
     @Override
     public boolean isEmpty() {
         return mSize == 0;
     }
 
-
     @Override
     public Iterator<P> iterator() {
         return new KDTreeIterator();
     }
-
 
     @Override
     @SuppressWarnings( "unchecked" )
@@ -166,7 +160,7 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
 
         try {
             while( node != null ) {
-                double val = mComp.value( (P)o, node.mDim );
+                double val = mComp.get( (P)o, node.mDim );
 
                 if( val < node.mVal ) {
                     node = node.mLess;
@@ -215,7 +209,6 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         return false;
     }
 
-
     @Override
     public boolean removeAll( Collection<?> c ) {
         boolean ret = false;
@@ -226,7 +219,6 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
 
         return ret;
     }
-
 
     @Override
     public boolean retainAll( Collection<?> c ) {
@@ -249,12 +241,10 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         return mSize != size;
     }
 
-
     @Override
     public int size() {
         return mSize;
     }
-
 
     @Override
     public Object[] toArray() {
@@ -264,7 +254,6 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         }
         return array;
     }
-
 
     @Override
     @SuppressWarnings( "unchecked" )
@@ -284,13 +273,10 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         return arr;
     }
 
-
-
     @Override
     public PointPickResult<P> newPointPickResult() {
         return new Result<P>();
     }
-
 
     @Override
     public boolean pick( P point, PointPickResult<P> out ) {
@@ -368,7 +354,7 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
 
     private void addFirst( P feature ) {
         mRoot = new Node( null, feature, 0, Float.MIN_VALUE, Float.MAX_VALUE );
-        mDimCount = mComp.dimCount( feature );
+        mDimCount = mComp.dim();
         mBounds = new Bounds( mDimCount );
         mMinDist = new BinSum( mDimCount );
     }
@@ -386,7 +372,7 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
 
         for( P f : list ) {
             for( int i = 0; i < mDimCount; i++ ) {
-                range.mMin[i] += mComp.value( f, i );
+                range.mMin[i] += mComp.get( f, i );
             }
         }
 
@@ -396,7 +382,7 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
 
         for( P f : list ) {
             for( int i = 0; i < mDimCount; i++ ) {
-                double d = mComp.value( f, i ) - range.mMin[i];
+                double d = mComp.get( f, i ) - range.mMin[i];
                 range.mMax[i] += d * d;
             }
         }
@@ -431,11 +417,11 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         // double[] nodeVector = nodeFeature.vectorRef();
         Node newNode = new Node( parent, nodeFeature, maxIndex, mBounds.mMin[maxIndex], mBounds.mMax[maxIndex] );
 
-        bounds.mMin[maxIndex] = mComp.value( nodeFeature, maxIndex );
+        bounds.mMin[maxIndex] = mComp.get( nodeFeature, maxIndex );
         newNode.mLess = balance( newNode, bounds, list, range );
         bounds.mMin[maxIndex] = newNode.mMin;
 
-        bounds.mMax[maxIndex] = mComp.value( nodeFeature, maxIndex );
+        bounds.mMax[maxIndex] = mComp.get( nodeFeature, maxIndex );
         newNode.mMore = balance( newNode, bounds, rightList, range );
         bounds.mMax[maxIndex] = newNode.mMax;
 
@@ -465,7 +451,7 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
             mParent = parent;
             mFeature = feature;
             mDim = dim;
-            mVal = mComp.value( feature, dim );
+            mVal = mComp.get( feature, dim );
             mMin = min;
             mMax = max;
         }
@@ -473,11 +459,11 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
 
 
         public boolean findNearest( P feature, BinSum minDist, Result<P> result ) {
-            final int dimCount = mComp.dimCount( mFeature );
+            final int dimCount = mComp.dim();
             double dist = 0f;
 
             for( int i = 0; i < dimCount; i++ ) {
-                double d = mComp.value( feature, i ) - mComp.value( mFeature, i );
+                double d = mComp.get( feature, i ) - mComp.get( mFeature, i );
                 dist += d * d;
             }
 
@@ -486,8 +472,7 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
                 result.mPickPoint = mFeature;
             }
 
-            double val = mComp.value( feature, mDim );
-
+            double val = mComp.get( feature, mDim );
             if( val < mVal ) {
                 if( mLess != null ) {
                     mLess.findNearest( feature, minDist, result );
@@ -547,12 +532,12 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
             if( mFeature == startVec ) {
                 findApproximateNearest( vec, minDist, result, queue );
 
-            } else if( mComp.value( startVec, mDim ) < mVal ) {
+            } else if( mComp.get( startVec, mDim ) < mVal ) {
                 if( mLess == null ) {
                     return;
                 }
 
-                double val = mComp.value( vec, mDim );
+                double val = mComp.get( vec, mDim );
 
                 if( val > mVal ) {
                     double d = minDist.getBin( mDim );
@@ -570,7 +555,7 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
                     return;
                 }
 
-                double val = mComp.value( vec, mDim );
+                double val = mComp.get( vec, mDim );
                 if( val < mVal ) {
                     minDist.setBin( mDim, (val - mVal) * (val - mVal) );
                     mMore.findApproximateNearest( startVec, vec, minDist, result, queue );
@@ -586,12 +571,12 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
                                             Result<P> result,
                                             PriorityQueue<Choice<Node>> queue )
         {
-            int dimCount = mComp.dimCount( mFeature );
+            int dimCount = mComp.dim();
             double dist = 0f;
-            double val = mComp.value( feature, mDim );
+            double val = mComp.get( feature, mDim );
 
             for( int i = 0; i < dimCount; i++ ) {
-                double d = mComp.value( feature, i ) - mComp.value( mFeature, i );
+                double d = mComp.get( feature, i ) - mComp.get( mFeature, i );
                 dist += d * d;
             }
 
@@ -638,15 +623,12 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
         @Override
         public int hashCode() {
             int code = mFeature.hashCode();
-
             if( mLess != null ) {
                 code += mLess.hashCode();
             }
-
             if( mMore != null ) {
                 code += mMore.hashCode();
             }
-
             return code;
         }
 
@@ -749,8 +731,8 @@ public class KdPointTree<P> implements Collection<P>, PointPicker<P> {
 
         @Override
         public int compare( P a, P b ) {
-            double va = mComp.value( a, mDim );
-            double vb = mComp.value( b, mDim );
+            double va = mComp.get( a, mDim );
+            double vb = mComp.get( b, mDim );
 
             if( va < vb ) {
                 return -1;
