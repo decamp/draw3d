@@ -34,9 +34,9 @@ public class UniformLoaders {
     public static final String TEX_MAT           = "TEX_MAT";
     public static final String INV_TEX_MAT       = "INV_TEX_MAT";
     public static final String LINE_WIDTH        = "LINE_WIDTH";
-    public static final String FOG_DENSITY       = "FOG.density";
-    public static final String FOG_START         = "FOG.start";
-    public static final String FOG_COLOR         = "FOG.color";
+    public static final String FOG_DENSITY       = "FOG_DENSITY";
+    public static final String FOG_START         = "FOG_START";
+    public static final String FOG_COLOR         = "FOG_COLOR";
 
     public static final String TEX_UNIT0         = "TEX_UNIT0";
     public static final String TEX_UNIT1         = "TEX_UNIT1";
