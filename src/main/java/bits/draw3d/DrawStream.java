@@ -6,9 +6,9 @@
 
 package bits.draw3d;
 
-import bits.draw3d.bo.*;
 import bits.draw3d.model.DrawVert;
-import bits.draw3d.shader.*;
+import bits.draw3d.shaders.BasicShaderConfig;
+import bits.draw3d.shaders.BasicShaders;
 import bits.math3d.*;
 
 import javax.media.opengl.GL3;
@@ -33,7 +33,10 @@ public class DrawStream {
     private final ByteBuffer mVertBuf;
     private final ByteBuffer mIndBuf;
 
-    private final DrawVert mVert = new DrawVert( new Vec3(), new float[4], new Vec3(), new Vec4( 0, 0, 0, 1 ) );
+    private final DrawVert          mVert         = new DrawVert( new Vec3(),
+                                                                  new float[4],
+                                                                  new Vec3(),
+                                                                  new Vec4( 0, 0, 0, 1 ) );
     private final BasicShaderConfig mConfig       = new BasicShaderConfig();
     private       BasicShaderConfig mChosenConfig = new BasicShaderConfig();
 

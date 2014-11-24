@@ -7,7 +7,7 @@
 package bits.draw3d.nodes;
 
 import bits.draw3d.DrawEnv;
-import bits.draw3d.tex.Texture;
+import bits.draw3d.Texture;
 import static javax.media.opengl.GL.*;
 
 /**
@@ -25,9 +25,7 @@ public class RenderbufferNode implements Texture {
     private boolean mNeedInit  = true;
     private boolean mNeedAlloc = true;
     
-    private final int[] mRevert = {0};
-    
-    
+
     public RenderbufferNode() {}
 
     

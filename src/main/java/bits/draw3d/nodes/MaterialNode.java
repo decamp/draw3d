@@ -7,7 +7,7 @@
 package bits.draw3d.nodes;
 
 import bits.draw3d.*;
-import bits.draw3d.tex.Material;
+import bits.draw3d.Material;
 
 /**
  * @author Philip DeCamp

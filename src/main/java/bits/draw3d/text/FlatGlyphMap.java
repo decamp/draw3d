@@ -17,7 +17,7 @@ class FlatGlyphMap implements GlyphMap {
     
     
     FlatGlyphMap( CharSet chars ) {
-        mChars   = chars.chars();
+        mChars   = chars.asString();
         mMin     = chars.min();
         mMax     = chars.max();
         mUnknown = chars.charAt( chars.unknown() ) - mMin;

@@ -76,7 +76,6 @@ public class DrawUtil {
 
 
     public static FloatBuffer ensureCap( FloatBuffer buf, int size ) {
-        int cap = buf.capacity();
         if( buf == null || buf.capacity() < size ) {
             return allocFloats( size );
         }

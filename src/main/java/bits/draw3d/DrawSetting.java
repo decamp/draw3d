@@ -7,8 +7,8 @@
 package bits.draw3d;
 
 import bits.draw3d.nodes.FogParams;
-import bits.draw3d.tex.Light;
-import bits.draw3d.tex.Material;
+import bits.draw3d.Light;
+import bits.draw3d.Material;
 import bits.math3d.Vec;
 import bits.math3d.Vec4;
 

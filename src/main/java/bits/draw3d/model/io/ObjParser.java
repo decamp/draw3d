@@ -6,7 +6,6 @@
 
 package bits.draw3d.model.io;
 
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -14,7 +13,7 @@ import java.util.*;
 import javax.imageio.ImageIO;
 
 import bits.draw3d.model.*;
-import bits.draw3d.tex.Material;
+import bits.draw3d.Material;
 import bits.math3d.Vec3;
 import bits.math3d.Vec4;
 
@@ -179,7 +178,6 @@ public class ObjParser {
         }
 
         BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
-        BufferedImage im  = null;
         DrawMaterial material = null;
         String[] names = null;
 

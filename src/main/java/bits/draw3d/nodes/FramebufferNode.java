@@ -7,7 +7,7 @@
 package bits.draw3d.nodes;
 
 import bits.draw3d.*;
-import bits.draw3d.tex.Texture;
+import bits.draw3d.Texture;
 
 import java.util.*;
 
@@ -173,7 +173,6 @@ public final class FramebufferNode implements DrawNode, ReshapeListener {
      * TODO: The revert on this is all wrong.
      */
     public void init( DrawEnv d ) {
-        BindingStack stack = currentStack();
         d.mGl.glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, mDrawRevert, 0 );
         doInit( d, GL_DRAW_FRAMEBUFFER );
         d.mGl.glBindFramebuffer( GL_DRAW_FRAMEBUFFER, mDrawRevert[0] );

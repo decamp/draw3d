@@ -13,7 +13,7 @@ import java.nio.*;
 import bits.blob.Blob;
 import bits.draw3d.model.DrawMaterial;
 import bits.draw3d.model.TriModel;
-import bits.draw3d.tex.Material;
+import bits.draw3d.Material;
 import bits.math3d.Vec4;
 
 
@@ -99,16 +99,6 @@ public final class ModelIO {
         Material matr = new Material( ambient, diffuse, specular, emissive, shininess );
         DrawMaterial ret = new DrawMaterial( name, null, null, matr );
 
-        return ret;
-    }
-
-
-    private static float[] readFloats( Blob blob ) {
-        int size = blob.size();
-        float[] ret = new float[size];
-        for( int i = 0; i < size; i++ ) {
-            ret[i] = blob.getFloat( i );
-        }
         return ret;
     }
 

@@ -726,15 +726,6 @@ public final class KdTriangleTree implements RayPicker {
     }
 
 
-    private static float computeSurfaceArea( Box3 vox ) {
-        float dx = vox.x1 - vox.x0;
-        float dy = vox.y1 - vox.y0;
-        float dz = vox.z1 - vox.z0;
-        return 2 * (dx * dy + dx * dz + dy * dz);
-    }
-
-
-
     private static final class Node {
         final int mDepth;
         final Node mLeft;

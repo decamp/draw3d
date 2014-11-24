@@ -34,10 +34,7 @@ public class CameraNode implements DrawNode, ReshapeListener {
     public final Mat4 mViewportMat    = new Mat4();
     public final Mat4 mInvViewportMat = new Mat4();
 
-    private final double[][] mRevert = new double[2][16];
-
     private final Rect mViewport             = new Rect( 0, 0, 1, 1 );
-    private final Rect mTileViewport         = new Rect( 0, 0, 1, 1 );
     private       Rect mOverrideViewport     = null;
     private       Rect mOverrideTileViewport = null;
 

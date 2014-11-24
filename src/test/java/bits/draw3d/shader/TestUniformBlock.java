@@ -5,7 +5,7 @@
  */
 
 package bits.draw3d.shader;
-import bits.draw3d.DrawEnv;
+import bits.draw3d.*;
 
 import java.awt.*;
 import javax.media.opengl.*;
@@ -57,7 +57,7 @@ public class TestUniformBlock {
             prog.bind( d );
             System.out.println( "###" );
 
-            for( ProgramResource res: ShaderUtil.listUniforms( d.mGl, prog.id() ) ) {
+            for( ProgramResource res: Shaders.listUniforms( d.mGl, prog.id() ) ) {
                 System.out.println( res.mName + "\t" + res.mLocation + "\t" + res.mType );
             }
 

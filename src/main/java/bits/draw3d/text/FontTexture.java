@@ -6,7 +6,7 @@
 
 package bits.draw3d.text;
 
-import bits.draw3d.tex.Mipmap2;
+import bits.draw3d.Mipmap2;
 import bits.draw3d.*;
 
 import java.awt.*;
@@ -43,15 +43,10 @@ import static javax.media.opengl.GL3.*;
  */
 public class FontTexture implements DrawUnit {
 
-    //private static final GLU GLU_INST = new GLU();
-
-
     private final Font        mFont;
     private final FontMetrics mMetrics;
     private final GlyphMap    mGlyphs;
     private final Mipmap2     mTexture;
-
-    private final int[] mBlendRevert = { 0 };
 
 
     public FontTexture( Font font ) {
@@ -558,25 +553,4 @@ public class FontTexture implements DrawUnit {
         return true;
     }
     
-    
-    private static ByteBuffer bufferGrayscale( BufferedImage image ) {
-        DataBuffer in = image.getData().getDataBuffer();
-        int count     = in.getSize() * in.getNumBanks();
-        
-        if( DataBuffer.getDataTypeSize( in.getDataType() ) != 8 ) {
-            throw new IllegalArgumentException( "Invalid image keyTyped. Image must by 8-bit grayscale." );
-        }
-        
-        ByteBuffer ret = ByteBuffer.allocateDirect( ( ( count + 7 ) / 8 ) * 8 );
-        ret.order( ByteOrder.nativeOrder() );
-        
-        for( int i = 0; i < in.getNumBanks(); i++ ) {
-            ret.put( ((DataBufferByte)in).getData( i ) );
-        }
-        
-        ret.flip();
-        return ret;
-    }
-    
-
 }

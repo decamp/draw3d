@@ -21,7 +21,6 @@ import static javax.media.opengl.GL.*;
 public final class InitNode implements DrawNode {
 
     private GLAutoDrawable mGld = null;
-    private DrawEnv mEnv = null;
 
     private final Vec4 mClearColor = new Vec4( 0, 0, 0, 1 );
     private int  mClearBits  = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT;

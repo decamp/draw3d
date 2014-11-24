@@ -17,7 +17,7 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 
 import bits.draw3d.model.*;
-import bits.draw3d.tex.Material;
+import bits.draw3d.Material;
 import bits.math3d.Vec;
 import bits.math3d.Vec3;
 import bits.util.Files;
@@ -96,6 +96,7 @@ public class MilkShape {
 
     public static void write( TriModel model, File outFile ) throws IOException {
         FileChannel out = new FileOutputStream( outFile ).getChannel();
+
         ByteBuffer buf = ByteBuffer.allocate( 1024 * 8 );
         buf.order( ByteOrder.LITTLE_ENDIAN );
 
@@ -275,7 +276,7 @@ public class MilkShape {
         buf.putShort( (short)triCount );
 
         for( int groupInd = 0; groupInd < model.mGroups.size(); groupInd++ ) {
-            final List<DrawTri> tris = model.mGroups.get( groupInd );
+            final List<DrawTri> tris = model.mGroups.get( groupInd ).mTris;
             final byte groupByte = (byte)groupInd;
 
             for( DrawTri t: tris ) {

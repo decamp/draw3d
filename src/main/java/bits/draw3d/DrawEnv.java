@@ -6,7 +6,7 @@
 
 package bits.draw3d;
 
-import bits.draw3d.shader.ShaderManager;
+import bits.draw3d.ShaderManager;
 import bits.draw3d.text.FontManager;
 import bits.math3d.*;
 

@@ -10,10 +10,9 @@ import java.util.List;
 import static javax.media.opengl.GL.*;
 
 import bits.draw3d.*;
-import bits.draw3d.bo.*;
 import bits.draw3d.model.DrawTri;
 import bits.draw3d.model.DrawVert;
-import bits.draw3d.shader.*;
+import bits.draw3d.shaders.BasicShaders;
 
 
 /**
@@ -30,12 +29,6 @@ public class TrianglesNode implements DrawUnit {
                                         boolean norm,
                                         boolean tex )
     {
-        boolean hasColor = true;
-        boolean hasNorm  = true;
-        boolean hasTex   = true;
-
-
-
         BoProgram<DrawVert,DrawTri> program;
         program = BasicShaders.createTriProgram( shaderMan, false, false, tex ? 2 : 0, norm, color );
         int vertNum = trianglesRef.size() * 3;

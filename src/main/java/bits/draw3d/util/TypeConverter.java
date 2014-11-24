@@ -19,7 +19,6 @@ public class TypeConverter {
     private static final boolean SWAP_ORDER = ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN;
 
     private static final float FLOAT_TO_BYTE  = 255f / 1f;
-    private static final float BYTE_TO_FLOAT  = 1f / 255f;
     private static final float FLOAT_TO_SHORT = Short.MAX_VALUE / 1f;
 
 

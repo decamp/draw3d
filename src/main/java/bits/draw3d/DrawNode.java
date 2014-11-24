@@ -6,10 +6,6 @@
 
 package bits.draw3d;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GLAutoDrawable;
-
-
 /**
  * Interface for nodes that perform drawing.
  *

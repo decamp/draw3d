@@ -6,8 +6,8 @@
 
 package bits.draw3d.model;
 
-import bits.draw3d.tex.Material;
-import bits.draw3d.tex.Texture;
+import bits.draw3d.Material;
+import bits.draw3d.Texture;
 
 import java.awt.image.BufferedImage;
 

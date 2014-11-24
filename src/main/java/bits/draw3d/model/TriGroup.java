@@ -8,11 +8,10 @@ package bits.draw3d.model;
 
 import java.util.*;
 
-
 /**
  * @author Philip DeCamp
  */
-public class TriGroup extends ArrayList<DrawTri> {
+public class TriGroup {
 
     public String        mName;
     public DrawMaterial  mMaterial;
@@ -27,5 +26,4 @@ public class TriGroup extends ArrayList<DrawTri> {
         mMaterial = material;
         mTris = trisRef == null ? new ArrayList<DrawTri>() : trisRef;
     }
-
 }
