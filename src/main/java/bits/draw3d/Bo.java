@@ -26,16 +26,11 @@ public class Bo extends DrawUnitAdapter implements DrawNode {
     }
 
 
-    public static Bo createUniformBuffer( int usage ) {
-        return new Bo( GL_UNIFORM_BUFFER, usage );
-    }
-
-
     protected final int mType;
     private int         mUsage;
 
     // mId[0] == ID, mId[1] == ID OF PREVIOUSLY BOUND BUFFER OBJECT.
-    protected final int[] mId          = { 0, 0 };
+    protected final int[] mId        = { 0, 0 };
 
     private boolean     mNeedInit    = true;
     private ByteBuffer  mCopyBytes   = null;
@@ -172,7 +167,7 @@ public class Bo extends DrawUnitAdapter implements DrawNode {
     }
 
     @Override
-    public void  unbind( DrawEnv d ) {
+    public void unbind( DrawEnv d ) {
         d.mGl.glBindBuffer( mType, 0 );
     }
 
@@ -187,7 +182,6 @@ public class Bo extends DrawUnitAdapter implements DrawNode {
     public void popDraw( DrawEnv d ) {
         d.mGl.glBindBuffer( mType, mId[1] );
     }
-
 
 
     private void doInit( DrawEnv d ) {

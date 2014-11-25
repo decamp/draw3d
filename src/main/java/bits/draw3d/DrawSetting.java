@@ -7,8 +7,6 @@
 package bits.draw3d;
 
 import bits.draw3d.nodes.FogParams;
-import bits.draw3d.Light;
-import bits.draw3d.Material;
 import bits.math3d.Vec;
 import bits.math3d.Vec4;
 
@@ -392,51 +390,6 @@ public interface DrawSetting {
     }
 
 
-    public static class Lighting extends Stack<Lighting> {
-        public       boolean     mOn     = false;
-        public final List<Light> mLights = new ArrayList<Light>( 8 );
-
-        private final DrawEnv mG;
-
-        public Lighting( DrawEnv g ) {
-            mG = g;
-        }
-
-
-        public void set( boolean on ) {
-            mOn = on;
-        }
-
-        public void addLight( Light light ) {
-
-        }
-
-        public void removeLight( Light light ) {
-            mLights.remove( light );
-        }
-
-        public void clearLights() {
-            mLights.clear();
-        }
-
-        @Override
-        public void apply() {}
-
-        @Override
-        Lighting alloc() {
-            return new Lighting( mG );
-        }
-
-        @Override
-        void copy( Lighting a ) {
-            mOn = a.mOn;
-            mLights.clear();
-            mLights.addAll( a.mLights );
-        }
-
-    }
-
-
     public static class LineWidth extends Stack<LineWidth> {
         public float mValue = 1f;
 
@@ -463,40 +416,6 @@ public interface DrawSetting {
         @Override
         void copy( LineWidth item ) {
             mValue = item.mValue;
-        }
-
-    }
-
-
-    public static class Materials extends Stack<Materials> {
-        public Material mFront;
-        public Material mBack;
-
-        private final DrawEnv mD;
-
-
-        public Materials( DrawEnv g ) {
-            mD = g;
-        }
-
-
-        public void set( Material front, Material back ) {
-            mFront = front;
-            mBack = back;
-        }
-
-        @Override
-        public void apply() {}
-
-        @Override
-        Materials alloc() {
-            return new Materials( mD );
-        }
-
-        @Override
-        void copy( Materials a ) {
-            mFront = a.mFront;
-            mBack = a.mBack;
         }
 
     }

@@ -6,7 +6,7 @@
 
 package bits.draw3d;
 
-import static javax.media.opengl.GL4ES3.*;
+import static javax.media.opengl.GL4.*;
 
 /**
  * Information about the OpenGL data component types.
@@ -14,20 +14,19 @@ import static javax.media.opengl.GL4ES3.*;
  * @author Philip DeCamp
  */
 public enum ComponentType {
-    BYTE        ( GL_BYTE, 1 ),
-    UBYTE       ( GL_UNSIGNED_BYTE, 1 ),
-    SHORT       ( GL_SHORT, 2 ),
-    USHORT      ( GL_UNSIGNED_SHORT, 2 ),
-    INT         ( GL_INT, 4 ),
-    UINT        ( GL_UNSIGNED_INT, 4 ),
-    FIXED       ( GL_FIXED, 4 ),
-    HALF_FLOAT  ( GL_HALF_FLOAT, 2 ),
-    FLOAT       ( GL_FLOAT, 4 );
-
+    BYTE        ( GL_BYTE           , 1 ),
+    UBYTE       ( GL_UNSIGNED_BYTE  , 1 ),
+    SHORT       ( GL_SHORT          , 2 ),
+    USHORT      ( GL_UNSIGNED_SHORT , 2 ),
+    INT         ( GL_INT            , 4 ),
+    UINT        ( GL_UNSIGNED_INT   , 4 ),
+    FIXED       ( GL_FIXED          , 4 ),
+    HALF_FLOAT  ( GL_HALF_FLOAT     , 2 ),
+    FLOAT       ( GL_FLOAT          , 4 ),
+    DOUBLE      ( GL_DOUBLE         , 8 );
 
     private final int mCode;
     private final int mBytes;
-
 
     ComponentType( int code, int bytes ) {
         mCode  = code;
@@ -50,28 +49,18 @@ public enum ComponentType {
 
     public static ComponentType fromGl( int code ) {
         switch( code ) {
-        case GL_BYTE:
-            return BYTE;
-        case GL_UNSIGNED_BYTE:
-            return UBYTE;
-        case GL_SHORT:
-            return SHORT;
-        case GL_UNSIGNED_SHORT:
-            return USHORT;
-        case GL_INT:
-            return INT;
-        case GL_UNSIGNED_INT:
-            return UINT;
-        case GL_FIXED:
-            return FIXED;
-        case GL_HALF_FLOAT:
-            return HALF_FLOAT;
-        case GL_FLOAT:
-            return FLOAT;
-        default:
-            return null;
+        case GL_BYTE           : return BYTE       ;
+        case GL_UNSIGNED_BYTE  : return UBYTE      ;
+        case GL_SHORT          : return SHORT      ;
+        case GL_UNSIGNED_SHORT : return USHORT     ;
+        case GL_INT            : return INT        ;
+        case GL_UNSIGNED_INT   : return UINT       ;
+        case GL_FIXED          : return FIXED      ;
+        case GL_HALF_FLOAT     : return HALF_FLOAT ;
+        case GL_FLOAT          : return FLOAT      ;
+        case GL_DOUBLE         : return DOUBLE     ;
+        default                : return null       ;
         }
     }
-
 
 }

@@ -4,7 +4,7 @@
  * http://opensource.org/licenses/BSD-2-Clause
  */
 
-package bits.draw3d;
+package bits.draw3d.lighting;
 
 import bits.math3d.*;
 
@@ -42,7 +42,7 @@ public class Light {
      * {@code cutoff}: the cosine of the maximum angle of the light ( 1 = no spread, 0 = 0.5*PI ) <br>
      * {@code spreadExp}: determines spread of light where light strength is computed as
      * {@code cos(ang)^spreadExp }.
-     * 0 = uniform, 1 = cosine func.
+     * 0 = member, 1 = cosine func.
      */
     public Vec4 mShape;
 

@@ -15,7 +15,7 @@ import bits.blob.Blob;
 import bits.draw3d.model.*;
 import bits.draw3d.model.io.ModelIO;
 import bits.draw3d.ShaderManager;
-import bits.draw3d.Material;
+import bits.draw3d.lighting.Material;
 import bits.draw3d.Texture2;
 import bits.draw3d.util.MatrixIO;
 import bits.math3d.Mat4;

@@ -4,7 +4,7 @@
  * http://opensource.org/licenses/BSD-2-Clause
  */
 
-package bits.draw3d;
+package bits.draw3d.lighting;
 
 import bits.math3d.Vec;
 import bits.math3d.Vec4;

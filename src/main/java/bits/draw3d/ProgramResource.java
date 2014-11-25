@@ -17,9 +17,19 @@ public class ProgramResource {
     public final int mInterface;
 
     /**
+     * Type of element, eg GL_FLOAT, GL_FLOAT_VEC3, GL_FLOAT_MAT4x4, GL_SAMPLER_2D, etc.
+     */
+    public final int mMemberType;
+
+    /**
+     * Length of array, or 1 if not an array.
+     */
+    public final int mArrayLength;
+
+    /**
      * Index of resource.
      *
-     * For uniforms, index is is used for queries, while location is used for writes.
+     * <p>For uniforms, index is is used for queries, while location is used for writes.
      * For attributes, index and location should be the same.
      */
     public final int mIndex;
@@ -27,8 +37,9 @@ public class ProgramResource {
     /**
      * Location of resource.
      *
-     * For uniforms, index is is used for queries, while location is used for writes.
-     * For attributes, index and location should be the same.
+     * <p>For attributes, index and location should be the same.
+     * <p>For uniforms, index is is used for reading and location is used for writing.
+     * <p>For member blocks, this is the binding location, if defined by the shader.
      */
     public final int mLocation;
 
@@ -37,23 +48,30 @@ public class ProgramResource {
      */
     public final String mName;
 
-    /**
-     * Type of element, eg GL_FLOAT, GL_FLOAT_VEC3, GL_FLOAT_MAT4x4, GL_SAMPLER_2D, etc.
-     */
-    public final int mType;
 
-    /**
-     * Length of array, or 0 if resource is not an array.
-     */
-    public final int mArrayLen;
-
-
-    public ProgramResource( int inter, int index, int location, String name, int type, int arrayLen ) {
+    public ProgramResource( int inter,
+                            int memberType,
+                            int arrayLen,
+                            int index,
+                            int location,
+                            String optName )
+    {
         mInterface = inter;
-        mIndex     = index;
-        mLocation  = location;
-        mName      = name;
-        mType      = type;
-        mArrayLen  = arrayLen;
+        mMemberType = memberType;
+        mArrayLength = arrayLen;
+        mIndex = index;
+        mLocation = location;
+        mName = optName != null ? optName : "";
     }
+
+
+    public ProgramResource( ProgramResource copy ) {
+        mInterface   = copy.mInterface;
+        mMemberType  = copy.mMemberType;
+        mArrayLength = copy.mArrayLength;
+        mIndex       = copy.mIndex;
+        mLocation    = copy.mLocation;
+        mName        = copy.mName;
+    }
+
 }

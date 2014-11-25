@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2014. Massachusetts Institute of Technology
- * Released under the BSD 2-Clause License
- * http://opensource.org/licenses/BSD-2-Clause
- */
+* Copyright (c) 2014. Massachusetts Institute of Technology
+* Released under the BSD 2-Clause License
+* http://opensource.org/licenses/BSD-2-Clause
+*/
 
 package bits.draw3d.nodes;
 
 import bits.draw3d.*;
-import bits.draw3d.Material;
+import bits.draw3d.lighting.Material;
 
 /**
- * @author Philip DeCamp
- */
+* @author Philip DeCamp
+*/
 public class MaterialNode extends DrawUnitAdapter implements DrawNode {
 
     public Material mFront;
@@ -28,23 +28,23 @@ public class MaterialNode extends DrawUnitAdapter implements DrawNode {
 
     @Override
     public void bind( DrawEnv d ) {
-        d.mMaterials.set( mFront, mBack );
+        //d.mMaterials.set( mFront, mBack );
     }
 
     @Override
     public void unbind( DrawEnv d ) {
-        d.mMaterials.set( null, null );
+        //d.mMaterials.set( null, null );
     }
 
     @Override
     public void pushDraw( DrawEnv d ) {
-        d.mMaterials.push();
+        //d.mMaterials.push();
         bind( d );
     }
 
     @Override
     public void popDraw( DrawEnv d ) {
-        d.mMaterials.pop();
+        //d.mMaterials.pop();
     }
 
 }

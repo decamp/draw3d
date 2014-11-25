@@ -15,14 +15,17 @@ import java.util.*;
 public class AutoloadProgram extends Program {
 
     private boolean mCreateUniformLoadersOnInit = true;
+    private boolean mConfigBlockBindingsOnInit  = true;
 
-    protected final Map<String, ProgramResource> mAttribs  = new HashMap<String, ProgramResource>();
-    protected final Map<String, ProgramResource> mUniforms = new HashMap<String, ProgramResource>();
+    protected List<ProgramResource> mAttribs;
+    protected List<Uniform>         mUniforms;
+    protected List<UniformBlock>    mBlocks;
+
+
     private List<DrawTask> mOnBind = null;
 
 
     public AutoloadProgram() {}
-
 
 
     public boolean createUniformLoadersOnInit() {
@@ -38,32 +41,41 @@ public class AutoloadProgram extends Program {
         mCreateUniformLoadersOnInit = enable;
     }
 
-    /**
-     * Not available until initialized.
-     */
-    public ProgramResource attrib( String name ) {
-        return mAttribs.get( name );
+
+    public boolean configBlockBindingsOnInit() {
+        return mConfigBlockBindingsOnInit;
     }
+
+    /**
+     * @param enable If true, this program will automatically configure itself during initialization
+     *               to automatically load common uniforms.
+     * @see UniformLoaders#addAvailableLoaders
+     */
+    public void configBlockBindingsOnInit( boolean enable ) {
+        mConfigBlockBindingsOnInit = enable;
+    }
+
+
 
     /**
      * Not available until initialized.
      */
-    public Map<String,ProgramResource> attribs() {
+    public List<ProgramResource> attribsRef() {
         return mAttribs;
     }
 
     /**
      * Not available until initialized.
      */
-    public ProgramResource uniform( String name ) {
-        return mUniforms.get( name );
+    public List<Uniform> uniformsRef() {
+        return mUniforms;
     }
 
     /**
      * Not available until initialized.
      */
-    public Map<String,ProgramResource> uniforms() {
-        return mUniforms;
+    public List<UniformBlock> uniformBlocksRef() {
+        return mBlocks;
     }
 
 
@@ -78,11 +90,16 @@ public class AutoloadProgram extends Program {
     @Override
     public void init( DrawEnv d ) {
         super.init( d );
-        for( ProgramResource p: Shaders.listAttributes( d.mGl, mId ) ) {
-            mAttribs.put( p.mName, p );
-        }
-        for( ProgramResource p: Shaders.listUniforms( d.mGl, mId ) ) {
-            mUniforms.put( p.mName, p );
+        mAttribs = Shaders.listAttributes( d.mGl, mId );
+        mUniforms = Shaders.listUniforms( d.mGl, mId );
+        mBlocks = Shaders.listUniformBlocks( d.mGl, mId, mUniforms );
+
+        // Remove uniforms in blocks.
+        Iterator<Uniform> iter = mUniforms.iterator();
+        while( iter.hasNext() ) {
+            if( iter.next().mBlockIndex >= 0 ) {
+                iter.remove();
+            }
         }
 
         if( mCreateUniformLoadersOnInit ) {
@@ -90,7 +107,8 @@ public class AutoloadProgram extends Program {
             bind( d );
         }
 
-        UniformLoaders.setDefaultTexUnits( d, mUniforms.values() );
+        UniformLoaders.setDefaultBlockBindings( d, mId, mBlocks );
+        UniformLoaders.setDefaultTexUnits( d, mUniforms );
         unbind( d );
         d.checkErr();
     }

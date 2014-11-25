@@ -11,6 +11,7 @@ import java.awt.*;
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.*;
+import java.util.List;
 import static javax.media.opengl.GL3.*;
 
 
@@ -57,34 +58,31 @@ public class TestUniformBlock {
             prog.bind( d );
             System.out.println( "###" );
 
-            for( ProgramResource res: Shaders.listUniforms( d.mGl, prog.id() ) ) {
-                System.out.println( res.mName + "\t" + res.mLocation + "\t" + res.mType );
+            List<Uniform> uniforms = Shaders.listUniforms( d.mGl, prog.id() );
+            List<UniformBlock> blocks = Shaders.listUniformBlocks( d.mGl, prog.id(), uniforms );
+
+            for( UniformBlock res: blocks ) {
+                System.out.println( res.mName + "\t" + res.mLocation + "\t" + res.mDataSize );
+                for( Uniform uni: res.mUniforms ) {
+                    System.out.println( "   " + uni.mBlockOffset + "\t" + uni.mName  );
+                }
             }
 
             System.out.println( "###" );
 
-
             d.checkErr();
             int loc = d.mGl.glGetUniformLocation( prog.id(), "Fog.color" );
             System.out.println( loc );
-
-
         }
 
         @Override
-        public void dispose( GLAutoDrawable drawable ) {
-
-        }
+        public void dispose( GLAutoDrawable drawable ) {}
 
         @Override
-        public void display( GLAutoDrawable drawable ) {
-
-        }
+        public void display( GLAutoDrawable drawable ) {}
 
         @Override
-        public void reshape( GLAutoDrawable drawable, int i, int i2, int i3, int i4 ) {
-
-        }
+        public void reshape( GLAutoDrawable drawable, int i, int i2, int i3, int i4 ) {}
     }
 
 }

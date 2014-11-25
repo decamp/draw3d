@@ -43,9 +43,7 @@ public class DrawEnv {
     public final DrawSetting.DepthMask     mDepthMask     = new DrawSetting.DepthMask( this );
     public final DrawSetting.DepthTest     mDepthTest     = new DrawSetting.DepthTest( this );
     public final DrawSetting.Fog           mFog           = new DrawSetting.Fog( this );
-    public final DrawSetting.Lighting      mLighting      = new DrawSetting.Lighting( this );
     public final DrawSetting.LineWidth     mLineWidth     = new DrawSetting.LineWidth( this );
-    public final DrawSetting.Materials     mMaterials     = new DrawSetting.Materials( this );
     public final DrawSetting.PolygonOffset mPolygonOffset = new DrawSetting.PolygonOffset( this );
     public final DrawSetting.ScissorTest   mScissorTest   = new DrawSetting.ScissorTest( this );
     public final DrawSetting.StencilTest   mStencilTest   = new DrawSetting.StencilTest( this );

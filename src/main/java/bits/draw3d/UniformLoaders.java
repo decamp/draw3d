@@ -9,7 +9,7 @@ package bits.draw3d;
 import bits.math3d.*;
 
 import java.nio.FloatBuffer;
-import java.util.Collection;
+import java.util.*;
 
 
 /**
@@ -45,7 +45,25 @@ public class UniformLoaders {
     public static final String TEX_UNIT5         = "TEX_UNIT5";
     public static final String TEX_UNIT6         = "TEX_UNIT6";
     public static final String TEX_UNIT7         = "TEX_UNIT7";
+    
 
+    private static final Map<String, Integer> DEFAULT_BLOCK_BINDINGS = new HashMap<String, Integer>();
+    static {
+        DEFAULT_BLOCK_BINDINGS.put( "FOG",          5 );
+        DEFAULT_BLOCK_BINDINGS.put( "MATERIAL[0]",  6 );
+        DEFAULT_BLOCK_BINDINGS.put( "MATERIAL[1]",  7 );
+        DEFAULT_BLOCK_BINDINGS.put( "MATERIAL[2]",  8 );
+        DEFAULT_BLOCK_BINDINGS.put( "MATERIAL[3]",  9 );
+        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[0]",    10 );
+        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[1]",    11 );
+        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[2]",    12 );
+        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[3]",    13 );
+        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[4]",    14 );
+        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[5]",    15 );
+        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[6]",    16 );
+        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[7]",    17 );
+        // Assume that 24 binding locations are available.
+    }
 
 
     public static DrawTask loaderFor( ProgramResource res ) {
@@ -95,7 +113,7 @@ public class UniformLoaders {
 
 
     public static void addAvailableLoaders( AutoloadProgram prog ) {
-        for( ProgramResource res: prog.uniforms().values() ) {
+        for( ProgramResource res: prog.uniformsRef() ) {
             DrawTask task = loaderFor( res );
             if( task != null ) {
                 prog.addBindTask( task );
@@ -103,11 +121,16 @@ public class UniformLoaders {
         }
     }
 
+    public static int defaultBlockBinding( String name ) {
+        Integer n = DEFAULT_BLOCK_BINDINGS.get( name );
+        return n == null ? -1 : n;
+    }
+
     /**
      * Sets all sampler uniforms of the form "texUnitXXX" to value "XXX".
      * @param uniforms List of program uniforms for BOUND program.
      */
-    public static void setDefaultTexUnits( DrawEnv d, Collection<ProgramResource> uniforms ) {
+    public static void setDefaultTexUnits( DrawEnv d, Collection<? extends ProgramResource> uniforms ) {
         for( ProgramResource res: uniforms ) {
             String name = res.mName;
             if( !name.startsWith( "TEX_UNIT" ) ) {
@@ -120,6 +143,16 @@ public class UniformLoaders {
             } catch( NumberFormatException ignored ) {}
         }
         d.checkErr();
+    }
+
+
+    public static void setDefaultBlockBindings( DrawEnv d, int program, Collection<? extends UniformBlock> blocks ) {
+        for( UniformBlock ub: blocks ) {
+            int binding = defaultBlockBinding( ub.mName );
+            if( binding >= 0 ) {
+                d.mGl.glUniformBlockBinding( program, ub.mIndex, binding );
+            }
+        }
     }
 
 

@@ -13,7 +13,7 @@ import java.nio.*;
 import bits.blob.Blob;
 import bits.draw3d.model.DrawMaterial;
 import bits.draw3d.model.TriModel;
-import bits.draw3d.Material;
+import bits.draw3d.lighting.Material;
 import bits.math3d.Vec4;
 
 
