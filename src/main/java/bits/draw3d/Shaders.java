@@ -150,6 +150,9 @@ public class Shaders {
 
     private static List<Uniform> initUniforms( GL2ES3 gl, int prog, int[] inds, int num ) {
         final List<Uniform> ret = new ArrayList<Uniform>( num );
+        if( num == 0 ) {
+            return ret;
+        }
 
         int[] vals = { 0, 0, 0 };
         gl.glGetProgramiv( prog, GL_ACTIVE_UNIFORM_MAX_LENGTH, vals, 0 );
@@ -159,10 +162,10 @@ public class Shaders {
         int[] matrixStrides = new int[ num ];
         int[] blockIndices  = new int[ num ];
         int[] blockOffsets  = new int[ num ];
-        gl.glGetActiveUniformsiv( prog, num, inds, 0, GL_UNIFORM_ARRAY_STRIDE, arrayStrides, 0 );
+        gl.glGetActiveUniformsiv( prog, num, inds, 0, GL_UNIFORM_ARRAY_STRIDE,  arrayStrides,  0 );
         gl.glGetActiveUniformsiv( prog, num, inds, 0, GL_UNIFORM_MATRIX_STRIDE, matrixStrides, 0 );
-        gl.glGetActiveUniformsiv( prog, num, inds, 0, GL_UNIFORM_BLOCK_INDEX, blockIndices, 0 );
-        gl.glGetActiveUniformsiv( prog, num, inds, 0, GL_UNIFORM_OFFSET, blockOffsets, 0 );
+        gl.glGetActiveUniformsiv( prog, num, inds, 0, GL_UNIFORM_BLOCK_INDEX,   blockIndices,  0 );
+        gl.glGetActiveUniformsiv( prog, num, inds, 0, GL_UNIFORM_OFFSET,        blockOffsets,  0 );
 
         for( int i = 0; i < num; i++ ) {
             gl.glGetActiveUniform( prog, inds[i], nameBytes.length, vals, 0, vals, 1, vals, 2, nameBytes, 0 );

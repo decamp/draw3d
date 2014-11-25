@@ -16,6 +16,9 @@ package bits.draw3d;
 public interface UboBlock {
     public UniformBlock target();
 
+    public int  bindLocation();
+    public void bindLocation( int loc );
+
     public int memberNum();
     public UboMember member( int idx );
     public UboMember member( String name );

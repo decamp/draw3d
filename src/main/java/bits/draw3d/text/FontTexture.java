@@ -12,8 +12,6 @@ import bits.draw3d.*;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.image.*;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import static javax.media.opengl.GL3.*;
 
@@ -100,7 +98,7 @@ public class FontTexture implements DrawUnit {
     public void bind( DrawEnv g ) {
         g.drawStream().config( true, true, false );
         g.mBlend.push();
-        g.mBlend.set( true );
+        g.mBlend.apply( true );
         if( mTexture == null ) {
             init( g );
         }

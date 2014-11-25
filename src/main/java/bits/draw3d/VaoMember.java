@@ -14,7 +14,7 @@ import javax.media.opengl.GL2ES2;
  *
  * @author Philip DeCamp
  */
-public class VertAttribute {
+public class VaoMember {
 
     public int mLocation;
     public int mCompNum;
@@ -23,15 +23,15 @@ public class VertAttribute {
     public int mStride        = -1;
     public int mOffset        = -1;
 
-    public VertAttribute() {}
+    public VaoMember() {}
 
 
-    public VertAttribute( int location, int compNum, int type, boolean normalize ) {
+    public VaoMember( int location, int compNum, int type, boolean normalize ) {
         this( location, compNum, type, normalize, -1, -1 );
     }
 
 
-    public VertAttribute( int location, int compNum, int type, boolean normalize, int stride, int offset ) {
+    public VaoMember( int location, int compNum, int type, boolean normalize, int stride, int offset ) {
         mLocation  = location;
         mCompNum   = compNum;
         mType      = type;

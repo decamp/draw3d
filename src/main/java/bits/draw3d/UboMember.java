@@ -12,7 +12,7 @@ import bits.math3d.*;
 /**
  * Provides access to one member of a block of UBO data.
  *
- * <p>After altering data (calling any of the {@code set} commands),
+ * <p>After altering data (calling any of the {@code apply} commands),
  * you will need to rebind the parent block.
  *
  * @author Philip DeCamp
@@ -22,7 +22,9 @@ public interface UboMember {
     public UboBlock block();
 
     public int   getInt();
+    public int getComponentInt( int elem, int row, int col );
     public float getFloat();
+    public float getComponentFloat( int elem, int row, int col );
     public void  get( Vec2 vec );
     public void  get( Vec3 vec );
     public void  get( Mat3 mat );
@@ -34,8 +36,11 @@ public interface UboMember {
     public void  get( Mat3[] out, int off, int len );
     public void  get( Mat4[] out, int off, int len );
 
+
     public void  set( int val );
+    public void setComponent( int elem, int row, int col, int val );
     public void  set( float val );
+    public void setComponent( int elem, int row, int col, float val );
     public void  set( Vec2 vec );
     public void  set( Vec3 vec );
     public void  set( Mat3 mat );

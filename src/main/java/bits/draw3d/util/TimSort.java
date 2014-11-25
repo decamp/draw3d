@@ -67,7 +67,7 @@ public class TimSort {
      *
      * This constant should be a power of two.  It was 64 in Tim Peter's C
      * implementation, but 32 was empirically determined to work better in
-     * this implementation.  In the unlikely event that you set this constant
+     * this implementation.  In the unlikely event that you apply this constant
      * to be a number that's not a power of two, you'll need to change the
      * {@link #minRunLength} computation.
      *

@@ -7,8 +7,7 @@
 package bits.draw3d;
 
 import bits.draw3d.nodes.FogParams;
-import bits.math3d.Vec;
-import bits.math3d.Vec4;
+import bits.math3d.*;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL3;
@@ -49,23 +48,23 @@ public interface DrawSetting {
         }
 
 
-        public void set( boolean on ) {
+        public void apply( boolean on ) {
             mOn = on;
             apply();
         }
 
 
-        public void set( boolean on, int src, int dst ) {
-            mOn = on;
-            mSrcRgb = src;
+        public void apply( boolean on, int src, int dst ) {
+            mOn       = on;
+            mSrcRgb   = src;
             mSrcAlpha = src;
-            mDstRgb = dst;
+            mDstRgb   = dst;
             mDstAlpha = dst;
             apply();
         }
 
 
-        public void set( boolean on, int srcRgb, int dstRgb, int srcAlpha, int dstAlpha ) {
+        public void apply( boolean on, int srcRgb, int dstRgb, int srcAlpha, int dstAlpha ) {
             mOn       = on;
             mSrcRgb   = srcRgb;
             mDstRgb   = dstRgb;
@@ -85,20 +84,25 @@ public interface DrawSetting {
             gl.glBlendFuncSeparate( mSrcRgb, mDstRgb, mSrcAlpha, mDstAlpha );
         }
 
+
         @Override
         Blend alloc() {
             return new Blend();
         }
 
         @Override
-        void copy( Blend a ) {
+        void getState( Blend a ) {
+            a.setState( this );
+        }
+
+        @Override
+        void setState( Blend a ) {
             mOn       = a.mOn;
             mSrcRgb   = a.mSrcRgb;
             mDstRgb   = a.mDstRgb;
             mSrcAlpha = a.mSrcAlpha;
             mDstAlpha = a.mDstAlpha;
         }
-
     }
 
 
@@ -122,10 +126,10 @@ public interface DrawSetting {
         }
 
 
-        public void set( float red, float green, float blue, float alpha ) {
-            mRed = red;
+        public void apply( float red, float green, float blue, float alpha ) {
+            mRed   = red;
             mGreen = green;
-            mBlue = blue;
+            mBlue  = blue;
             mAlpha = alpha;
             apply();
         }
@@ -135,17 +139,21 @@ public interface DrawSetting {
             mG.mGl.glBlendColor( mRed, mGreen, mBlue, mAlpha );
         }
 
-
         @Override
         BlendColor alloc() {
             return new BlendColor();
         }
 
         @Override
-        void copy( BlendColor a ) {
-            mRed = a.mRed;
+        void getState( BlendColor a ) {
+            a.setState( this );
+        }
+
+        @Override
+        void setState( BlendColor a ) {
+            mRed   = a.mRed;
             mGreen = a.mGreen;
-            mBlue = a.mBlue;
+            mBlue  = a.mBlue;
             mAlpha = a.mAlpha;
         }
     }
@@ -171,10 +179,10 @@ public interface DrawSetting {
         }
 
 
-        public void set( boolean red, boolean green, boolean blue, boolean alpha ) {
-            mRed = red;
+        public void apply( boolean red, boolean green, boolean blue, boolean alpha ) {
+            mRed   = red;
             mGreen = green;
-            mBlue = blue;
+            mBlue  = blue;
             mAlpha = alpha;
             apply();
         }
@@ -191,12 +199,18 @@ public interface DrawSetting {
         }
 
         @Override
-        void copy( ColorMask a ) {
-            mRed = a.mRed;
+        void getState( ColorMask a ) {
+            a.setState( this );
+        }
+
+        @Override
+        void setState( ColorMask a ) {
+            mRed   = a.mRed;
             mGreen = a.mGreen;
-            mBlue = a.mBlue;
+            mBlue  = a.mBlue;
             mAlpha = a.mAlpha;
         }
+
     }
 
 
@@ -218,7 +232,7 @@ public interface DrawSetting {
         }
 
 
-        public void set( boolean on ) {
+        public void apply( boolean on ) {
             mOn = on;
             apply();
         }
@@ -233,13 +247,19 @@ public interface DrawSetting {
             }
         }
 
+
         @Override
         CullFace alloc() {
             return new CullFace();
         }
 
         @Override
-        void copy( CullFace a ) {
+        void getState( CullFace a ) {
+            a.mOn = mOn;
+        }
+
+        @Override
+        void setState( CullFace a ) {
             mOn = a.mOn;
         }
     }
@@ -248,7 +268,6 @@ public interface DrawSetting {
     public static class DepthMask extends Stack<DepthMask> {
 
         public boolean mOn = false;
-
         private final DrawEnv mG;
 
 
@@ -263,7 +282,7 @@ public interface DrawSetting {
         }
 
 
-        public void set( boolean on ) {
+        public void apply( boolean on ) {
             mOn = on;
             apply();
         }
@@ -279,7 +298,12 @@ public interface DrawSetting {
         }
 
 
-        void copy( DepthMask copy ) {
+        void getState( DepthMask out ) {
+            out.mOn = mOn;
+        }
+
+
+        void setState( DepthMask copy ) {
             mOn = copy.mOn;
         }
     }
@@ -303,13 +327,13 @@ public interface DrawSetting {
         }
 
 
-        public void set( boolean on ) {
+        public void apply( boolean on ) {
             mOn = on;
             apply();
         }
 
 
-        public void set( boolean on, int func ) {
+        public void apply( boolean on, int func ) {
             mOn = on;
             mFunc = func;
             apply();
@@ -326,67 +350,150 @@ public interface DrawSetting {
             gl.glDepthFunc( mFunc );
         }
 
+
         @Override
         DepthTest alloc() {
             return new DepthTest();
         }
 
         @Override
-        void copy( DepthTest a ) {
-            mOn = a.mOn;
+        void getState( DepthTest a ) {
+            a.mOn   = mOn;
+            a.mFunc = mFunc;
+        }
+
+        @Override
+        void setState( DepthTest a ) {
+            mOn   = a.mOn;
             mFunc = a.mFunc;
         }
     }
 
 
-    public static class Fog extends Stack<Fog> {
-        public       boolean mOn      = false;
-        public final Vec4    mColor   = new Vec4( 0, 0, 0, 0 );
-        public       float   mStart   = 0f;
-        public       float   mDensity = 0f;
+    public static class Fog extends Stack<DrawSetting.Fog.State> {
+
+        private final DrawEnv mEnv;
+
+        public final UboBlock  mBlock;
+        public final UboMember mColor;
+        public final UboMember mParams;
+
+        private final Vec2 mWork = new Vec2();
 
 
-        public Fog() {}
+        public Fog( DrawEnv d, Ubo ubo ) {
+            mEnv    = d;
+            mBlock  = ubo.startBlock( Uniforms.defaultBlockBinding( "FOG" ), "FOG" );
+            mColor  = ubo.addUniform( 1, GL_FLOAT_VEC4, "color"  );
+            mParams = ubo.addUniform( 1, GL_FLOAT_VEC2, "params" );
+        }
 
 
-        public Fog( DrawEnv d ) {}
-
-
-        public void set( boolean on ) {
-            mOn = on;
+        public void apply( int bindLoc ) {
+            mBlock.bindLocation( bindLoc );
             apply();
         }
 
 
-        public void set( boolean on, Vec4 color, float start, float density ) {
-            mOn = on;
-            Vec.put( color, mColor );
-            mStart = start;
-            mDensity = density;
+        public void apply( int bindLoc, Vec4 color, float density, float start ) {
+            mBlock.bindLocation( bindLoc );
+            mColor.set( color );
+            mWork.x = density;
+            mWork.y = start;
+            mParams.set( mWork );
             apply();
         }
 
 
-        public void set( FogParams params ) {
-            set( params.mOn, params.mColor, params.mStart, params.mDensity );
+        public void apply( Vec4 color, float density, float start ) {
+            mColor.set( color );
+            mWork.x = density;
+            mWork.y = start;
+            mParams.set( mWork );
+            apply();
+        }
+
+
+        public void apply( FogParams params ) {
+            apply( params.mColor, params.mStart, params.mDensity );
+        }
+
+
+        public int bindLocation() {
+            return mBlock.bindLocation();
+        }
+
+
+        public void bindLocation( int loc ) {
+            mBlock.bindLocation( loc );
+        }
+
+
+        public void getColor( Vec4 color ) {
+            mColor.get( color );
+        }
+
+
+        public void setColor( Vec4 color ) {
+            mColor.set( color );
+        }
+
+
+        public float density() {
+            return mParams.getComponentFloat( 0, 0, 0 );
+        }
+
+
+        public void density( float density ) {
+            mParams.setComponent( 0, 0, 0, density );
+        }
+
+
+        public float startDist() {
+            return mParams.getComponentFloat( 0, 1, 0 );
+        }
+
+
+        public void startDist( float val ) {
+            mParams.setComponent( 0, 1, 0, val );
+        }
+
+        @Override
+        public int stackDepth() {
+            return 0;
+        }
+
+        @Override
+        public void apply() {
+            mBlock.bind( mEnv );
         }
 
 
         @Override
-        Fog alloc() {
-            return new Fog();
+        State alloc() {
+            return new State();
         }
 
         @Override
-        void copy( Fog item ) {
-            mOn = item.mOn;
-            Vec.put( item.mColor, mColor );
-            mStart = item.mStart;
-            mDensity = item.mDensity;
+        void getState( State out ) {
+            out.mBindLocation = mBlock.bindLocation();
+            mColor.get( out.mColor );
+            mParams.get( out.mParams );
         }
 
         @Override
-        public void apply() {}
+        void setState( State item ) {
+            mBlock.bindLocation( item.mBindLocation );
+            mColor.set( item.mColor );
+            mParams.set( item.mParams );
+        }
+
+
+        static class State extends FogParams {
+            int mBindLocation = -1;
+            final Vec4 mColor   = new Vec4();
+            final Vec2 mParams  = new Vec2();
+        }
     }
 
 
@@ -400,13 +507,13 @@ public interface DrawSetting {
         }
 
 
-        public void set( float value ) {
+        public void apply( float value ) {
             mValue = value;
         }
 
-
         @Override
         public void apply() {}
+
 
         @Override
         LineWidth alloc() {
@@ -414,7 +521,12 @@ public interface DrawSetting {
         }
 
         @Override
-        void copy( LineWidth item ) {
+        void getState( LineWidth out ) {
+            out.mValue = mValue;
+        }
+
+        @Override
+        void setState( LineWidth item ) {
             mValue = item.mValue;
         }
 
@@ -442,13 +554,13 @@ public interface DrawSetting {
         }
 
 
-        public void set( boolean on ) {
+        public void apply( boolean on ) {
             mFillOn = mLineOn = mPointOn = on;
             apply();
         }
 
 
-        public void set( boolean fillOn, boolean lineOn, boolean pointOn ) {
+        public void apply( boolean fillOn, boolean lineOn, boolean pointOn ) {
             mFillOn = fillOn;
             mLineOn = lineOn;
             mPointOn = pointOn;
@@ -456,7 +568,7 @@ public interface DrawSetting {
         }
 
 
-        public void set( boolean on, float factor, float units ) {
+        public void apply( boolean on, float factor, float units ) {
             mFillOn = mLineOn = mPointOn = on;
             mFactor = factor;
             mUnits = units;
@@ -464,7 +576,7 @@ public interface DrawSetting {
         }
 
 
-        public void set( boolean fillOn, boolean lineOn, boolean pointOn, float factor, float units ) {
+        public void apply( boolean fillOn, boolean lineOn, boolean pointOn, float factor, float units ) {
             mFillOn = fillOn;
             mLineOn = lineOn;
             mPointOn = pointOn;
@@ -494,18 +606,28 @@ public interface DrawSetting {
             gl.glPolygonOffset( mFactor, mUnits );
         }
 
+
         @Override
         PolygonOffset alloc() {
             return new PolygonOffset();
         }
 
         @Override
-        void copy( PolygonOffset a ) {
-            mFillOn = a.mFillOn;
-            mLineOn = a.mLineOn;
+        void getState( PolygonOffset a ) {
+            a.mFillOn  = mFillOn;
+            a.mLineOn  = mLineOn;
+            a.mPointOn = mPointOn;
+            a.mFactor  = mFactor;
+            a.mUnits   = mUnits;
+        }
+
+        @Override
+        void setState( PolygonOffset a ) {
+            mFillOn  = a.mFillOn;
+            mLineOn  = a.mLineOn;
             mPointOn = a.mPointOn;
-            mFactor = a.mFactor;
-            mUnits = a.mUnits;
+            mFactor  = a.mFactor;
+            mUnits   = a.mUnits;
         }
     }
 
@@ -527,13 +649,14 @@ public interface DrawSetting {
             mG = null;
         }
 
-        public void set( boolean on ) {
+
+        public void apply( boolean on ) {
             mOn = on;
             apply();
         }
 
 
-        public void set( boolean on, int x, int y, int w, int h ) {
+        public void apply( boolean on, int x, int y, int w, int h ) {
             mOn = on;
             mScissor[0] = x;
             mScissor[1] = y;
@@ -553,13 +676,19 @@ public interface DrawSetting {
             gl.glScissor( mScissor[0], mScissor[1], mScissor[2], mScissor[3] );
         }
 
+
         @Override
         ScissorTest alloc() {
             return new ScissorTest();
         }
 
         @Override
-        void copy( ScissorTest a ) {
+        void getState( ScissorTest a ) {
+            a.setState( this );
+        }
+
+        @Override
+        void setState( ScissorTest a ) {
             mOn = a.mOn;
             System.arraycopy( a.mScissor, 0, mScissor, 0, 4 );
         }
@@ -589,32 +718,32 @@ public interface DrawSetting {
         }
 
 
-        public void set( boolean on ) {
-            mOn = on;
-            apply();
-        }
-
-
-        public void set( boolean on, int func, int ref, int mask ) {
-            mOn = on;
-            mFrontFunc = mBackFunc = func;
-            mFrontRef = mBackRef = ref;
-            mFrontMask = mBackMask = mask;
-            apply();
-        }
-
-
-        public void setFront( int frontFunc, int frontRef, int frontMask ) {
+        public void front( int frontFunc, int frontRef, int frontMask ) {
             mFrontFunc = frontFunc;
             mFrontRef = frontRef;
             mFrontMask = frontMask;
         }
 
 
-        public void setBack( int backFunc, int backRef, int backMask ) {
+        public void back( int backFunc, int backRef, int backMask ) {
             mBackFunc = backFunc;
-            mBackRef = backRef;
+            mBackRef  = backRef;
             mBackMask = backMask;
+        }
+
+
+        public void apply( boolean on ) {
+            mOn = on;
+            apply();
+        }
+
+
+        public void apply( boolean on, int func, int ref, int mask ) {
+            mOn = on;
+            mFrontFunc = mBackFunc = func;
+            mFrontRef  = mBackRef = ref;
+            mFrontMask = mBackMask = mask;
+            apply();
         }
 
         @Override
@@ -636,7 +765,12 @@ public interface DrawSetting {
         }
 
         @Override
-        void copy( StencilTest copy ) {
+        void getState( StencilTest out ) {
+            out.setState( this );
+        }
+
+        @Override
+        void setState( StencilTest copy ) {
             mOn = copy.mOn;
             mFrontFunc = copy.mFrontFunc;
             mFrontRef = copy.mFrontRef;
@@ -670,7 +804,7 @@ public interface DrawSetting {
         }
 
 
-        public void set( int stencilFail, int depthFail, int pass ) {
+        public void apply( int stencilFail, int depthFail, int pass ) {
             mFrontStencilFail = mBackStencilFail = stencilFail;
             mFrontDepthFail = mBackDepthFail = depthFail;
             mFrontPass = mBackPass = pass;
@@ -690,7 +824,12 @@ public interface DrawSetting {
         }
 
         @Override
-        void copy( StencilOp a ) {
+        void getState( StencilOp a ) {
+            a.setState( this );
+        }
+
+        @Override
+        void setState( StencilOp a ) {
             mFrontStencilFail = a.mFrontStencilFail;
             mFrontDepthFail = a.mFrontDepthFail;
             mFrontPass = a.mFrontPass;
@@ -721,7 +860,7 @@ public interface DrawSetting {
         }
 
 
-        public void set( int x, int y, int w, int h ) {
+        public void apply( int x, int y, int w, int h ) {
             mX = x;
             mY = y;
             mW = w;
@@ -749,7 +888,12 @@ public interface DrawSetting {
         }
 
         @Override
-        void copy( Viewport a ) {
+        void getState( Viewport out ) {
+            out.setState( this );
+        }
+
+        @Override
+        void setState( Viewport a ) {
             mX = a.mX;
             mY = a.mY;
             mW = a.mW;
@@ -759,36 +903,37 @@ public interface DrawSetting {
     }
 
 
-    static abstract class Stack<T extends Stack> implements DrawSetting {
+    static abstract class Stack<T> implements DrawSetting {
 
         protected static final int DEFAULT_CAP = 8;
 
-        Stack[] mArr;
-        int     mPos;
+        T[] mArr;
+        int mPos;
 
         Stack() {
             mArr = null;
             mPos = 0;
         }
 
-
+        @SuppressWarnings( "unchecked" )
         Stack( int initialCapacity ) {
-            mArr = new Stack[initialCapacity];
-            for( int i = 0; i < mArr.length; i++ ) {
+            T t = alloc();
+            mArr = (T[])java.lang.reflect.Array.newInstance( t.getClass(), initialCapacity );
+            mArr[0] = t;
+            for( int i = 1; i < mArr.length; i++ ) {
                 mArr[i] = alloc();
             }
         }
 
 
-        @SuppressWarnings( "unchecked" )
         public void push() {
             ensureCapacity( mPos + 1 );
-            mArr[mPos++].copy( this );
+            getState( mArr[mPos++] );
         }
 
-        @SuppressWarnings( "unchecked" )
+
         public void pop() {
-            copy( (T)mArr[--mPos] );
+            setState( mArr[--mPos] );
             apply();
         }
 
@@ -801,7 +946,10 @@ public interface DrawSetting {
         abstract T alloc();
 
 
-        abstract void copy( T item );
+        abstract void getState( T out );
+
+
+        abstract void setState( T item );
 
         @SuppressWarnings( "unchecked" )
         void ensureCapacity( int minCap ) {

@@ -18,7 +18,7 @@ import bits.collect.PublicList;
 /**
  * Buffer Object List. Adding an object to a BoList will
  * result in that object being serialized and added to
- * a set of OpenGL Buffer Objects (VBO/IBO).
+ * a apply of OpenGL Buffer Objects (VBO/IBO).
  *
  * <p>While BoList manages the item and buffer lists,
  * a BoSerializer is needed to perform actual serialization

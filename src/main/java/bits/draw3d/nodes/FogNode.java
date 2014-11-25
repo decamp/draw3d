@@ -19,9 +19,9 @@ import static javax.media.opengl.GL2.*;
  */
 @Deprecated public class FogNode extends DrawNodeAdapter {
 
-    private final int[] mStateInt     = { 1, GL_EXP };
+    private final int[]   mStateInt     = { 1, GL_EXP };
     private final float[] mStateFloat = { 1f, 0f, 1f, 0f, 0f, 0f, 0f };
-    private final int[] mRevertInt;
+    private final int[]   mRevertInt;
     private final float[] mRevertFloat;
     
     

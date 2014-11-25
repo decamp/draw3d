@@ -21,7 +21,7 @@ public interface RayPicker {
 
     /**
      * Given a point and a direction, the <i>pick</i> operation finds the nearest point
-     * in some set of geometric objects.  We're mostly just working with Triangles, but
+     * in some apply of geometric objects.  We're mostly just working with Triangles, but
      * we might eventually use other primitives. 
      * 
      * @param rayPoint Origin point of the ray as a length-3 array.

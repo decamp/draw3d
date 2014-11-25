@@ -39,7 +39,7 @@ public class ProgramResource {
      *
      * <p>For attributes, index and location should be the same.
      * <p>For uniforms, index is is used for reading and location is used for writing.
-     * <p>For member blocks, this is the binding location, if defined by the shader.
+     * <p>For member blocks, this is the bindLocation location, if defined by the shader.
      */
     public final int mLocation;
 

@@ -20,7 +20,7 @@ public class Vao implements DrawUnit {
 
     private final int[] mId = { 0 };
 
-    private final List<VertAttribute> mAttribs = new ArrayList<VertAttribute>( 5 );
+    private final List<VaoMember> mAttribs = new ArrayList<VaoMember>( 5 );
 
     private Bo mVbo = null;
     private Bo mIbo = null;
@@ -35,7 +35,6 @@ public class Vao implements DrawUnit {
         mVbo = vbo;
         mIbo = ibo;
     }
-
 
 
     public Bo vbo() {
@@ -60,7 +59,7 @@ public class Vao implements DrawUnit {
     }
 
     /**
-     * @return The stride value of the first VertAttribute object, or 0 if none.
+     * @return The stride value of the first VaoMember object, or 0 if none.
      */
     public int firstStride() {
         return mAttribs.isEmpty() ? 0 : mAttribs.get( 0 ).mStride;
@@ -68,23 +67,23 @@ public class Vao implements DrawUnit {
 
 
     public void addAttribute( int location, int compNum, int compType, boolean normalize ) {
-        addAttribute( new VertAttribute( location, compNum, compType, normalize ) );
+        addAttribute( new VaoMember( location, compNum, compType, normalize ) );
     }
 
 
     public void addAttribute( int location, int compNum, int compType, boolean normalize, int stride, int offset ) {
-        addAttribute( new VertAttribute( location, compNum, compType, normalize, stride, offset ) );
+        addAttribute( new VaoMember( location, compNum, compType, normalize, stride, offset ) );
 
     }
 
 
-    public void addAttribute( VertAttribute attrib ) {
+    public void addAttribute( VaoMember attrib ) {
         mAttribs.add( attrib );
         mNeedInit = true;
     }
 
 
-    public void removeAttribute( VertAttribute attrib ) {
+    public void removeAttribute( VaoMember attrib ) {
         mAttribs.remove( attrib );
         mNeedInit = true;
     }
@@ -103,13 +102,13 @@ public class Vao implements DrawUnit {
      */
     public void packFormat( ByteAlignment alignment ) {
         int off = 0;
-        for( VertAttribute v: mAttribs ) {
+        for( VaoMember v: mAttribs ) {
             v.mOffset = off;
             off += alignment.size( ComponentType.fromGl( v.mType ), v.mCompNum );
         }
 
         // Alignment for next vertex.
-        for( VertAttribute v: mAttribs ) {
+        for( VaoMember v: mAttribs ) {
             v.mStride = off;
         }
 
@@ -117,7 +116,7 @@ public class Vao implements DrawUnit {
     }
 
 
-    public List<VertAttribute> attributesRef() {
+    public List<VaoMember> attributesRef() {
         return mAttribs;
     }
 
@@ -161,7 +160,7 @@ public class Vao implements DrawUnit {
 
         if( mVbo != null ) {
             mVbo.bind( d );
-            for( VertAttribute va: mAttribs ) {
+            for( VaoMember va: mAttribs ) {
                 va.enable( gl );
             }
         } else {

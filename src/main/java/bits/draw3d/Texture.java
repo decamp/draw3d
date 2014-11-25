@@ -15,7 +15,7 @@ package bits.draw3d;
  * scene graph if desired. When used as a DrawNode, the
  * primary pushDraw() behavior binds the Texture to the
  * current Framebuffer, and the primary popDraw() behavior
- * reverts the binding to the previous state.
+ * reverts the bindLocation to the previous state.
  * 
  * @author decamp
  */

@@ -21,7 +21,7 @@ import javax.media.opengl.GL;
  * plane separate from the near plane, without affecting the z-order of the
  * geometry. For this class to work, the projection matrix MUST be modified
  * accordingly. When this action is pushed, the nearplane of the projection
- * transform should be set to clipDepth. Rendering will then operate AS IF the
+ * transform should be apply to clipDepth. Rendering will then operate AS IF the
  * near-plane of the projection is at nearDepth, but fragments will be clipped
  * at clipDepth.
  * <p>

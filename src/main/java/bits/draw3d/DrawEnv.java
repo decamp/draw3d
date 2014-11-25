@@ -6,7 +6,6 @@
 
 package bits.draw3d;
 
-import bits.draw3d.ShaderManager;
 import bits.draw3d.text.FontManager;
 import bits.math3d.*;
 
@@ -42,7 +41,7 @@ public class DrawEnv {
     public final DrawSetting.CullFace      mCullFace      = new DrawSetting.CullFace( this );
     public final DrawSetting.DepthMask     mDepthMask     = new DrawSetting.DepthMask( this );
     public final DrawSetting.DepthTest     mDepthTest     = new DrawSetting.DepthTest( this );
-    public final DrawSetting.Fog           mFog           = new DrawSetting.Fog( this );
+    public final DrawSetting.Fog           mFog;
     public final DrawSetting.LineWidth     mLineWidth     = new DrawSetting.LineWidth( this );
     public final DrawSetting.PolygonOffset mPolygonOffset = new DrawSetting.PolygonOffset( this );
     public final DrawSetting.ScissorTest   mScissorTest   = new DrawSetting.ScissorTest( this );
@@ -63,12 +62,15 @@ public class DrawEnv {
     public final Rect        mWorkRect   = new Rect();
 
     private final DrawStream mStream;
+    private final Ubo mUbo;
 
 
     public DrawEnv() {
-        mFontMan = new FontManager();
+        mFontMan   = new FontManager();
         mShaderMan = new ShaderManager();
-        mStream = new DrawStream();
+        mStream    = new DrawStream();
+        mUbo       = new Ubo();
+        mFog       = new DrawSetting.Fog( this, mUbo );
     }
 
 
@@ -81,6 +83,20 @@ public class DrawEnv {
         return mStream;
     }
 
+
+    public FontManager fontManager() {
+        return mFontMan;
+    }
+
+
+    public ShaderManager shaderManager() {
+        return mShaderMan;
+    }
+
+
+    public Ubo ubo() {
+        return mUbo;
+    }
 
     /**
      * Should be called every frame.
@@ -99,15 +115,11 @@ public class DrawEnv {
             mContextViewport.x1 = gld.getSurfaceWidth();
             mContextViewport.y1 = gld.getSurfaceHeight();
         }
+        mUbo.init( this );
         mStream.init( this );
     }
 
 
     public void dispose( GLAutoDrawable gld ) {}
-
-
-    public FontManager fontManager() {
-        return mFontMan;
-    }
 
 }

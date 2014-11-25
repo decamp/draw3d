@@ -35,7 +35,7 @@ public class AutoloadProgram extends Program {
     /**
      * @param enable If true, this program will automatically configure itself during initialization
      *               to automatically load common uniforms.
-     * @see UniformLoaders#addAvailableLoaders
+     * @see Uniforms#addAvailableLoaders
      */
     public void createUniformLoadersOnInit( boolean enable ) {
         mCreateUniformLoadersOnInit = enable;
@@ -49,7 +49,7 @@ public class AutoloadProgram extends Program {
     /**
      * @param enable If true, this program will automatically configure itself during initialization
      *               to automatically load common uniforms.
-     * @see UniformLoaders#addAvailableLoaders
+     * @see Uniforms#addAvailableLoaders
      */
     public void configBlockBindingsOnInit( boolean enable ) {
         mConfigBlockBindingsOnInit = enable;
@@ -103,12 +103,12 @@ public class AutoloadProgram extends Program {
         }
 
         if( mCreateUniformLoadersOnInit ) {
-            UniformLoaders.addAvailableLoaders( this );
+            Uniforms.addAvailableLoaders( this );
             bind( d );
         }
 
-        UniformLoaders.setDefaultBlockBindings( d, mId, mBlocks );
-        UniformLoaders.setDefaultTexUnits( d, mUniforms );
+        Uniforms.setDefaultBlockBindings( d, mId, mBlocks );
+        Uniforms.setDefaultTexUnits( d, mUniforms );
         unbind( d );
         d.checkErr();
     }

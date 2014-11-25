@@ -28,12 +28,12 @@ public class MaterialNode extends DrawUnitAdapter implements DrawNode {
 
     @Override
     public void bind( DrawEnv d ) {
-        //d.mMaterials.set( mFront, mBack );
+        //d.mMaterials.apply( mFront, mBack );
     }
 
     @Override
     public void unbind( DrawEnv d ) {
-        //d.mMaterials.set( null, null );
+        //d.mMaterials.apply( null, null );
     }
 
     @Override

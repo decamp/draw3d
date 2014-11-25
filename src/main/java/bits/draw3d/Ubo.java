@@ -103,15 +103,26 @@ public class Ubo implements DrawUnit {
         block.mMembers.add( new Member( block, uniform ) );
         block.mBufSize += uniform.mArrayStride;
         mNeedUpdate = mNeedRealloc = true;
-        return null;
+
+        return member;
     }
+
+
+    public void removeBlock( UboBlock block ) {
+        if( mBlocks.remove( block ) ) {
+            mNeedUpdate = mNeedRealloc = true;
+        }
+    }
+
+
 
     /**
      * Must be called before accessing any UboMember values. Called automatically
      * by bind() or alloc() if needed.
      */
     public void alloc() {
-        mNeedRealloc = false;
+        mCurrentBlock = null;
+        mNeedRealloc  = false;
         int totalSize = 0;
         for( Block block: mBlocks ) {
             totalSize += block.mBufSize;
@@ -154,12 +165,12 @@ public class Ubo implements DrawUnit {
     /**
      * @param index Note this is the Block index within this Bo, not the index within a shader.
      */
-    public Block block( int index ) {
+    public UboBlock block( int index ) {
         return mBlocks.get( index );
     }
 
 
-    public Block block( String name ) {
+    public UboBlock block( String name ) {
         if( name == null ) {
             return null;
         }
@@ -175,7 +186,6 @@ public class Ubo implements DrawUnit {
     public List<UboBlock> blocksRef() {
         return (List)mBlocks;
     }
-
 
     @Override
     public void init( DrawEnv d ) {
@@ -270,6 +280,16 @@ public class Ubo implements DrawUnit {
         }
 
         @Override
+        public int  bindLocation() {
+            return mBinding;
+        }
+
+        @Override
+        public void bindLocation( int loc ) {
+            mBinding = loc;
+        }
+
+        @Override
         public int memberNum() {
             return mMembers.size();
         }
@@ -295,7 +315,7 @@ public class Ubo implements DrawUnit {
 
         @Override
         public void bind( DrawEnv d ) {
-            bind( d, mTarget.mLocation >= 0 ? mTarget.mLocation : 0 );
+            bind( d, mBinding >= 0 ? mBinding : 0 );
         }
 
         @Override
@@ -518,6 +538,14 @@ public class Ubo implements DrawUnit {
             }
         }
 
+        public int getComponentInt( int elem, int row, int col ) {
+            return mBuf.getInt( mBufOff + elem * mTarget.mArrayStride + col * mTarget.mMatrixStride + 4 * row );
+        }
+
+        public float getComponentFloat( int elem, int row, int col ) {
+            return mBuf.getFloat( mBufOff + elem * mTarget.mArrayStride + col * mTarget.mMatrixStride + 4 * row );
+        }
+
 
         public void set( int val ) {
             mBuf.putInt( mTarget.mBlockOffset, val );
@@ -707,6 +735,14 @@ public class Ubo implements DrawUnit {
                 pos += mTarget.mArrayStride;
             }
             mBlock.mDirty = true;
+        }
+
+        public void setComponent( int elem, int row, int col, int val ) {
+            mBuf.putInt( mBufOff + elem * mTarget.mArrayStride + col * mTarget.mMatrixStride + 4 * row, val );
+        }
+
+        public void setComponent( int elem, int row, int col, float val ) {
+            mBuf.putFloat( mBufOff + elem * mTarget.mArrayStride + col * mTarget.mMatrixStride + 4 * row, val );
         }
 
     }

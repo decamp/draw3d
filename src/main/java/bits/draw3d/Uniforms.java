@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * @author Philip DeCamp
  */
-public class UniformLoaders {
+public class Uniforms {
 
     public static final String PROJ_MAT          = "PROJ_MAT";
     public static final String INV_PROJ_MAT      = "INV_PROJ_MAT";
@@ -33,9 +33,6 @@ public class UniformLoaders {
     public static final String TEX_MAT           = "TEX_MAT";
     public static final String INV_TEX_MAT       = "INV_TEX_MAT";
     public static final String LINE_WIDTH        = "LINE_WIDTH";
-    public static final String FOG_DENSITY       = "FOG_DENSITY";
-    public static final String FOG_START         = "FOG_START";
-    public static final String FOG_COLOR         = "FOG_COLOR";
 
     public static final String TEX_UNIT0         = "TEX_UNIT0";
     public static final String TEX_UNIT1         = "TEX_UNIT1";
@@ -45,9 +42,10 @@ public class UniformLoaders {
     public static final String TEX_UNIT5         = "TEX_UNIT5";
     public static final String TEX_UNIT6         = "TEX_UNIT6";
     public static final String TEX_UNIT7         = "TEX_UNIT7";
-    
+
 
     private static final Map<String, Integer> DEFAULT_BLOCK_BINDINGS = new HashMap<String, Integer>();
+
     static {
         DEFAULT_BLOCK_BINDINGS.put( "FOG",          5 );
         DEFAULT_BLOCK_BINDINGS.put( "MATERIAL[0]",  6 );
@@ -62,7 +60,7 @@ public class UniformLoaders {
         DEFAULT_BLOCK_BINDINGS.put( "LIGHT[5]",    15 );
         DEFAULT_BLOCK_BINDINGS.put( "LIGHT[6]",    16 );
         DEFAULT_BLOCK_BINDINGS.put( "LIGHT[7]",    17 );
-        // Assume that 24 binding locations are available.
+        // Assume that 24 bindLocation locations are available.
     }
 
 
@@ -100,12 +98,6 @@ public class UniformLoaders {
             return new InvTexMat( res.mLocation );
         } else if( name == LINE_WIDTH ) {
             return new LineWidth( res.mLocation );
-        } else if( name == FOG_DENSITY ) {
-            return new FogDensity( res.mLocation );
-        } else if( name == FOG_START ) {
-            return new FogStart( res.mLocation );
-        } else if( name == FOG_COLOR ) {
-            return new FogColor( res.mLocation );
         }
 
         return null;
@@ -120,6 +112,7 @@ public class UniformLoaders {
             }
         }
     }
+
 
     public static int defaultBlockBinding( String name ) {
         Integer n = DEFAULT_BLOCK_BINDINGS.get( name );
@@ -437,43 +430,6 @@ public class UniformLoaders {
 
         public void run( DrawEnv g ) {
             g.mGl.glUniform1f( mLocation, g.mLineWidth.mValue );
-        }
-    }
-
-
-    public static final class FogDensity implements DrawTask {
-        private final int mLocation;
-        public FogDensity( int location ) {
-            mLocation = location;
-        }
-
-        public void run( DrawEnv d ) {
-            d.mGl.glUniform1f( mLocation, d.mFog.mDensity );
-        }
-    }
-
-
-    public static final class FogStart implements DrawTask {
-        private final int mLocation;
-        public FogStart( int location ) {
-            mLocation = location;
-        }
-
-        public void run( DrawEnv d ) {
-            d.mGl.glUniform1f( mLocation, d.mFog.mStart );
-        }
-    }
-
-
-    public static final class FogColor implements DrawTask {
-        private final int mLocation;
-        public FogColor( int location ) {
-            mLocation = location;
-        }
-
-        public void run( DrawEnv d ) {
-            Vec4 c = d.mFog.mColor;
-            d.mGl.glUniform4f( mLocation, c.x, c.y, c.z, c.w );
         }
     }
 
