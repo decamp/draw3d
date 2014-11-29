@@ -30,6 +30,8 @@ public class DrawUtil {
             return;
         }
         String msg = String.format( "Err 0x%08X: %s", err, errString( err ) );
+        System.out.println( msg );
+        System.exit( -1 );
         throw new GLException( msg );
     }
 

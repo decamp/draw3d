@@ -131,7 +131,7 @@ public class Bo extends DrawUnitAdapter implements DrawNode {
     
     /**
      * Sets usage to be used on next buffer allocation. This is,
-     * determines usage type to be used on next call to <code>alloc()</code>
+     * determines usage type to be used on next call to <code>allocMembersBuffer()</code>
      * or {@code buffer()}.
      *
      * @param usage One of GL_[STREAMING_STATIC_DYNAMIC]_[DRAW_READ_COPY].

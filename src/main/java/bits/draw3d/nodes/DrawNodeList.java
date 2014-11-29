@@ -7,11 +7,7 @@
 package bits.draw3d.nodes;
 
 import bits.draw3d.*;
-
 import java.util.*;
-import javax.media.opengl.GL;
-import javax.media.opengl.GLAutoDrawable;
-
 
 /**
  * Propagates draw action calls to a list of DrawActions.

@@ -6,13 +6,15 @@
 
 package bits.draw3d;
 
-import bits.draw3d.text.FontManager;
-import bits.math3d.*;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL3;
 import javax.media.opengl.GLAutoDrawable;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
+import static javax.media.opengl.GL3.*;
+
+import bits.draw3d.text.FontManager;
+import bits.math3d.*;
 
 
 /**
@@ -35,6 +37,12 @@ public class DrawEnv {
     public final MatStack mColorMat = new MatStack();
     public final MatStack mTexMat   = new MatStack();
 
+    public final DrawSetting.Program       mProgram       = new DrawSetting.Program( this );
+    public final DrawSetting.Buffer        mArrayBuf      = new DrawSetting.Buffer( this, GL_ARRAY_BUFFER );
+    public final DrawSetting.Buffer        mElementBuf    = new DrawSetting.Buffer( this, GL_ELEMENT_ARRAY_BUFFER );
+    public final DrawSetting.Buffer        mUniformBuf    = new DrawSetting.Buffer( this, GL_UNIFORM_BUFFER );
+
+
     public final DrawSetting.Blend         mBlend         = new DrawSetting.Blend( this );
     public final DrawSetting.BlendColor    mBlendColor    = new DrawSetting.BlendColor( this );
     public final DrawSetting.ColorMask     mColorMask     = new DrawSetting.ColorMask( this );
@@ -49,6 +57,7 @@ public class DrawEnv {
     public final DrawSetting.StencilOp     mStencilOp     = new DrawSetting.StencilOp( this );
     public final DrawSetting.Viewport      mViewport      = new DrawSetting.Viewport( this );
 
+
     public final ShaderManager mShaderMan;
     public final FontManager   mFontMan;
 
@@ -62,15 +71,13 @@ public class DrawEnv {
     public final Rect        mWorkRect   = new Rect();
 
     private final DrawStream mStream;
-    private final Ubo mUbo;
 
 
     public DrawEnv() {
         mFontMan   = new FontManager();
         mShaderMan = new ShaderManager();
         mStream    = new DrawStream();
-        mUbo       = new Ubo();
-        mFog       = new DrawSetting.Fog( this, mUbo );
+        mFog       = new DrawSetting.Fog( this );
     }
 
 
@@ -94,10 +101,6 @@ public class DrawEnv {
     }
 
 
-    public Ubo ubo() {
-        return mUbo;
-    }
-
     /**
      * Should be called every frame.
 
@@ -115,7 +118,6 @@ public class DrawEnv {
             mContextViewport.x1 = gld.getSurfaceWidth();
             mContextViewport.y1 = gld.getSurfaceHeight();
         }
-        mUbo.init( this );
         mStream.init( this );
     }
 

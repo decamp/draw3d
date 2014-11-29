@@ -27,7 +27,7 @@ import static javax.media.opengl.GL3.*;
  * class can cost significant memory resources. This class is meant to be used
  * in conjuncture with FontManager to minimize the number of textures generated.
  * <p>
- * FontTexture essentially maps pixels onto GL coordinates, so if you alloc
+ * FontTexture essentially maps pixels onto GL coordinates, so if you allocMembersBuffer
  * a FontTexture with a Font with pointsize 12.0 that maps to 16 pixels high,
  * the FontTexture will render that Font 16.0 GL units tall. You can alter
  * height by scaling your matrix stack, but keep in mind the resolution of the

@@ -61,7 +61,6 @@ public class BasicShaders {
     }
 
 
-
     public static BoProgram<DrawVert,Void> createProgram( BasicShaderConfig config, ShaderManager shaderMan ) {
         BoProgram<DrawVert,Void> ret = new BoProgram<DrawVert,Void>();
         initProgram( config, shaderMan, ret );
@@ -72,7 +71,11 @@ public class BasicShaders {
 
     public static BoWriter<DrawVert> createVertWriter( BasicShaderConfig config ) {
         if( config.texComponentNum() == 0 ) {
-            return new ColorWriter();
+            if( config.color() || !config.normals() ) {
+                return new ColorWriter();
+            } else {
+                return new NormWriter();
+            }
         } else {
             if( !config.normals() ) {
                 if( !config.color() ) {
@@ -250,6 +253,30 @@ public class BasicShaders {
             for( int i = 0; i < mTexDim; i++ ) {
                 vbo.putFloat( vert.mTex[i] );
             }
+        }
+    }
+
+
+    private static final class NormWriter extends AbstractVertWriter {
+
+        NormWriter() {}
+
+        @Override
+        public int bytesPerElem() {
+            return 12 + 12;
+        }
+
+        @Override
+        public void attributes( Vao out ) {
+            int stride = bytesPerElem();
+            out.addAttribute( 0, 3, GL_FLOAT, false, stride,  0 );
+            out.addAttribute( 1, 3, GL_FLOAT, false, stride, 12 );
+        }
+
+        @Override
+        public void write( DrawVert vert, ByteBuffer vbo ) {
+            Vec.put( vert.mPos, vbo );
+            Vec.put( vert.mNorm, vbo );
         }
     }
 

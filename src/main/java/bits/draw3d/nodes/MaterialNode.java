@@ -9,20 +9,25 @@ package bits.draw3d.nodes;
 import bits.draw3d.*;
 import bits.draw3d.lighting.Material;
 
+
 /**
 * @author Philip DeCamp
 */
 public class MaterialNode extends DrawUnitAdapter implements DrawNode {
 
-    public Material mFront;
-    public Material mBack;
+    private UboBlock mFrontBlock;
+    private UboBlock mBackBlock;
+
+    private Material mFront;
+    private Material mBack;
+
 
     public MaterialNode() {}
 
 
     public MaterialNode( Material front, Material back ) {
         mFront = front;
-        mBack  = back;
+        mBack = back;
     }
 
 
@@ -46,5 +51,13 @@ public class MaterialNode extends DrawUnitAdapter implements DrawNode {
     public void popDraw( DrawEnv d ) {
         //d.mMaterials.pop();
     }
+
+
+    private static class MatBlock {
+
+
+
+    }
+
 
 }

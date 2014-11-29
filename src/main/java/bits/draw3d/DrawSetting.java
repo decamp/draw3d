@@ -11,6 +11,7 @@ import bits.math3d.*;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL3;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import static javax.media.opengl.GL2GL3.*;
@@ -155,6 +156,71 @@ public interface DrawSetting {
             mGreen = a.mGreen;
             mBlue  = a.mBlue;
             mAlpha = a.mAlpha;
+        }
+    }
+
+
+    public static class Buffer extends Stack<int[]> {
+
+        public final int mTarget;
+        public int mId;
+
+        private final DrawEnv mEnv;
+        private final int[] mWork = { 0 };
+
+
+        Buffer( DrawEnv d, int target  ) {
+            mEnv = d;
+            mTarget = target;
+        }
+
+
+        public int gen() {
+            mEnv.mGl.glGenBuffers( 1, mWork, 0 );
+            return mWork[0];
+        }
+
+
+        public void delete( int id ) {
+            mWork[0] = id;
+            mEnv.mGl.glDeleteBuffers( 1, mWork, 0 );
+        }
+
+
+        public void bind( int bufferObjectId ) {
+            mId = bufferObjectId;
+            apply();
+        }
+
+
+        public ByteBuffer map( int access ) {
+            return mEnv.mGl.glMapBuffer( mTarget, access );
+        }
+
+
+        public void unmap() {
+            mEnv.mGl.glUnmapBuffer( mTarget );
+        }
+
+        @Override
+        public void apply() {
+            mEnv.mGl.glBindBuffer( mTarget, mId );
+        }
+
+
+        @Override
+        int[] alloc() {
+            return new int[1];
+        }
+
+        @Override
+        void getState( int[] out ) {
+            out[0] = mId;
+        }
+
+        @Override
+        void setState( int[] item ) {
+            mId = item[0];
         }
     }
 
@@ -374,29 +440,31 @@ public interface DrawSetting {
 
         private final DrawEnv mEnv;
 
-        public final UboBlock  mBlock;
+        public final Ubo       mUbo;
         public final UboMember mColor;
         public final UboMember mParams;
 
         private final Vec2 mWork = new Vec2();
 
 
-        public Fog( DrawEnv d, Ubo ubo ) {
-            mEnv    = d;
-            mBlock  = ubo.startBlock( Uniforms.defaultBlockBinding( "FOG" ), "FOG" );
-            mColor  = ubo.addUniform( 1, GL_FLOAT_VEC4, "color"  );
-            mParams = ubo.addUniform( 1, GL_FLOAT_VEC2, "params" );
+        public Fog( DrawEnv d ) {
+            mEnv = d;
+            mUbo = new Ubo();
+            mUbo.bindLocation( Uniforms.defaultBlockBinding( "FOG" ) );
+            mColor = mUbo.addUniform( 1, GL_FLOAT_VEC4, "color" );
+            mParams = mUbo.addUniform( 1, GL_FLOAT_VEC2, "params" );
+            mUbo.allocMembersBuffer();
         }
 
 
         public void apply( int bindLoc ) {
-            mBlock.bindLocation( bindLoc );
+            mUbo.bindLocation( bindLoc );
             apply();
         }
 
 
         public void apply( int bindLoc, Vec4 color, float density, float start ) {
-            mBlock.bindLocation( bindLoc );
+            mUbo.bindLocation( bindLoc );
             mColor.set( color );
             mWork.x = density;
             mWork.y = start;
@@ -420,12 +488,12 @@ public interface DrawSetting {
 
 
         public int bindLocation() {
-            return mBlock.bindLocation();
+            return mUbo.bindLocation();
         }
 
 
         public void bindLocation( int loc ) {
-            mBlock.bindLocation( loc );
+            mUbo.bindLocation( loc );
         }
 
 
@@ -465,7 +533,7 @@ public interface DrawSetting {
 
         @Override
         public void apply() {
-            mBlock.bind( mEnv );
+            mUbo.bind( mEnv );
         }
 
 
@@ -476,14 +544,14 @@ public interface DrawSetting {
 
         @Override
         void getState( State out ) {
-            out.mBindLocation = mBlock.bindLocation();
+            out.mBindLocation = mUbo.bindLocation();
             mColor.get( out.mColor );
             mParams.get( out.mParams );
         }
 
         @Override
         void setState( State item ) {
-            mBlock.bindLocation( item.mBindLocation );
+            mUbo.bindLocation( item.mBindLocation );
             mColor.set( item.mColor );
             mParams.set( item.mParams );
         }
@@ -491,8 +559,8 @@ public interface DrawSetting {
 
         static class State extends FogParams {
             int mBindLocation = -1;
-            final Vec4 mColor   = new Vec4();
-            final Vec2 mParams  = new Vec2();
+            final Vec4 mColor  = new Vec4();
+            final Vec2 mParams = new Vec2();
         }
     }
 
@@ -614,21 +682,67 @@ public interface DrawSetting {
 
         @Override
         void getState( PolygonOffset a ) {
-            a.mFillOn  = mFillOn;
-            a.mLineOn  = mLineOn;
+            a.mFillOn = mFillOn;
+            a.mLineOn = mLineOn;
             a.mPointOn = mPointOn;
-            a.mFactor  = mFactor;
-            a.mUnits   = mUnits;
+            a.mFactor = mFactor;
+            a.mUnits = mUnits;
         }
 
         @Override
         void setState( PolygonOffset a ) {
-            mFillOn  = a.mFillOn;
-            mLineOn  = a.mLineOn;
+            mFillOn = a.mFillOn;
+            mLineOn = a.mLineOn;
             mPointOn = a.mPointOn;
-            mFactor  = a.mFactor;
-            mUnits   = a.mUnits;
+            mFactor = a.mFactor;
+            mUnits = a.mUnits;
         }
+    }
+
+
+    public static class Program extends Stack<int[]> {
+
+        private final DrawEnv mEnv;
+
+        public int mId;
+
+
+        Program( DrawEnv d ) {
+            mEnv = d;
+        }
+
+
+        Program() {
+            mEnv = null;
+        }
+
+
+        public void apply( int programId ) {
+            mId = programId;
+            mEnv.mGl.glUseProgram( mId );
+        }
+
+        @Override
+        public void apply() {
+            mEnv.mGl.glUseProgram( mId );
+        }
+
+
+        @Override
+        int[] alloc() {
+            return new int[1];
+        }
+
+        @Override
+        void getState( int[] out ) {
+            out[0] = mId;
+        }
+
+        @Override
+        void setState( int[] item ) {
+            mId = item[0];
+        }
+
     }
 
 
@@ -836,6 +950,61 @@ public interface DrawSetting {
             mBackStencilFail = a.mBackStencilFail;
             mBackDepthFail = a.mBackDepthFail;
             mBackPass = a.mBackPass;
+        }
+    }
+
+
+    public static class Texture extends Stack<int[]> {
+
+        public final int mTarget;
+        public int mId;
+
+        private final DrawEnv mEnv;
+        private final int[] mWork = { 0 };
+
+
+        Texture( DrawEnv d, int target  ) {
+            mEnv = d;
+            mTarget = target;
+        }
+
+
+        public int gen() {
+            mEnv.mGl.glGenTextures( 1, mWork, 0 );
+            return mWork[0];
+        }
+
+
+        public void delete( int id ) {
+            mWork[0] = id;
+            mEnv.mGl.glDeleteTextures( 1, mWork, 0 );
+        }
+
+
+        public void bind( int textureObjectId ) {
+            mId = textureObjectId;
+            apply();
+        }
+
+        @Override
+        public void apply() {
+            mEnv.mGl.glBindTexture( mTarget, mId );
+        }
+
+
+        @Override
+        int[] alloc() {
+            return new int[1];
+        }
+
+        @Override
+        void getState( int[] out ) {
+            out[0] = mId;
+        }
+
+        @Override
+        void setState( int[] item ) {
+            mId = item[0];
         }
     }
 

@@ -48,18 +48,8 @@ public class Uniforms {
 
     static {
         DEFAULT_BLOCK_BINDINGS.put( "FOG",          5 );
-        DEFAULT_BLOCK_BINDINGS.put( "MATERIAL[0]",  6 );
-        DEFAULT_BLOCK_BINDINGS.put( "MATERIAL[1]",  7 );
-        DEFAULT_BLOCK_BINDINGS.put( "MATERIAL[2]",  8 );
-        DEFAULT_BLOCK_BINDINGS.put( "MATERIAL[3]",  9 );
-        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[0]",    10 );
-        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[1]",    11 );
-        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[2]",    12 );
-        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[3]",    13 );
-        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[4]",    14 );
-        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[5]",    15 );
-        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[6]",    16 );
-        DEFAULT_BLOCK_BINDINGS.put( "LIGHT[7]",    17 );
+        DEFAULT_BLOCK_BINDINGS.put( "MATERIALS",    6 );
+        DEFAULT_BLOCK_BINDINGS.put( "LIGHTS",       7 );
         // Assume that 24 bindLocation locations are available.
     }
 
@@ -146,6 +136,7 @@ public class Uniforms {
                 d.mGl.glUniformBlockBinding( program, ub.mIndex, binding );
             }
         }
+        d.checkErr();
     }
 
 
@@ -265,7 +256,6 @@ public class Uniforms {
 
         public void run( DrawEnv g ) {
             // normMat = transpose( inverse( modelView ) )
-
             Mat4 mat = g.mWorkMat4;
             Mat.invert( g.mView.get(), mat );
             FloatBuffer buf = g.mWorkFloats;
@@ -275,7 +265,7 @@ public class Uniforms {
             buf.put( mat.m10 ).put( mat.m11 ).put( mat.m12 );
             buf.put( mat.m20 ).put( mat.m21 ).put( mat.m22 );
             buf.flip();
-            g.mGl.glUniformMatrix4fv( mLocation, 1, false, buf );
+            g.mGl.glUniformMatrix3fv( mLocation, 1, false, buf );
         }
     }
 
@@ -296,7 +286,7 @@ public class Uniforms {
             buf.put( mat.m10 ).put( mat.m11 ).put( mat.m12 );
             buf.put( mat.m20 ).put( mat.m21 ).put( mat.m22 );
             buf.flip();
-            g.mGl.glUniformMatrix4fv( mLocation, 1, false, buf );
+            g.mGl.glUniformMatrix3fv( mLocation, 1, false, buf );
         }
     }
 

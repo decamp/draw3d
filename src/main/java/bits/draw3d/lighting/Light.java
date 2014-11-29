@@ -23,7 +23,7 @@ public class Light {
     public Vec4 mAmbient;
     public Vec4 mDiffuse;
     public Vec4 mSpecular;
-    public Vec3 mPos;
+    public Vec4 mPos;
     public Vec3 mDir;
 
     /**
@@ -39,7 +39,7 @@ public class Light {
      *
      * <p>For a spotlight type light, this value holds
      * {@code [ cutoff, spreadExp ]}, where:<br>
-     * {@code cutoff}: the cosine of the maximum angle of the light ( 1 = no spread, 0 = 0.5*PI ) <br>
+     * {@code cutoff}: the angle of the maximum angle of the light ( 0 = no spread, 0.5 * PI = max ) <br>
      * {@code spreadExp}: determines spread of light where light strength is computed as
      * {@code cos(ang)^spreadExp }.
      * 0 = member, 1 = cosine func.
@@ -56,19 +56,50 @@ public class Light {
                   Vec4 ambient,
                   Vec4 diffuse,
                   Vec4 specular,
-                  Vec3 pos,
+                  Vec4 pos,
                   Vec3 dir,
                   Vec3 attenuation,
                   Vec4 shape )
     {
+        float posw = type == TYPE_DIRECTIONAL ? 0f : 1f;
+
         mType        = type;
         mAmbient     = ambient     == null ? new Vec4( 0, 0, 0, 1 ) : new Vec4( ambient );
         mDiffuse     = diffuse     == null ? new Vec4( 0, 0, 0, 1 ) : new Vec4( diffuse );
         mSpecular    = specular    == null ? new Vec4( 0, 0, 0, 1 ) : new Vec4( specular );
-        mPos         = pos         == null ? new Vec3()             : new Vec3( mPos );
-        mDir         = dir         == null ? new Vec3()             : new Vec3( mDir );
+
+        if( pos != null ) {
+            mPos = new Vec4( pos );
+        } else if( type == TYPE_DIRECTIONAL ) {
+            mPos = new Vec4( 0, 0, 0, 0 );
+        } else {
+            mPos = new Vec4( 0, 0, 0, 1 );
+        }
+
+        mDir         = dir         == null ? new Vec3()             : new Vec3( dir );
         mAttenuation = attenuation == null ? new Vec3( 1, 0, 0 )    : new Vec3( attenuation );
-        mShape       = shape       == null ? new Vec4()             : new Vec4( mShape );
+
+        if( shape != null ) {
+            mShape = new Vec4( shape );
+        } else if( type == TYPE_SPOTLIGHT ) {
+            mShape = new Vec4( 0.5f * (float)Ang.PI, 1f, 0, 0 );
+        } else {
+            mShape = new Vec4( 10f, 0, 0, 0 );
+        }
+    }
+
+
+    public void applyTypeToParams() {
+        if( mType == TYPE_DIRECTIONAL ) {
+            mPos.w = 0;
+        } else {
+            mPos.w = 1;
+        }
+
+        if( mType != TYPE_SPOTLIGHT ) {
+            mShape.x = 2;
+            mShape.y = 0;
+        }
     }
 
 }

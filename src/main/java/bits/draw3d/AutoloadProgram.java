@@ -90,9 +90,9 @@ public class AutoloadProgram extends Program {
     @Override
     public void init( DrawEnv d ) {
         super.init( d );
-        mAttribs = Shaders.listAttributes( d.mGl, mId );
+        mAttribs  = Shaders.listAttributes( d.mGl, mId );
         mUniforms = Shaders.listUniforms( d.mGl, mId );
-        mBlocks = Shaders.listUniformBlocks( d.mGl, mId, mUniforms );
+        mBlocks   = Shaders.listUniformBlocks( d.mGl, mId, mUniforms );
 
         // Remove uniforms in blocks.
         Iterator<Uniform> iter = mUniforms.iterator();
@@ -101,6 +101,8 @@ public class AutoloadProgram extends Program {
                 iter.remove();
             }
         }
+
+        d.checkErr();
 
         if( mCreateUniformLoadersOnInit ) {
             Uniforms.addAvailableLoaders( this );

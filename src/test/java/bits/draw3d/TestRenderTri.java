@@ -47,7 +47,6 @@ public class TestRenderTri {
     }
 
 
-
     private static class Handler implements GLEventListener {
 
         DrawEnv d = new DrawEnv();
@@ -61,7 +60,6 @@ public class TestRenderTri {
 
             mProg = new AutoloadProgram();
             mProg.addShader( d.mShaderMan.loadResource( GL_VERTEX_SHADER, "../test/java/bits/draw3d/TestRenderTri.vert" ) );
-            //prog.addShader( d.mShaderMan.loadResource( GL_GEOMETRY_SHADER, "../test/java/bits/draw3d/Test.geom" ) );
             mProg.addShader( d.mShaderMan.loadResource( GL_FRAGMENT_SHADER, "../test/java/bits/draw3d/TestRenderTri.frag" ) );
             mProg.init( d );
             mProg.bind( d );
@@ -147,4 +145,5 @@ public class TestRenderTri {
         @Override
         public void reshape( GLAutoDrawable drawable, int i, int i2, int i3, int i4 ) {}
     }
+
 }

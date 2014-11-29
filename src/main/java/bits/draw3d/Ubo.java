@@ -8,7 +8,6 @@ package bits.draw3d;
 
 import bits.math3d.*;
 
-import javax.media.opengl.GL2ES3;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +23,13 @@ public class Ubo implements DrawUnit {
     private final ByteAlignment mLayout;
     private final int[] mId = { 0 };
 
-    private final List<Block> mBlocks       = new ArrayList<Block>();
-    private       Block       mCurrentBlock = null;
+    final   List<Member> mMembers     = new ArrayList<Member>();
+    private int          mMembersSize = 0;
+    private int          mBindLoc     = -1;
 
-    private boolean mNeedUpdate  = true;
-    private boolean mNeedRealloc = true;
+    private boolean mDirty    = true; // Set true for any state change.
+    private boolean mNeedInit = true; // Set true only if realloc is needed.
+
     private ByteBuffer mBuf;
     private int mInternalCap = -1;
 
@@ -44,151 +45,96 @@ public class Ubo implements DrawUnit {
 
 
 
-    public UboBlock addBlockFromProgram( UniformBlock block ) {
-        mCurrentBlock = null;
-        Block b = new Block( block );
-
-        if( !mBlocks.isEmpty() ) {
-            Block prev = mBlocks.get( mBlocks.size() - 1 );
-            b.mBufOff = prev.mBufOff + prev.mBufSize;
-        }
-
-        for( Uniform uniform: block.mUniforms ) {
-            Member member   = new Member( b, uniform );
-            member.mBufOff  = b.mBufOff + uniform.mBlockOffset;
-        }
-
-        mBlocks.add( b );
-        mNeedUpdate = mNeedRealloc = true;
-        return b;
+    public int bindLocation() {
+        return mBindLoc;
     }
 
 
-    public UboBlock startBlock( int defaultLocation, String optName ) {
-        UniformBlock ub = new UniformBlock( mBlocks.size(), defaultLocation, null, 0, null );
-        Block b = mCurrentBlock = new Block( ub );
+    public void bindLocation( int loc ) {
+        mBindLoc = loc;
+    }
 
-        if( !mBlocks.isEmpty() ) {
-            Block prev = mBlocks.get( mBlocks.size() - 1 );
-            b.mBufOff = prev.mBufOff + prev.mBufSize;
+
+    public void configureForProgramBlock( UniformBlock block ) {
+        mMembers.clear();
+        mMembersSize = 0;
+
+        for( Uniform uniform : block.mUniforms ) {
+            Member member = new Member( uniform );
+            member.mBufOff = uniform.mBlockOffset;
         }
 
-        mBlocks.add( b );
-        mNeedUpdate = mNeedRealloc = true;
-        return mCurrentBlock;
+        if( mBindLoc < 0 ) {
+            mBindLoc = block.mLocation;
+        }
+
+        mDirty = mNeedInit = true;
     }
 
 
     public UboMember addUniform( int arrayLen, int memberType, String optName ) {
-        Block block = mCurrentBlock;
-        if( block == null ) {
-            throw new IllegalStateException( "Cannot add member without block" );
-        }
-
         MemberType type = MemberType.fromGl( memberType );
         Uniform uniform = new Uniform( memberType,
                                       arrayLen,
-                                      block.mMembers.size(),
+                                      mMembers.size(),
                                       -1,
                                       optName != null ? optName : "",
                                       mLayout.arrayStride( type, 1 ),
                                       mLayout.matrixStride( type ),
-                                      mBlocks.size() - 1,
-                                      block.mBufSize );
+                                      -1,
+                                      mMembersSize );
 
-        Member member   = new Member( block, uniform );
-        member.mBufOff  = block.mBufOff + uniform.mBlockOffset;
+        Member member   = new Member( uniform );
+        member.mBufOff  = uniform.mBlockOffset;
         member.mBufSize = mLayout.arrayStride( type, arrayLen );
-
-        block.mMembers.add( new Member( block, uniform ) );
-        block.mBufSize += uniform.mArrayStride;
-        mNeedUpdate = mNeedRealloc = true;
+        mMembersSize += member.mBufSize;
+        mMembers.add( member );
+        mDirty = mNeedInit = true;
 
         return member;
     }
 
 
-    public void removeBlock( UboBlock block ) {
-        if( mBlocks.remove( block ) ) {
-            mNeedUpdate = mNeedRealloc = true;
-        }
+    public int memberNum() {
+        return mMembers.size();
     }
 
 
-
-    /**
-     * Must be called before accessing any UboMember values. Called automatically
-     * by bind() or alloc() if needed.
-     */
-    public void alloc() {
-        mCurrentBlock = null;
-        mNeedRealloc  = false;
-        int totalSize = 0;
-        for( Block block: mBlocks ) {
-            totalSize += block.mBufSize;
-        }
-
-        ByteBuffer old = mBuf;
-        mBuf = DrawUtil.alloc( totalSize );
-
-        int off = 0;
-        for( Block block: mBlocks ) {
-            int prevPos   = block.mBufOff;
-            int prevLimit = block.mBufOff + block.mBufSize;
-
-            if( old != null && prevPos >= 0 && prevLimit < old.capacity() ) {
-                // Rewrite old blocks into new buffer.
-                old.clear().position( prevPos ).limit( prevLimit );
-                mBuf.position( off );
-                mBuf.put( old );
-                mBuf.clear();
-            }
-
-            block.mBufOff = off;
-            off += block.mBufSize;
-
-            for( Member member: block.mMembers ) {
-                member.mBufOff = block.mBufOff + member.mTarget.mBlockOffset;
-            }
-
-            block.mDirty = true;
-        }
-
-        mNeedUpdate = true;
+    public UboMember member( int idx ) {
+        return mMembers.get( idx );
     }
 
 
-    public int blockNum() {
-        return mBlocks.size();
-    }
-
-    /**
-     * @param index Note this is the Block index within this Bo, not the index within a shader.
-     */
-    public UboBlock block( int index ) {
-        return mBlocks.get( index );
-    }
-
-
-    public UboBlock block( String name ) {
+    public UboMember member( String name ) {
         if( name == null ) {
             return null;
         }
-        for( Block block: mBlocks ) {
-            if( name.equals( block.mTarget.mName ) ) {
-                return block;
+        for( Member m: mMembers ) {
+            if( name.equals( m.target().mName ) ) {
+                return m;
             }
         }
         return null;
     }
 
-    @SuppressWarnings( { "rawtype", "unchecked" } )
-    public List<UboBlock> blocksRef() {
-        return (List)mBlocks;
+    /**
+     * Must be called before accessing any UboMember values. Called automatically
+     * by bind() if needed.
+     */
+    public void allocMembersBuffer() {
+        if( mBuf != null && mBuf.capacity() == mMembersSize ) {
+            return;
+        }
+        mBuf = DrawUtil.alloc( mMembersSize );
+        mDirty = true;
     }
+
 
     @Override
     public void init( DrawEnv d ) {
+        if( !mNeedInit ) {
+            return;
+        }
         doInit( d );
     }
 
@@ -198,17 +144,39 @@ public class Ubo implements DrawUnit {
             d.mGl.glDeleteBuffers( 1, mId, 0 );
             mId[0] = 0;
         }
-        mBlocks.clear();
-        mNeedUpdate = mNeedRealloc = true;
+        mMembersSize = 0;
+        mMembers.clear();
+        mNeedInit = true;
+        mDirty = true;
+    }
+
+
+    public void bindWithoutLocation( DrawEnv d ) {
+        if( !mDirty ) {
+            d.mGl.glBindBuffer( GL_UNIFORM_BUFFER, mId[0] );
+            return;
+        }
+
+        if( mNeedInit ) {
+            doInit( d );
+        } else {
+            d.mGl.glBindBuffer( GL_UNIFORM_BUFFER, mId[0] );
+        }
+        rebuffer( d );
     }
 
     @Override
     public void bind( DrawEnv d ) {
-        if( !mNeedUpdate ) {
-            d.mGl.glBindBuffer( GL_UNIFORM_BUFFER, mId[0] );
-        } else {
-            doInit( d );
+        bindWithoutLocation( d );
+        if( mBindLoc >= 0 ) {
+            d.mGl.glBindBufferBase( GL_UNIFORM_BUFFER, mBindLoc, mId[0] );
         }
+    }
+
+
+    public void bind( DrawEnv d, int location ) {
+        bindWithoutLocation( d );
+        d.mGl.glBindBufferBase( GL_UNIFORM_BUFFER, location, mId[0] );
     }
 
     @Override
@@ -217,11 +185,13 @@ public class Ubo implements DrawUnit {
     }
 
     /**
-     * Rebuffers all blocks at once.
+     * Called automatically if by any {@code bind()} method if any members
+     * have been set.
      *
-     * <p>Ubo must be bound before calling.
+     * <p>Must be bound before calling.
      */
     public void rebuffer( DrawEnv d ) {
+        mDirty = false;
         int cap = mBuf.capacity();
         if( mInternalCap == cap ) {
             d.mGl.glBufferSubData( GL_UNIFORM_BUFFER, 0, cap, mBuf );
@@ -229,139 +199,35 @@ public class Ubo implements DrawUnit {
             d.mGl.glBufferData( GL_UNIFORM_BUFFER, cap, mBuf, GL_DYNAMIC_DRAW );
             mInternalCap = cap;
         }
-
-        for( Block b: mBlocks ) {
-            b.mDirty = false;
-        }
     }
 
 
     private void doInit( DrawEnv d ) {
-        mNeedUpdate = false;
-
-        GL2ES3 gl = d.mGl;
+        mNeedInit = false;
         if( mId[0] == 0 ) {
-            gl.glGenBuffers( 1, mId, 0 );
+            d.mGl.glGenBuffers( 1, mId, 0 );
         }
-
-        gl.glBindBuffer( GL_UNIFORM_BUFFER, mId[0] );
-        if( mNeedRealloc ) {
-            alloc();
-        }
-
-        // Rebuffer everything.
-        rebuffer( d );
+        d.mGl.glBindBuffer( GL_UNIFORM_BUFFER, mId[0] );
+        allocMembersBuffer();
         d.checkErr();
-    }
-
-
-
-    private class Block implements UboBlock {
-
-        final UniformBlock mTarget;
-        final List<Member> mMembers = new ArrayList<Member>();
-
-        private int mBinding = -1;
-        private int mBufOff  =  0;
-        private int mBufSize =  0;
-
-        private boolean mDirty = true;
-
-
-        public Block( UniformBlock target ) {
-            mTarget  = target;
-            mBinding = target.mLocation;
-        }
-
-
-        @Override
-        public UniformBlock target() {
-            return mTarget;
-        }
-
-        @Override
-        public int  bindLocation() {
-            return mBinding;
-        }
-
-        @Override
-        public void bindLocation( int loc ) {
-            mBinding = loc;
-        }
-
-        @Override
-        public int memberNum() {
-            return mMembers.size();
-        }
-
-        @Override
-        public UboMember member( int idx ) {
-            return mMembers.get( idx );
-        }
-
-        @Override
-        public UboMember member( String name ) {
-            if( name == null ) {
-                return null;
-            }
-            for( Member m: mMembers ) {
-                if( name.equals( m.target().mName ) ) {
-                    return m;
-                }
-            }
-            return null;
-        }
-
-
-        @Override
-        public void bind( DrawEnv d ) {
-            bind( d, mBinding >= 0 ? mBinding : 0 );
-        }
-
-        @Override
-        public void bind( DrawEnv d, int location ) {
-            d.mGl.glBindBufferRange( GL_UNIFORM_BUFFER, location, mId[0], mBufOff, mBufSize );
-            mBinding = location;
-            if( mDirty ) {
-                d.mGl.glBufferSubData( GL_UNIFORM_BUFFER, mBufOff, mBufSize, mBuf );
-                mDirty = false;
-            }
-        }
-
-        @Override
-        public void unbind( DrawEnv d ) {
-            mBinding = -1;
-        }
-
-        @Override
-        public void unbind( DrawEnv d, int location ) {
-            mBinding = -1;
-        }
-
     }
 
 
     private class Member implements UboMember {
 
-        private final Block   mBlock;
         private final Uniform mTarget;
 
         private int mBufOff  = -1;
         private int mBufSize = -1;
 
 
-        Member( Block parent, Uniform target ) {
-            mBlock = parent;
+        Member( Uniform target ) {
             mTarget = target;
         }
 
 
         public Uniform target() {
             return mTarget;
-        }
-
-        public Block block() {
-            return mBlock;
         }
 
 
@@ -433,64 +299,69 @@ public class Ubo implements DrawUnit {
             mat.m33 = mBuf.getFloat( toff + 12 );
         }
 
-        public void get( int[] vals, int off, int len ) {
+        public void get( int firstElem, int[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
-            final int arrStride = mTarget.mArrayStride;
+            final int as = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * as;
             for( int i = off; i < end; i++ ) {
                 vals[i] = mBuf.getInt( pos );
-                pos += arrStride;
+                pos += as;
             }
         }
 
-        public void get( float[] vals, int off, int len ) {
+        public void get( int firstElem, float[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int as = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * as;
             for( int i = off; i < end; i++ ) {
                 vals[i] = mBuf.getFloat( pos );
-                pos += mTarget.mArrayStride;
+                pos += as;
             }
         }
 
-        public void get( Vec2[] vals, int off, int len ) {
+        public void get( int firstElem, Vec2[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int as = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * as;
             for( int i = off; i < end; i++ ) {
                 Vec2 v = vals[i];
                 v.x = mBuf.getFloat( pos );
                 v.y = mBuf.getFloat( pos + 4 );
-                pos += mTarget.mArrayStride;
+                pos += as;
             }
         }
 
-        public void get( Vec3[] vals, int off, int len ) {
+        public void get( int firstElem, Vec3[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int as = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * as;
             for( int i = off; i < end; i++ ) {
                 Vec3 v = vals[i];
                 v.x = mBuf.getFloat( pos );
                 v.y = mBuf.getFloat( pos + 4 );
                 v.z = mBuf.getFloat( pos + 8 );
-                pos += mTarget.mArrayStride;
+                pos += as;
             }
         }
 
-        public void get( Vec4[] vals, int off, int len ) {
+        public void get( int firstElem, Vec4[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int as = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * as;
             for( int i = off; i < end; i++ ) {
                 Vec4 v = vals[i];
                 v.x = mBuf.getFloat( pos );
                 v.y = mBuf.getFloat( pos + 4 );
                 v.z = mBuf.getFloat( pos + 8 );
                 v.w = mBuf.getFloat( pos + 12 );
-                pos += mTarget.mArrayStride;
+                pos += as;
             }
         }
 
-        public void get( Mat3[] vals, int off, int len ) {
+        public void get( int firstElem, Mat3[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int as = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * as;
             for( int i = off; i < end; i++ ) {
                 int p = pos;
                 Mat3 mat = vals[i];
@@ -505,13 +376,14 @@ public class Ubo implements DrawUnit {
                 mat.m02 = mBuf.getFloat( p + 0 );
                 mat.m12 = mBuf.getFloat( p + 4 );
                 mat.m22 = mBuf.getFloat( p + 8 );
-                pos += mTarget.mArrayStride;
+                pos += as;
             }
         }
 
-        public void get( Mat4[] vals, int off, int len ) {
+        public void get( int firstElem, Mat4[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int as = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * as;
             for( int i = off; i < end; i++ ) {
                 int p = pos;
                 Mat4 mat = vals[i];
@@ -534,7 +406,7 @@ public class Ubo implements DrawUnit {
                 mat.m13 = mBuf.getFloat( p + 4 );
                 mat.m23 = mBuf.getFloat( p + 8 );
                 mat.m33 = mBuf.getFloat( p + 12 );
-                pos += mTarget.mArrayStride;
+                pos += as;
             }
         }
 
@@ -549,19 +421,19 @@ public class Ubo implements DrawUnit {
 
         public void set( int val ) {
             mBuf.putInt( mTarget.mBlockOffset, val );
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
         public void set( float val ) {
             mBuf.putFloat( mBufOff, val );
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
         public void set( Vec2 vec ) {
             final int toff = mBufOff;
             mBuf.putFloat( toff, vec.x );
             mBuf.putFloat( toff + 4, vec.y );
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
         public void set( Vec3 vec ) {
@@ -569,7 +441,7 @@ public class Ubo implements DrawUnit {
             mBuf.putFloat( toff, vec.x );
             mBuf.putFloat( toff + 4, vec.y );
             mBuf.putFloat( toff + 8, vec.z );
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
         public void set( Vec4 vec ) {
@@ -578,7 +450,7 @@ public class Ubo implements DrawUnit {
             mBuf.putFloat( toff + 4, vec.y );
             mBuf.putFloat( toff + 8, vec.z );
             mBuf.putFloat( toff + 12, vec.w );
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
         public void set( Mat3 mat ) {
@@ -594,7 +466,7 @@ public class Ubo implements DrawUnit {
             mBuf.putFloat( off + 0, mat.m02 );
             mBuf.putFloat( off + 4, mat.m12 );
             mBuf.putFloat( off + 8, mat.m22 );
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
         public void set( Mat4 mat ) {
@@ -619,72 +491,77 @@ public class Ubo implements DrawUnit {
             mBuf.putFloat( toff + 4, mat.m13 );
             mBuf.putFloat( toff + 8, mat.m23 );
             mBuf.putFloat( toff + 12, mat.m33 );
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
-        public void set( int[] vals, int off, int len ) {
+        public void set( int firstElem, int[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
             final int arrStride = mTarget.mArrayStride;
+            int pos = mBufOff + arrStride * firstElem;
             for( int i = off; i < end; i++ ) {
                 mBuf.putInt( pos, vals[i] );
                 pos += arrStride;
             }
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
-        public void set( float[] vals, int off, int len ) {
+        public void set( int firstElem, float[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int arrStride = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * arrStride;
             for( int i = off; i < end; i++ ) {
                 mBuf.putFloat( pos, vals[i] );
-                pos += mTarget.mArrayStride;
+                pos += arrStride;
             }
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
-        public void set( Vec2[] vals, int off, int len ) {
+        public void set( int firstElem, Vec2[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int arrStride = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * arrStride;
             for( int i = off; i < end; i++ ) {
                 Vec2 v = vals[i];
                 mBuf.putFloat( pos, v.x );
                 mBuf.putFloat( pos + 4, v.y );
-                pos += mTarget.mArrayStride;
+                pos += arrStride;
             }
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
-        public void set( Vec3[] vals, int off, int len ) {
+        public void set( int firstElem, Vec3[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int arrStride = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * arrStride;
             for( int i = off; i < end; i++ ) {
                 Vec3 v = vals[i];
                 mBuf.putFloat( pos, v.x );
                 mBuf.putFloat( pos + 4, v.y );
                 mBuf.putFloat( pos + 8, v.z );
-                pos += mTarget.mArrayStride;
+                pos += arrStride;
             }
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
-        public void set( Vec4[] vals, int off, int len ) {
+        public void set( int firstElem, Vec4[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int arrStride = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * arrStride;
             for( int i = off; i < end; i++ ) {
                 Vec4 v = vals[i];
                 mBuf.putFloat( pos, v.x );
                 mBuf.putFloat( pos + 4, v.y );
                 mBuf.putFloat( pos + 8, v.z );
                 mBuf.putFloat( pos + 12, v.w );
-                pos += mTarget.mArrayStride;
+                pos += arrStride;
             }
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
-        public void set( Mat3[] vals, int off, int len ) {
+        public void set( int firstElem, Mat3[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int arrStride = mTarget.mArrayStride;
+            int pos = mBufOff + firstElem * arrStride;
             for( int i = off; i < end; i++ ) {
                 int p = pos;
 
@@ -700,15 +577,15 @@ public class Ubo implements DrawUnit {
                 mBuf.putFloat( p + 0, mat.m02 );
                 mBuf.putFloat( p + 4, mat.m12 );
                 mBuf.putFloat( p + 8, mat.m22 );
-
-                pos += mTarget.mArrayStride;
+                pos += arrStride;
             }
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
-        public void set( Mat4[] vals, int off, int len ) {
+        public void set( int firstElem, Mat4[] vals, int off, int len ) {
             final int end = off + len;
-            int pos = mBufOff;
+            final int arrStride = mTarget.mArrayStride;
+            int pos = mBufOff + arrStride * firstElem;
             for( int i = off; i < end; i++ ) {
                 int p = pos;
                 Mat4 mat = vals[i];
@@ -732,9 +609,9 @@ public class Ubo implements DrawUnit {
                 mBuf.putFloat( p + 8, mat.m23 );
                 mBuf.putFloat( p + 12, mat.m33 );
 
-                pos += mTarget.mArrayStride;
+                pos += arrStride;
             }
-            mBlock.mDirty = true;
+            mDirty = true;
         }
 
         public void setComponent( int elem, int row, int col, int val ) {
