@@ -92,20 +92,20 @@ public class TestLighting {
 
             mLights    = new LightUniform( 1 );
             mMaterials = new MaterialUniform( 2 );
-            mLights.set( 0, new Light( Light.TYPE_SPOTLIGHT,
-                                       new Vec4( 0.4f, 0.4f, 0.4f, 0.4f ),
-                                       new Vec4( 1f, 1f, 1f, 1.0f ),
-                                       new Vec4( 1f, 1f, 1f, 1.0f ),
-                                       new Vec4( -1f, 1f, -1f, 1f ),
-                                       new Vec3( 1, -1f, 1f ),
-                                       new Vec3( 1, 0f, 0.1f ),
-                                       new Vec4( 0.25f, 40f, 0f, 0f ) ) );
+            mLights.ambient( new Vec3( 0.25f, 0.25f, 0.25f ) );
+            mLights.set( 0, Light.createSpotlight( new Vec3( 1, 1, 1 ),
+                                                   new Vec3( -1, 1, -1 ),
+                                                   new Vec3( 1, -1, 1 ),
+                                                   new Vec3( 1, 0, 0.1f ),
+                                                   (float)Math.PI * 0.25f,
+                                                   4f ) );
+
             mLights.init( d );
             mMaterials.set( 0, new Material( new Vec4( 0.5f, 0.1f, 0.1f, 1.0f ),
                                              new Vec4( 0.1f, 0.5f, 0.1f, 1.0f ),
                                              new Vec4( 0.1f, 0.1f, 0.5f, 1.0f ),
                                              new Vec4( 0.0f, 0.0f, 0.0f, 1.0f ),
-                                             50f ) );
+                                             20f ) );
             mMaterials.init( d );
             d.checkErr();
             new Animator( gld ).start();
@@ -146,22 +146,6 @@ public class TestLighting {
             gl.glDrawElements( GL_TRIANGLES, mTriCount * 3, GL_UNSIGNED_INT, 0 );
             d.checkErr();
 
-//            Random rand = new Random( 1 );
-//            DrawStream s = d.drawStream();
-//            s.config( true, false, false );
-//            s.beginTris();
-//            for( DrawTri t: mTris ) {
-//                s.color( rand.nextFloat(), rand.nextFloat(), rand.nextFloat() );
-//                s.vert( t.mVerts[0].mPos );
-//                s.vert( t.mVerts[1].mPos );
-//                s.vert( t.mVerts[2].mPos );
-//            }
-////            s.vert( 0.5f, 0, 0 );
-////            s.color( 0, 1, 0 );
-////            s.vert( 0, 0.5f, 0 );
-////            s.color( 0, 0, 1 );
-////            s.vert( 0, 0, 0 );
-//            s.end();
         }
 
         @Override

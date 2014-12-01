@@ -8,6 +8,7 @@ package bits.draw3d.lighting;
 
 import bits.draw3d.*;
 import bits.math3d.*;
+import bits.math3d.func.SinCosTable;
 
 import static javax.media.opengl.GL2ES2.*;
 
@@ -19,16 +20,15 @@ import static javax.media.opengl.GL2ES2.*;
  */
 public class LightUniform implements DrawUnit {
 
-    private String mOptName;
+    private final Vec3 mGlobalAmbient = new Vec3();
     private Light[] mLights = null;
 
     private final Ubo       mUbo;
     private final UboMember mAmbient;
-    private final UboMember mDiffuse;
-    private final UboMember mSpecular;
+    private final UboMember mColor;
     private final UboMember mPos;
     private final UboMember mDir;
-    private final UboMember mAttenuation;
+    private final UboMember mFalloff;
     private final UboMember mShape;
 
     private Vec4[] mArr4 = { null };
@@ -44,16 +44,22 @@ public class LightUniform implements DrawUnit {
         mLights = new Light[lightNum];
         mUbo = new Ubo();
         mUbo.bindLocation( bindingLoc );
-        mAmbient     = mUbo.addUniform( mLights.length, GL_FLOAT_VEC4, "AMBIENT" );
-        mDiffuse     = mUbo.addUniform( mLights.length, GL_FLOAT_VEC4, "DIFFUSE" );
-        mSpecular    = mUbo.addUniform( mLights.length, GL_FLOAT_VEC4, "SPECULAR" );
-        mPos         = mUbo.addUniform( mLights.length, GL_FLOAT_VEC4, "POS" );
-        mDir         = mUbo.addUniform( mLights.length, GL_FLOAT_VEC3, "DIR" );
-        mAttenuation = mUbo.addUniform( mLights.length, GL_FLOAT_VEC3, "ATTENUATION" );
-        mShape       = mUbo.addUniform( mLights.length, GL_FLOAT_VEC4, "SHAPE" );
+        mAmbient  = mUbo.addUniform( 1, GL_FLOAT_VEC3, "AMBIENT" );
+        mColor    = mUbo.addUniform( mLights.length, GL_FLOAT_VEC3, "COLOR" );
+        mPos      = mUbo.addUniform( mLights.length, GL_FLOAT_VEC3, "POS" );
+        mDir      = mUbo.addUniform( mLights.length, GL_FLOAT_VEC3, "DIR" );
+        mFalloff  = mUbo.addUniform( mLights.length, GL_FLOAT_VEC3, "FALLOFF" );
+        mShape    = mUbo.addUniform( mLights.length, GL_FLOAT_VEC4, "SHAPE" );
         mUbo.allocMembersBuffer();
     }
 
+
+    /**
+     * Sets global ambient light.
+     */
+    public void ambient( Vec3 color ) {
+        Vec.put( color, mGlobalAmbient );
+    }
 
     /**
      * Updates material writeBuffer. UBO might not be updated until next bind.
@@ -86,7 +92,7 @@ public class LightUniform implements DrawUnit {
 
     @Override
     public void unbind( DrawEnv d ) {
-        unbind( d );
+        mUbo.unbind( d );
     }
 
 
@@ -96,10 +102,10 @@ public class LightUniform implements DrawUnit {
 
 
     private void writeBuffer( DrawEnv d ) {
-        final Vec4[] a4 = mArr4;
-        final Vec3[] a3 = mArr3;
-        final Vec4 v4 = d.mWorkVec4;
-        final Vec3 v3 = d.mWorkVec3;
+        final Vec4[] arr4 = mArr4;
+        final Vec3[] arr3 = mArr3;
+        final Vec4 vec4 = d.mWorkVec4;
+        final Vec3 vec3 = d.mWorkVec3;
 
         // Get view and normal matrices.
         Mat4 view = d.mView.get();
@@ -109,41 +115,39 @@ public class LightUniform implements DrawUnit {
         Mat.put( work, norm );
         Mat.transpose( norm, norm );
 
+        mAmbient.set( mGlobalAmbient );
+
         for( int ind = 0; ind < mLights.length; ind++ ) {
             Light light = mLights[ind];
             if( light == null ) {
                 continue;
             }
 
-            a4[0] = light.mAmbient;
-            mAmbient.set( ind, a4, 0, 1 );
-            a4[0] = light.mDiffuse;
-            mDiffuse.set( ind, a4, 0, 1 );
-            a4[0] = light.mSpecular;
-            mSpecular.set( ind, a4, 0, 1 );
+            arr3[0] = light.mColor;
+            mColor.set( ind, arr3, 0, 1 );
+            Mat.mult( view, light.mPos, vec3 );
+            arr3[0] = vec3;
+            mPos.set( ind, arr3, 0, 1 );
+            Mat.mult( norm, light.mDir, vec3 );
+            Vec.normalize( vec3 );
+            arr3[0] = vec3;
+            mDir.set( ind, arr3, 0, 1 );
+            arr3[0] = light.mFalloff;
+            mFalloff.set( ind, arr3, 0, 1 );
 
-            Mat.mult( view, (Vec3)light.mPos, v4 );
-            a4[0] = v4;
-            mPos.set( ind, a4, 0, 1 );
-
-            Mat.mult( norm, light.mDir, v3 );
-            Vec.normalize( v3 );
-            a3[0] = v3;
-            mDir.set( ind, a3, 0, 1 );
-
-            a3[0] = light.mAttenuation;
-            mAttenuation.set( ind, a3, 0, 1 );
-
-            Vec4 shape = light.mShape;
-            v4.x = (float)( shape.x > Math.PI ? -2.0 : Math.cos( shape.x ) );
-            v4.y = shape.y;
-            v4.z = shape.z;
-            v4.w = shape.w;
-            a4[0] = v4;
-            mShape.set( ind, a4, 0, 1 );
+            if( light.mPositional ) {
+                vec4.x = 1f;
+                vec4.y = (float)SinCosTable.cos( light.mSpotAngle );
+                vec4.z = light.mSpotExp;
+            } else {
+                vec4.x = 0f;
+                vec4.y = 10f;
+                vec4.z = 0f;
+            }
+            arr4[0] = vec4;
+            mShape.set( ind, arr4, 0, 1 );
         }
     }
-
 }
 
 

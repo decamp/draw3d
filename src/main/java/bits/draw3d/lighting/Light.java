@@ -13,93 +13,75 @@ import bits.math3d.*;
  */
 public class Light {
 
-    public static final int TYPE_AMBIENT     = 0;
-    public static final int TYPE_POINT       = 1;
-    public static final int TYPE_DIRECTIONAL = 2;
-    public static final int TYPE_SPOTLIGHT   = 3;
+    public static Light createDirectionalLight( Vec4 color, Vec3 dir ) {
+        return new Light( color, null, dir, null, false, 10f, 0f );
+    }
 
-    public int mType;
+    public static Light createPointLight( Vec3 color, Vec3 pos, Vec3 falloff ) {
+        return new Light( color, pos, null, falloff, true, 10f, 0f );
+    }
 
-    public Vec4 mAmbient;
-    public Vec4 mDiffuse;
-    public Vec4 mSpecular;
-    public Vec4 mPos;
+    public static Light createSpotlight( Vec3 color,
+                                         Vec3 pos,
+                                         Vec3 dir,
+                                         Vec3 falloff,
+                                         float spotAngle,
+                                         float spotExp )
+    {
+        return new Light( color, pos, dir, falloff, true, spotAngle, spotExp );
+    }
+
+
+    public Vec3 mColor;
+    public Vec3 mPos;
     public Vec3 mDir;
 
     /**
      * Holds constant, linear, and quadratic attenuation coefficients.
      * The strength of the light is proportional to
-     * {@code 1.0 / ( mAttenuation * Vec3( 1.0, dist, dist * dist ) ) },
+     * {@code 1.0 / ( mFalloff * Vec3( 1.0, dist, dist * dist ) ) },
      * where {@code dist} is the distance between the light and a given point.
      */
-    public Vec3 mAttenuation;
+    public Vec3 mFalloff;
 
     /**
-     * Holds type-specific parameters that define the distribution of the light.
-     *
-     * <p>For a spotlight type light, this value holds
-     * {@code [ cutoff, spreadExp ]}, where:<br>
-     * {@code cutoff}: the angle of the maximum angle of the light ( 0 = no spread, 0.5 * PI = max ) <br>
-     * {@code spreadExp}: determines spread of light where light strength is computed as
-     * {@code cos(ang)^spreadExp }.
-     * 0 = member, 1 = cosine func.
+     * 0 if directional, 1 if positional.
      */
-    public Vec4 mShape;
+    public boolean mPositional;
+
+    /**
+     * The angle of the maximum angle of the light. <br>
+     * {@code mSpotAngle <= 0 } means light has no spread. <br>
+     * {@code mSpotAngle >= Math.PI } means light spreads in all directions.
+     */
+    public float mSpotAngle;
+
+    /**
+     * Exponent of light strength, computed as {@code cos(ang) ^ mSpotExponen}
+     */
+    public float mSpotExp;
 
 
     public Light() {
-        this( TYPE_AMBIENT, null, null, null, null, null, null, null );
+        this( null, null, null, null, true, 10f, 0f );
     }
 
 
-    public Light( int type,
-                  Vec4 ambient,
-                  Vec4 diffuse,
-                  Vec4 specular,
-                  Vec4 pos,
+    public Light( Vec3 color,
+                  Vec3 pos,
                   Vec3 dir,
-                  Vec3 attenuation,
-                  Vec4 shape )
+                  Vec3 falloff,
+                  boolean positional,
+                  float spotCutoff,
+                  float spotExp )
     {
-        float posw = type == TYPE_DIRECTIONAL ? 0f : 1f;
-
-        mType        = type;
-        mAmbient     = ambient     == null ? new Vec4( 0, 0, 0, 1 ) : new Vec4( ambient );
-        mDiffuse     = diffuse     == null ? new Vec4( 0, 0, 0, 1 ) : new Vec4( diffuse );
-        mSpecular    = specular    == null ? new Vec4( 0, 0, 0, 1 ) : new Vec4( specular );
-
-        if( pos != null ) {
-            mPos = new Vec4( pos );
-        } else if( type == TYPE_DIRECTIONAL ) {
-            mPos = new Vec4( 0, 0, 0, 0 );
-        } else {
-            mPos = new Vec4( 0, 0, 0, 1 );
-        }
-
-        mDir         = dir         == null ? new Vec3()             : new Vec3( dir );
-        mAttenuation = attenuation == null ? new Vec3( 1, 0, 0 )    : new Vec3( attenuation );
-
-        if( shape != null ) {
-            mShape = new Vec4( shape );
-        } else if( type == TYPE_SPOTLIGHT ) {
-            mShape = new Vec4( 0.5f * (float)Ang.PI, 1f, 0, 0 );
-        } else {
-            mShape = new Vec4( 10f, 0, 0, 0 );
-        }
-    }
-
-
-    public void applyTypeToParams() {
-        if( mType == TYPE_DIRECTIONAL ) {
-            mPos.w = 0;
-        } else {
-            mPos.w = 1;
-        }
-
-        if( mType != TYPE_SPOTLIGHT ) {
-            mShape.x = 2;
-            mShape.y = 0;
-        }
+        mColor      = color   == null ? new Vec3( 0, 0, 0 ) : new Vec3( color );
+        mPos        = pos     == null ? new Vec3( 0, 0, 0 ) : new Vec3( pos );
+        mDir        = dir     == null ? new Vec3( 0, 0, 0 ) : new Vec3( dir );
+        mFalloff    = falloff == null ? new Vec3( 1, 0, 0 ) : new Vec3( falloff );
+        mPositional = positional;
+        mSpotAngle  = spotCutoff;
+        mSpotExp    = spotExp;
     }
 
 }
