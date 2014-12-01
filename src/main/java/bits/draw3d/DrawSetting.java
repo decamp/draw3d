@@ -451,8 +451,8 @@ public interface DrawSetting {
             mEnv = d;
             mUbo = new Ubo();
             mUbo.bindLocation( Uniforms.defaultBlockBinding( "FOG" ) );
-            mColor = mUbo.addUniform( 1, GL_FLOAT_VEC4, "color" );
-            mParams = mUbo.addUniform( 1, GL_FLOAT_VEC2, "params" );
+            mColor  = mUbo.addUniform( 1, GL_FLOAT_VEC4, "COLOR" );
+            mParams = mUbo.addUniform( 1, GL_FLOAT_VEC2, "PARAMS" );
             mUbo.allocMembersBuffer();
         }
 
