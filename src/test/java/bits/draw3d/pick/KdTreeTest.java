@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2014. Massachusetts Institute of Technology
- * Released under the BSD 2-Clause License
- * http://opensource.org/licenses/BSD-2-Clause
- */
 
 package bits.draw3d.pick;
 
@@ -26,14 +21,16 @@ public class KdTreeTest {
     private static final String MODEL_PATH = "../test/resources/debhouse.obj";
 
 
-    @Test public void validatePickPointsTest() throws IOException {
+    @Test
+    public void validatePickPointsTest() throws IOException {
         List<DrawTri> tris = newGeometry();
+        System.out.println( "TRIS: " + tris.size() );
         Box3 bounds = new Box3();
         Models.computeBounds( Models.vertIterator( tris ), bounds );
 
         System.out.println( "Triangle Count: " + tris.size() + "\t" + bounds );
 
-        List<RayPicker> pickerList = newTreeInstances( tris );
+        List<RayPicker> pickerList = createTree( tris );
         List<RayPickResult> resultList = new ArrayList<RayPickResult>();
         for( RayPicker gp : pickerList ) {
             resultList.add( gp.newRayPickResult() );
@@ -43,11 +40,14 @@ public class KdTreeTest {
         float[] boundSpan = { bounds.x1 - bounds.x0, bounds.y1 - bounds.y0, bounds.z1 - bounds.z0 };
         float[] boundMin  = { bounds.x0, bounds.y0, bounds.z0 };
 
-        Random rand = new Random( 1 );
+        Random rand = new Random( 50 );
         Vec3 pos = new Vec3();
         Vec3 dir = new Vec3();
 
-        for( int i = 0; i < 5000; i++ ) {
+        final int TEST_COUNT = 5000;
+
+        for( int i = 0; i < TEST_COUNT; i++ ) {
+            //System.out.println( "Test : " + i );
             pos.x = rand.nextFloat() * boundSpan[0] + boundMin[0];
             pos.y = rand.nextFloat() * boundSpan[1] + boundMin[1];
             pos.z = rand.nextFloat() * boundSpan[2] + boundMin[2];
@@ -60,21 +60,21 @@ public class KdTreeTest {
 
             for( int j = 1; j < pickerList.size(); j++ ) {
                 //System.out.println( pos + " ->  " + dir );
-
                 pickerList.get( j ).pick( pos, dir, Side.BOTH, resultList.get( j ) );
                 RayPickResult r0 = resultList.get( 0 );
                 RayPickResult r1 = resultList.get( j );
-
                 assertTrue( r0.hasPick() == r1.hasPick() );
 
                 if( r0.hasPick() ) {
                     if( !assertNear( r0.pickedPointRef(), r1.pickedPointRef(), 0.01f ) ) {
                         System.out.println( "### FAIL" );
-                        System.out.println( r0.pickedTriangle() == r1.pickedTriangle() );
-                        System.out.println( r0.pickedPoint() + "\t" + r1.pickedPoint() );
-                        System.out.println( r0.pickedSide() + "\t" + r1.pickedSide() );
-
-                        System.out.println( r0.pickedParamDistance() + "\t" + r1.pickedParamDistance() );
+                        System.out.println( "### SAME TRI: " + ( r0.pickedTriangle() == r1.pickedTriangle() ) );
+                        System.out.println( "### PICKED TRI: " + ( r0.pickedTriangle().mVerts[0].pos() + "\t" +
+                                                                   r0.pickedTriangle().mVerts[1].pos() + "\t" +
+                                                                   r0.pickedTriangle().mVerts[2].pos()  ));
+                        System.out.println( "### PICKED POINT: " + r0.pickedPoint() + "\t" + r1.pickedPoint() );
+                        System.out.println( "### PICKED DIST: "  + r0.pickedParamDistance() + "\t" + r1.pickedParamDistance() );
+                        System.out.println( "### PICKED SIDE:  " + r0.pickedSide() + "\t" + r1.pickedSide() );
                         assertTrue( false );
                     }
                 }
@@ -83,7 +83,8 @@ public class KdTreeTest {
     }
 
 
-    @Ignore @Test public void pickSpeedTest() throws IOException {
+    @Ignore @Test
+    public void pickSpeedTest() throws IOException {
         List<DrawTri> tris = newGeometry();
         Box3 bounds = new Box3();
         Models.computeBounds( Models.vertIterator( tris ), bounds );
@@ -92,7 +93,7 @@ public class KdTreeTest {
         float[] boundSpan = { bounds.x1 - bounds.x0, bounds.y1 - bounds.y0, bounds.z1 - bounds.z0 };
         float[] boundMin  = { bounds.x0, bounds.y0, bounds.z0 };
 
-        List<RayPicker> pickerList = newTreeInstances( tris );
+        List<RayPicker> pickerList = createTree( tris );
 
         for( RayPicker picker : pickerList ) {
             RayPickResult result = picker.newRayPickResult();
@@ -122,7 +123,8 @@ public class KdTreeTest {
     }
 
 
-    @Ignore @Test public void buildSpeedTest() throws IOException {
+    @Ignore @Test
+    public void buildSpeedTest() throws IOException {
         List<DrawTri> tris = newGeometry();
         Box3 bounds = new Box3();
         Models.computeBounds( Models.vertIterator( tris ), bounds );
@@ -155,7 +157,8 @@ public class KdTreeTest {
     }
 
     
-    @Ignore @Test public void arrayVersusListSortTest() {
+    @Ignore @Test
+    public void arrayVersusListSortTest() {
         final int count = 1000000;
 
         for( int t = 0; t < 10; t++ ) {
@@ -193,7 +196,7 @@ public class KdTreeTest {
     }
 
 
-    private static List<RayPicker> newTreeInstances( List<DrawTri> tris ) throws IOException {
+    private static List<RayPicker> createTree( List<DrawTri> tris ) throws IOException {
         List<RayPicker> ret = new ArrayList<RayPicker>();
         ret.add( BruteForcePicker.build( tris ) );
         //ret.add( MedianVolumeKdTree.build( tris ) );
@@ -206,8 +209,9 @@ public class KdTreeTest {
 
     private static boolean assertNear( Vec3 x, Vec3 y, float tol ) {
         if( Vec.dist( x, y ) > tol ) {
-            System.out.println( Vec.dist( x, y ) + "\t" + tol );
-            System.out.println( Vec.format( x ) + "\t" + Vec.format( y ) );
+            System.out.println( "### ASSERT FAILED" );
+            System.out.println( "### Difference / tolerance: " + Vec.dist( x, y ) + "\t" + tol );
+            System.out.println( "### Values: " + Vec.format( x ) + "\t" + Vec.format( y ) );
             return false;
         }
         

@@ -15,11 +15,7 @@ import java.util.Random;
 class RandomFeature {
 
     final float[] mVector;
-    
-    
-    public RandomFeature( int dimCount ) {
-        this( dimCount, new Random( System.currentTimeMillis() ) );
-    }
+
     
     public RandomFeature( int dimCount, Random rand ) {
         mVector = new float[dimCount];

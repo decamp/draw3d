@@ -9,6 +9,7 @@ package bits.draw3d.pick;
 import java.util.*;
 
 import bits.draw3d.model.*;
+import bits.draw3d.util.TimSort;
 import bits.math3d.*;
 import bits.math3d.geom.*;
 
@@ -66,6 +67,7 @@ public final class KdTriangleTree implements RayPicker {
     public static KdTriangleTree build( List<? extends DrawTri> triList ) {
         Box3 box = new Box3();
         Models.computeBounds( Models.vertIterator( triList ), box );
+        //Box.inflate( box, 1.001f, 1.001f, 1.001f, box );
         float[] vox = { box.x0, box.y0, box.z0, box.x1, box.y1, box.z1 };
 
         // Generate events.
@@ -104,7 +106,8 @@ public final class KdTriangleTree implements RayPicker {
             }
         }
 
-        Arrays.sort( events, 0, eventCount );
+        TimSort.defaultInstance().sort( events, 0, eventCount );
+        //Arrays.sort( events, 0, eventCount );
 
         Node root = build( 0,
                            tris,
@@ -132,12 +135,10 @@ public final class KdTriangleTree implements RayPicker {
     }
 
 
-
     @Override
     public RayPickResult newRayPickResult() {
         return new Result();
     }
-
 
     @Override
     public boolean pick( Vec3 rayPointVec, Vec3 rayDirVec, int side, RayPickResult out ) {
@@ -385,6 +386,7 @@ public final class KdTriangleTree implements RayPicker {
         float[] triVoxel = new float[6];
         Vec3[] verts = new Vec3[3];
         Box3 tempBox = new Box3();
+        PolyLine tempLoop = new PolyLine();
 
         for( int i = 0; i < eventCount; i++ ) {
             SplitEvent e = events[i];
@@ -399,17 +401,21 @@ public final class KdTriangleTree implements RayPicker {
                 break;
 
             case BOTH:
-                // Reclip triangles.
             {
-                triMark[e.mTriIndex] = NONE; // Leave indication that new events
+                // Reclip triangles.
+
+                // Leave indication that new events
                 // have now been generated.
+                triMark[e.mTriIndex] = NONE;
+
                 DrawTri t = tris[e.mTriIndex];
                 verts[0] = t.mVerts[0].mPos;
                 verts[1] = t.mVerts[1].mPos;
                 verts[2] = t.mVerts[2].mPos;
 
                 put( leftVoxel, tempBox );
-                if( Clip.clipPlanar( verts, 0, 3, tempBox, loop ) ) {
+//                if( Clip2.clipPlanarOld( verts, 0, 3, tempBox, loop ) ) {
+                if( Clip.clipPlanarWithBox( verts, 0, 3, tempBox, tempLoop, loop ) ) {
                     Box.pointUnion( loop.mVerts, 0, loop.mSize, tempBox );
                     put( tempBox, triVoxel );
 
@@ -424,13 +430,8 @@ public final class KdTriangleTree implements RayPicker {
                 }
 
                 put( rightVoxel, tempBox );
-                if( Clip.clipPlanar( verts, 0, 3, tempBox, loop ) ) {
-                    for( int j = 0; j < loop.mSize; j++ ) {
-                        if( Vec.isNaN( loop.mVerts[j] ) ) {
-                            Clip.clipPlanar( verts, 0, 3, tempBox, loop );
-                        }
-                    }
-
+//                if( Clip2.clipPlanarOld( verts, 0, 3, tempBox, loop ) ) {
+                if( Clip.clipPlanarWithBox( verts, 0, 3, tempBox, tempLoop, loop ) ) {
                     Box.pointUnion( loop.mVerts, 0, loop.mSize, tempBox );
                     put( tempBox, triVoxel );
 
@@ -705,7 +706,12 @@ public final class KdTriangleTree implements RayPicker {
     }
 
 
-    private static void splitVoxel( float[] vox, int splitAxis, float splitPos, float[] outLeft, float[] outRight ) {
+    private static void splitVoxel( float[] vox,
+                                    int splitAxis,
+                                    float splitPos,
+                                    float[] outLeft,
+                                    float[] outRight )
+    {
         outLeft[0] = outRight[0] = vox[0];
         outLeft[1] = outRight[1] = vox[1];
         outLeft[2] = outRight[2] = vox[2];
@@ -862,43 +868,24 @@ public final class KdTriangleTree implements RayPicker {
         int mTriIndex;
 
         SplitEvent( int axis, float position, int type, int triIndex ) {
-            if( position != position ) {
-                System.out.println( "??" );
-            }
-            mAxis = axis;
+            mAxis     = axis;
             mPosition = position;
-            mType = type;
+            mType     = type;
             mTriIndex = triIndex;
         }
-
 
         @Override
         public int compareTo( SplitEvent e ) {
             if( this == e ) {
                 return 0;
             }
-
-            if( mPosition < e.mPosition ) {
-                return -1;
-            }
-
-            if( mPosition > e.mPosition ) {
-                return 1;
-            }
-
-            if( mAxis < e.mAxis ) {
-                return -1;
-            }
-
-            if( mAxis > e.mAxis ) {
-                return 1;
-            }
-
-            if( mType != e.mType ) {
-                return mType - e.mType;
-            }
-
-            return -1;
+            return mPosition < e.mPosition ? -1 :
+                   mPosition > e.mPosition ?  1 :
+                   mAxis < e.mAxis ? -1:
+                   mAxis > e.mAxis ?  1:
+                   mType < e.mType ? -1:
+                   mType > e.mType ?  1:
+                   mTriIndex <= e.mTriIndex ? -1: 1;
         }
     }
 
@@ -912,6 +899,7 @@ public final class KdTriangleTree implements RayPicker {
         box.z1 = b[5];
     }
 
+
     private static void put( Box3 box, float[] b ) {
         b[0] = box.x0;
         b[1] = box.y0;
@@ -920,6 +908,5 @@ public final class KdTriangleTree implements RayPicker {
         b[4] = box.y1;
         b[5] = box.z1;
     }
-
 
 }
