@@ -157,12 +157,12 @@ public class Vao implements DrawUnit {
         }
 
         gl.glBindVertexArray( mId[0] );
+        for( VaoMember va: mAttribs ) {
+            va.enable( gl );
+        }
 
         if( mVbo != null ) {
             mVbo.bind( d );
-            for( VaoMember va: mAttribs ) {
-                va.enable( gl );
-            }
         } else {
             gl.glBindBuffer( GL_ARRAY_BUFFER, 0 );
         }
