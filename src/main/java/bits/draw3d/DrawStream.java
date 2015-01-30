@@ -59,7 +59,10 @@ public class DrawStream {
 
     public DrawStream( int bufSize ) {
         mVertBuf = DrawUtil.alloc( bufSize );
-        mIndBuf = DrawUtil.alloc( bufSize / 16 * 6 / 4 );
+        // 12 is smallest possible vert size.
+        // 6/4 is the max ration between indices and verts (for drawing quads)
+        // 4 at the end is bytes per index.
+        mIndBuf  = DrawUtil.alloc( bufSize / 12 * 6 / 4 * 4 );
     }
 
 

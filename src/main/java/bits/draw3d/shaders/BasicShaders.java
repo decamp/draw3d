@@ -296,7 +296,7 @@ public class BasicShaders {
         @Override
         public void attributes( Vao out ) {
             int stride = bytesPerElem();
-            out.addAttribute( 0, 3,       GL_FLOAT,         false, stride, 0           );
+            out.addAttribute( 0, 3, GL_FLOAT, false, stride, 0 );
             out.addAttribute( 1, 4,       GL_UNSIGNED_BYTE, true,  stride, 12          );
             out.addAttribute( 2, 3,       GL_FLOAT,         false, stride, 12 + 4      );
             out.addAttribute( 3, mTexDim, GL_FLOAT,         false, stride, 12 + 4 + 12 );

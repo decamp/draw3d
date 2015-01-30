@@ -6,9 +6,6 @@
 
 package bits.draw3d;
 
-import bits.draw3d.DrawEnv;
-import bits.draw3d.DrawUnit;
-
 import static javax.media.opengl.GL2ES3.*;
 
 /**
@@ -32,6 +29,7 @@ public class DrawGroup<V, E> implements DrawUnit {
     private final Vao             mVao;
     private final BoList<V>       mVertList;
     private final BoList<E>       mItemList;
+    private final int             mIndexType;
 
     private boolean mInitialized  = false;
     private boolean mDrawOnBind   = false;
@@ -48,8 +46,23 @@ public class DrawGroup<V, E> implements DrawUnit {
         mVertList = BoList.create( program.mVertWriter, vertUsage, vertItemCap );
         if( program.mElemWriter != null ) {
             mItemList = BoList.create( program.mElemWriter, elemUsage, elemItemCap );
+
+            switch( mProgram.mElemWriter.bytesPerElem() ) {
+            case 1:
+                mIndexType = GL_UNSIGNED_BYTE;
+                break;
+            case 2:
+                mIndexType = GL_UNSIGNED_SHORT;
+                break;
+            case 4:
+                mIndexType = GL_UNSIGNED_INT;
+                break;
+            default:
+                throw new IllegalStateException( "Invalid element size: " + mProgram.mElemWriter.bytesPerElem() );
+            }
         } else {
-            mItemList = null;
+            mItemList  = null;
+            mIndexType = -1;
         }
         mVao = new Vao();
         program.mVertWriter.attributes( mVao );
@@ -125,24 +138,7 @@ public class DrawGroup<V, E> implements DrawUnit {
             }
         } else {
             int len = mItemList.elemNum();
-            if( len > 0 ) {
-                int type;
-                switch( mProgram.mElemWriter.bytesPerElem() ) {
-                case 1:
-                    type = GL_UNSIGNED_BYTE;
-                    break;
-                case 2:
-                    type = GL_UNSIGNED_SHORT;
-                    break;
-                case 4:
-                    type = GL_UNSIGNED_INT;
-                    break;
-                default:
-                    throw new IllegalStateException( "Invalid element size: " + mProgram.mElemWriter.bytesPerElem() );
-                }
-
-                d.mGl.glDrawElements( mode, len, type, 0 );
-            }
+            d.mGl.glDrawElements( mode, len, mIndexType, 0 );
         }
     }
 
