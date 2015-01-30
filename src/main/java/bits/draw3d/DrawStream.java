@@ -344,7 +344,7 @@ public class DrawStream {
         writer.mVertWriter.attributes( writer.mVao );
 
         mWriters.put( mChosenConfig, writer );
-        mChosenConfig = new BasicShaderConfig();
+        mChosenConfig = new BasicShaderConfig( mChosenConfig );
 
         return writer;
     }
