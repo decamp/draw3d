@@ -48,6 +48,7 @@ public class BoList<T> extends DrawUnitAdapter implements Collection<T> {
     private final PublicList<T>       mList;
     private final BoWriter<? super T> mWriter;
     private final Bo                  mBo;
+    private final int                 mUsage;
 
     // If mAutoWrite, objects are serialized every push.
     private final boolean mAutoWrite;
@@ -61,6 +62,7 @@ public class BoList<T> extends DrawUnitAdapter implements Collection<T> {
     protected BoList( Class<T> clazz, BoWriter<? super T> writer, int usage, int initCapacity ) {
         mList      = PublicList.create( clazz, initCapacity );
         mWriter    = writer;
+        mUsage     = usage;
         mAutoWrite = usage == GL_STREAM_DRAW;
         mBo        = new Bo( writer.boType(), usage );
     }
@@ -249,7 +251,11 @@ public class BoList<T> extends DrawUnitAdapter implements Collection<T> {
         int bytes = mWriter.bytesPerElem() * mElemNum;
         Bo bo = mBo;
         if( bytes > bo.capacity() ) {
-            bo.alloc( bytes * 11 / 10 );
+            if( mUsage == GL_STATIC_DRAW || mUsage == GL_STATIC_READ ) {
+                bo.alloc( bytes );
+            } else {
+                bo.alloc( bytes * 11 / 10 );
+            }
         }
         bo.bind( d );
         ByteBuffer bb = bo.map( d, GL_WRITE_ONLY );

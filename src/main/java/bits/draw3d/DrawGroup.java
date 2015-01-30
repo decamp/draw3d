@@ -46,7 +46,6 @@ public class DrawGroup<V, E> implements DrawUnit {
         mVertList = BoList.create( program.mVertWriter, vertUsage, vertItemCap );
         if( program.mElemWriter != null ) {
             mItemList = BoList.create( program.mElemWriter, elemUsage, elemItemCap );
-
             switch( mProgram.mElemWriter.bytesPerElem() ) {
             case 1:
                 mIndexType = GL_UNSIGNED_BYTE;
