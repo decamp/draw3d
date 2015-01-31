@@ -87,8 +87,6 @@ public class FontTexture implements DrawUnit {
         mTexture.param( GL_TEXTURE_SWIZZLE_B, GL_ONE );
         mTexture.param( GL_TEXTURE_SWIZZLE_A, GL_RED );
         mTexture.buffer( im );
-
-        System.out.println( "IMAGE: " + im.getWidth() );
     }
 
 
