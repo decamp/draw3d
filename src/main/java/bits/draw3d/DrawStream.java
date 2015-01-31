@@ -215,7 +215,7 @@ public class DrawStream {
 
 
     public void color( Vec4 v ) {
-        color( v.x, v.y, v.z, 1f );
+        color( v.x, v.y, v.z, v.w );
     }
 
 
