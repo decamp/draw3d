@@ -133,6 +133,16 @@ public class Models {
     }
 
 
+    public static void computeBounds( DrawTri tri, Box3 box ) {
+        Vec3 v = tri.mVerts[0].mPos;
+        box.x0 = box.x1 = v.x;
+        box.y0 = box.y1 = v.y;
+        box.z0 = box.z1 = v.z;
+        addToBounds( tri.mVerts[1].mPos, box );
+        addToBounds( tri.mVerts[2].mPos, box );
+    }
+
+
     public static boolean computeBounds( TriModel model, Box3 box ) {
         return computeBounds( vertIterator( model ), box );
     }
