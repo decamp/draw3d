@@ -10,4 +10,7 @@ void main()
 {
 	vec4 c = texture( TEX_UNIT0, tex0 );
 	fragColor = COLOR_MAT * c;
+	if( fragColor.a <= 0.0 ) {
+		discard;
+	}
 }
