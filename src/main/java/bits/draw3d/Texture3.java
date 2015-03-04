@@ -7,6 +7,8 @@
 package bits.draw3d;
 
 import java.nio.ByteBuffer;
+
+import static javax.media.opengl.GL2ES2.GL_UNPACK_ROW_LENGTH;
 import static javax.media.opengl.GL2GL3.GL_TEXTURE_3D;
 
 /**
@@ -16,6 +18,7 @@ public final class Texture3 extends AbstractTexture {
 
 
     private ByteBuffer mBuf = null;
+    private int mStride;
 
 
     public Texture3() {
@@ -29,7 +32,8 @@ public final class Texture3 extends AbstractTexture {
                                      int dataType,
                                      int w,
                                      int h,
-                                     int depth )
+                                     int depth,
+                                     int stride )
     {
         if( buf == null ) {
             if( mBuf == null ) {
@@ -51,6 +55,7 @@ public final class Texture3 extends AbstractTexture {
 
     @Override
     protected void doAlloc( DrawEnv g ) {
+        g.mGl.glPixelStorei( GL_UNPACK_ROW_LENGTH, mStride );
         g.mGl.glTexImage3D( GL_TEXTURE_3D,
                             0, // Level
                             internalFormat(),
@@ -61,6 +66,7 @@ public final class Texture3 extends AbstractTexture {
                             format(),
                             dataType(),
                             mBuf );
+        g.mGl.glPixelStorei( GL_UNPACK_ROW_LENGTH, mStride );
         mBuf = null;
     }
 }

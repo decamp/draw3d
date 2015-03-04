@@ -7,7 +7,7 @@
 package bits.draw3d;
 
 import java.nio.ByteBuffer;
-import static javax.media.opengl.GL2GL3.*;
+import static javax.media.opengl.GL2.*;
 
 /**
  * @author decamp
@@ -63,6 +63,7 @@ public final class Texture1 extends AbstractTexture {
                             format(),
                             dataType(),
                             mBuf );
+        mBuf = null;
     }
 
 }
