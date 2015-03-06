@@ -16,7 +16,6 @@ import javax.media.opengl.GL2ES2;
  */
 public class VaoMember {
 
-    public DrawUnit mBuffer;
     public int      mLocation;
     public int      mCompNum;
     public int      mType;
