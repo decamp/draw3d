@@ -33,17 +33,18 @@ public class DrawStream {
     private final ByteBuffer mVertBuf;
     private final ByteBuffer mIndBuf;
 
-    private final DrawVert          mVert         = new DrawVert( new Vec3(),
-                                                                  new float[4],
-                                                                  new Vec3(),
-                                                                  new Vec4( 0, 0, 0, 1 ) );
+    private final DrawVert mVert = new DrawVert( new Vec3(),
+                                                 new float[4],
+                                                 new Vec3(),
+                                                 new Vec4( 0, 0, 0, 1 ) );
+
     private final BasicShaderConfig mConfig       = new BasicShaderConfig();
     private       BasicShaderConfig mChosenConfig = new BasicShaderConfig();
 
     private final Map<BasicShaderConfig, Writer> mWriters     = new HashMap<BasicShaderConfig, Writer>();
     private final IndWriter                      mQuadIndexer = new QuadIndWriter();
 
-    private DrawEnv mG;
+    private DrawEnv mDraw;
 
     private Writer    mActiveWriter  = null;
     private IndWriter mActiveIndexer = null;
@@ -62,12 +63,12 @@ public class DrawStream {
         // 12 is smallest possible vert size.
         // 6/4 is the max ration between indices and verts (for drawing quads)
         // 4 at the end is bytes per index.
-        mIndBuf  = DrawUtil.alloc( bufSize / 12 * 6 / 4 * 4 );
+        mIndBuf = DrawUtil.alloc( bufSize / 12 * 6 / 4 * 4 );
     }
 
 
     public void init( DrawEnv g ) {
-        mG = g;
+        mDraw = g;
         GL3 gl = g.mGl;
 
         if( mVbo.id() != 0 ) {
@@ -139,7 +140,7 @@ public class DrawStream {
 
 
     private void begin( Writer writer, IndWriter indexer, int mode, int blockSize ) {
-        mG.checkErr();
+        mDraw.checkErr();
 
         mActiveWriter  = writer;
         mActiveIndexer = indexer;
@@ -151,16 +152,17 @@ public class DrawStream {
         mActiveCap = ( bytes / ( vertBytes * blockSize ) ) * blockSize;
         mActivePos = 0;
 
-        writer.mProgram.bind( mG );
-        writer.mVao.bind( mG );
+        writer.mProgram.bind( mDraw );
+        writer.mVao.bind( mDraw );
+        mVbo.bind( mDraw );
 
         if( indexer != null ) {
             indexer.reset();
             mIndBuf.clear();
-            mIbo.bind( mG );
+            mIbo.bind( mDraw );
         }
 
-        DrawUtil.checkErr( mG.mGl );
+        DrawUtil.checkErr( mDraw.mGl );
     }
 
 
@@ -172,12 +174,12 @@ public class DrawStream {
             flush();
         }
         if( mActiveIndexer != null ) {
-            mG.mGl.glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+            mDraw.mGl.glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
             mActiveIndexer = null;
         }
-        mActiveWriter.mVao.unbind( mG );
-        mActiveWriter.mProgram.unbind( mG );
-        DrawUtil.checkErr( mG.mGl );
+        mActiveWriter.mVao.unbind( mDraw );
+        mActiveWriter.mProgram.unbind( mDraw );
+        DrawUtil.checkErr( mDraw.mGl );
     }
 
 
@@ -320,27 +322,27 @@ public class DrawStream {
 
 
     public void pointSize( float f ) {
-        mG.mGl.glPointSize( f );
+        mDraw.mGl.glPointSize( f );
     }
 
 
 
     private Writer getWriter() {
-        mConfig.lineWidth( mG.mLineWidth.mValue );
+        mConfig.lineWidth( mDraw.mLineWidth.mValue );
         mConfig.chooseAvailable( mChosenConfig );
         Writer writer = mWriters.get( mChosenConfig );
         if( writer != null ) {
             return writer;
         }
 
-        BoProgram<DrawVert,?> prog = BasicShaders.createProgram( mChosenConfig, mG.mShaderMan );
+        BoProgram<DrawVert,?> prog = BasicShaders.createProgram( mChosenConfig, mDraw.mShaderMan );
         writer = new Writer();
 
         writer.mProgram    = prog.mProgram;
         writer.mVertWriter = prog.mVertWriter;
         writer.mVao        = new Vao( mVbo, null );
 
-        writer.mProgram.init( mG );
+        writer.mProgram.init( mDraw );
         writer.mVertWriter.attributes( writer.mVao );
 
         mWriters.put( mChosenConfig, writer );
@@ -351,16 +353,18 @@ public class DrawStream {
 
 
     private void flush() {
+        DrawEnv d = mDraw;
+
         mVertBuf.flip();
-        mG.mGl.glBufferSubData( GL_ARRAY_BUFFER, 0, mVertBuf.remaining(), mVertBuf );
+        d.mGl.glBufferSubData( GL_ARRAY_BUFFER, 0, mVertBuf.remaining(), mVertBuf );
         mVertBuf.clear();
 
         if( mActiveIndexer == null ) {
-            mG.mGl.glDrawArrays( mActiveMode, 0, mActivePos );
+            d.mGl.glDrawArrays( mActiveMode, 0, mActivePos );
         } else {
             mIndBuf.flip();
-            mG.mGl.glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, 0, mIndBuf.remaining(), mIndBuf );
-            mG.mGl.glDrawElements( mActiveMode, mActiveIndexer.count(), GL_UNSIGNED_INT, 0 );
+            d.mGl.glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, 0, mIndBuf.remaining(), mIndBuf );
+            d.mGl.glDrawElements( mActiveMode, mActiveIndexer.count(), GL_UNSIGNED_INT, 0 );
             mIndBuf.clear();
         }
         mActivePos = 0;

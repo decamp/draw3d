@@ -16,12 +16,15 @@ import javax.media.opengl.GL2ES2;
  */
 public class VaoMember {
 
-    public int mLocation;
-    public int mCompNum;
-    public int mType;
-    public boolean mNormalize;
-    public int mStride        = -1;
-    public int mOffset        = -1;
+    public DrawUnit mBuffer;
+    public int      mLocation;
+    public int      mCompNum;
+    public int      mType;
+    public boolean  mNormalize;
+
+    public int      mStride        = -1;
+    public int      mOffset        = -1;
+
 
     public VaoMember() {}
 

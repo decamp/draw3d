@@ -214,17 +214,16 @@ public class Vao implements DrawUnit {
 
         if( mVbo != null ) {
             mVbo.bind( d );
-            for( VaoMember va: mAttribs ) {
-                va.enable( gl );
-            }
-        } else {
-            gl.glBindBuffer( GL_ARRAY_BUFFER, 0 );
         }
+
+        for( VaoMember va: mAttribs ) {
+            va.enable( gl );
+        }
+
         if( mIbo != null ) {
             mIbo.bind( d );
-        } else {
-            gl.glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
         }
+
         d.checkErr();
     }
 
