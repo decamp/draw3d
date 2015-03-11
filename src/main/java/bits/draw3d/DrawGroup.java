@@ -111,13 +111,19 @@ public class DrawGroup<V, E> implements DrawUnit {
 
 
     public void bind( DrawEnv d ) {
-        mVao.bind( d );
         if( mVertList.needsUpdate() ) {
             mVertList.bind( d );
+            mVao.init( d );
+        } else {
+            mVao.bind( d );
         }
-        if( mItemList != null && mItemList.needsUpdate() ) {
+
+        if( mItemList != null ) {
             mItemList.bind( d );
         }
+
+        mProgram.mProgram.bind( d );
+
         if( mDrawOnBind ) {
             drawAll( d, mDrawMode );
         }

@@ -17,6 +17,7 @@ import bits.draw3d.scene.*;
 /**
  * @author decamp
  */
+@Deprecated
 public class ModelGraph implements EmbeddedGraphNode {
 
     private final ActorNode       mMotionNode;

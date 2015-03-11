@@ -9,9 +9,6 @@ package bits.draw3d;
 import javax.media.opengl.GL2ES3;
 import java.util.*;
 
-import static javax.media.opengl.GL2ES3.*;
-
-
 /**
  * Vertex Attribute Object (VAO) handle for Java. VAOs hold state associated with a
  * VBO and IBO. Most importantly, a VAO holds references to the VBO and IBO themselves,
