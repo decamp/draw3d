@@ -68,11 +68,11 @@ public class Material {
     
 
     public Material( Material copy ) {
-        Vec.put( copy.mAmbient, mAmbient );
-        Vec.put( copy.mAmbient, mAmbient );
-        Vec.put( copy.mAmbient, mAmbient );
-        Vec.put( copy.mAmbient, mAmbient );
-        mShininess = copy.mShininess;
+        this( copy.mAmbient,
+              copy.mDiffuse,
+              copy.mSpecular,
+              copy.mEmissive,
+              copy.mShininess );
     }
 
 
