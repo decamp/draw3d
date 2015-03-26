@@ -21,6 +21,7 @@ public class BasicShaderConfig {
     private int     mTexCompNum = 0;
     private boolean mNorm       = false;
     private boolean mColor      = false;
+    private boolean mFog        = false;
     private float   mLineWidth  = 1f;
 
     private String mVertShader;
@@ -44,6 +45,7 @@ public class BasicShaderConfig {
         mTexCompNum = copy.mTexCompNum;
         mNorm       = copy.mNorm;
         mColor      = copy.mColor;
+        mFog        = copy.mFog;
         mLineWidth  = copy.mLineWidth;
         mVertShader = copy.mVertShader;
         mGeomShader = copy.mGeomShader;
@@ -79,6 +81,16 @@ public class BasicShaderConfig {
 
     public int texComponentNum() {
         return mTexCompNum;
+    }
+
+
+    public void fog( boolean fog ) {
+        mFog = fog;
+    }
+
+
+    public boolean fog() {
+        return mFog;
     }
 
     /**
@@ -136,7 +148,11 @@ public class BasicShaderConfig {
         {
             if( mTexCompNum == 0 ) {
                 out.mNorm = false;
-                out.mVertShader = "glsl/bits/draw3d/shaders/Color.vert";
+                if( mFog ) {
+                    out.mVertShader = "glsl/bits/draw3d/shaders/ColorFog.vert";
+                } else {
+                    out.mVertShader = "glsl/bits/draw3d/shaders/Color.vert";
+                }
                 out.mGeomShader = null;
                 out.mFragShader = "glsl/bits/draw3d/shaders/Color.frag";
             } else {
@@ -146,7 +162,11 @@ public class BasicShaderConfig {
                         out.mGeomShader = null;
                         out.mFragShader = "glsl/bits/draw3d/shaders/ColorTex.frag";
                     } else {
-                        out.mVertShader = "glsl/bits/draw3d/shaders/ColorTex.vert";
+                        if( mFog ) {
+                            out.mVertShader = "glsl/bits/draw3d/shaders/ColorTexFog.vert";
+                        } else {
+                            out.mVertShader = "glsl/bits/draw3d/shaders/ColorTex.vert";
+                        }
                         out.mGeomShader = null;
                         out.mFragShader = "glsl/bits/draw3d/shaders/ColorTex.frag";
                     }

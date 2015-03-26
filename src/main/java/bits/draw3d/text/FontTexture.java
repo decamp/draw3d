@@ -39,7 +39,7 @@ import static javax.media.opengl.GL3.*;
  * 
  * @author Philip DeCamp
  */
-public class FontTexture implements DrawUnit {
+public class FontTexture {
 
     private final Font        mFont;
     private final FontMetrics mMetrics;
@@ -93,10 +93,7 @@ public class FontTexture implements DrawUnit {
     /**
      * You MUST call this method before using texture for rendering.
      */
-    public void bind( DrawEnv g ) {
-        g.drawStream().config( true, true, false );
-        g.mBlend.push();
-        g.mBlend.apply( true );
+    public void bindTex( DrawEnv g ) {
         if( mTexture == null ) {
             init( g );
         }
@@ -106,12 +103,11 @@ public class FontTexture implements DrawUnit {
     /**
      * You MUST call this method after you are done using texture for rendering.
      */
-    public void unbind( DrawEnv g ) {
+    public void unbindTex( DrawEnv g ) {
         if( mTexture == null ) {
             return;
         }
         mTexture.unbind( g );
-        g.mBlend.pop();
     }
 
     /**
@@ -253,9 +249,30 @@ public class FontTexture implements DrawUnit {
 
         return maxWidth;
     }
-    
-    
-    
+
+
+
+    /**
+     * Call this before using texture for rendering.
+     */
+    public void beginDrawing( DrawEnv g ) {
+        g.drawStream().config( true, true, false );
+        g.mBlend.push();
+        g.mBlend.apply( true );
+        bindTex( g );
+    }
+
+    /**
+     * You MUST call this method after you are done using texture for rendering.
+     */
+    public void endDrawing( DrawEnv g ) {
+        if( mTexture == null ) {
+            return;
+        }
+        mTexture.unbind( g );
+        g.mBlend.pop();
+    }
+
     /**
      * Renders character array to screen using [0, 0, 0]
      * as the start of the baseline.
@@ -263,8 +280,8 @@ public class FontTexture implements DrawUnit {
      * You MUST push the FontTexture before calling this method.
      * The characters will be rendered using the current GL colorub.
      */
-    public void renderChars( DrawEnv g, char[] chars, int off, int len ) {
-        renderChars( g, 0.0f, 0.0f, 0.0f, chars, off, len );
+    public void renderChars( DrawEnv d, char[] chars, int off, int len ) {
+        renderChars( d, 0.0f, 0.0f, 0.0f, chars, off, len );
     }
 
     /**
@@ -274,7 +291,7 @@ public class FontTexture implements DrawUnit {
      * You MUST push the FontTexture before calling this method.
      * The characters will be rendered using the current GL colorub.
      */
-    public void renderChars( DrawEnv gg,
+    public void renderChars( DrawEnv d,
                              float x, 
                              float y, 
                              float z,
@@ -284,7 +301,7 @@ public class FontTexture implements DrawUnit {
     {
         float xx = x;
         float yy = y;
-        DrawStream s = gg.drawStream();
+        DrawStream s = d.drawStream();
         s.beginQuads();
 
         for( int i = 0; i < len; i++ ) {
@@ -317,8 +334,8 @@ public class FontTexture implements DrawUnit {
      * You MUST push the FontTexture before calling this method.
      * The characters will be rendered using the current GL colorub.
      */
-    public void renderChars( DrawEnv g, CharSequence chars ) {
-        renderChars( g, 0.0f, 0.0f, 0.0f, chars );
+    public void renderChars( DrawEnv d, CharSequence chars ) {
+        renderChars( d, 0.0f, 0.0f, 0.0f, chars );
     }
 
     /**
@@ -328,12 +345,11 @@ public class FontTexture implements DrawUnit {
      * You MUST push the FontTexture before calling this method.
      * The characters will be rendered using the current GL colorub.
      */
-    public void renderChars( DrawEnv gg, float x, float y, float z, CharSequence chars ) {
+    public void renderChars( DrawEnv d, float x, float y, float z, CharSequence chars ) {
         final int len = chars.length();
         float xx = x;
         float yy = y;
-        DrawStream s = gg.drawStream();
-
+        DrawStream s = d.drawStream();
         s.beginQuads();
 
         for( int i = 0; i < len; i++ ) {
@@ -359,9 +375,7 @@ public class FontTexture implements DrawUnit {
 
         s.end();
    }
-    
-    
-    
+
     /**
      * Convenience method for rendering a box that will surround text.
      * The FontTexture MUST NOT be pushed before calling this method.
@@ -374,8 +388,8 @@ public class FontTexture implements DrawUnit {
      * 
      * @param margin  Margin by with box will exceed bounds of text.
      */
-    public void renderBox( DrawEnv g, CharSequence s, float margin ) {
-        renderBox( g, 0.0f, 0.0f, 0.0f, getCharsWidth( s ), margin );
+    public void renderBox( DrawEnv d, CharSequence s, float margin ) {
+        renderBox( d, 0.0f, 0.0f, 0.0f, getCharsWidth( s ), margin );
     }
     
     /**
@@ -388,8 +402,8 @@ public class FontTexture implements DrawUnit {
      * <p>
      * Rect will be rendered using current GL colorub.
      */
-    public void renderBox( DrawEnv g, float x, float y, float z, CharSequence s, float margin ) {
-        renderBox( g, x, y, z, getCharsWidth( s ), margin );
+    public void renderBox( DrawEnv d, float x, float y, float z, CharSequence s, float margin ) {
+        renderBox( d, x, y, z, getCharsWidth( s ), margin );
     }
     
     /**
@@ -402,9 +416,9 @@ public class FontTexture implements DrawUnit {
      * <p>
      * Rect will be rendered using current GL colorub.
      */
-    public void renderBox( DrawEnv g, char[] chars, int off, int len, float margin ) {
+    public void renderBox( DrawEnv d, char[] chars, int off, int len, float margin ) {
         float width = getCharsWidth( chars, off, len );
-        renderBox( g, width, margin );
+        renderBox( d, width, margin );
     }
 
     /**
@@ -417,8 +431,8 @@ public class FontTexture implements DrawUnit {
      * <p>
      * Rect will be rendered using current GL colorub.
      */
-    public void renderBox( DrawEnv g, float x, float y, float z, char[] chars, int off, int len, float margin ) {
-        renderBox( g, x, y, z, getCharsWidth( chars, off, len ), margin );
+    public void renderBox( DrawEnv d, float x, float y, float z, char[] chars, int off, int len, float margin ) {
+        renderBox( d, x, y, z, getCharsWidth( chars, off, len ), margin );
     }
 
     /**
@@ -431,8 +445,8 @@ public class FontTexture implements DrawUnit {
      * <p>
      * Rect will be rendered using current GL colorub.
      */
-    public void renderBox( DrawEnv g, float width, float margin ) {
-        renderBox( g, 0.0f, 0.0f, 0.0f, width, margin );
+    public void renderBox( DrawEnv d, float width, float margin ) {
+        renderBox( d, 0.0f, 0.0f, 0.0f, width, margin );
     }
 
     /**
@@ -445,8 +459,8 @@ public class FontTexture implements DrawUnit {
      * <p>
      * Rect will be rendered using current GL colorub.
      */
-    public void renderBox( DrawEnv g, float x, float y, float z, float width, float margin ) {
-        DrawStream s = g.drawStream();
+    public void renderBox( DrawEnv d, float x, float y, float z, float width, float margin ) {
+        DrawStream s = d.drawStream();
         float descent = getDescent();
         float ascent  = getAscent();
 

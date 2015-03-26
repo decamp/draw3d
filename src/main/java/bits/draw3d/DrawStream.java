@@ -10,6 +10,7 @@ import bits.draw3d.model.DrawVert;
 import bits.draw3d.shaders.BasicShaderConfig;
 import bits.draw3d.shaders.BasicShaders;
 import bits.math3d.*;
+import bits.util.ref.AbstractRefable;
 
 import javax.media.opengl.GL3;
 import java.nio.ByteBuffer;
@@ -38,11 +39,12 @@ public class DrawStream {
                                                  new Vec3(),
                                                  new Vec4( 0, 0, 0, 1 ) );
 
-    private final BasicShaderConfig mConfig       = new BasicShaderConfig();
-    private       BasicShaderConfig mChosenConfig = new BasicShaderConfig();
+    private final BasicShaderConfig mConfig         = new BasicShaderConfig();
+    private       BasicShaderConfig mChosenConfig   = new BasicShaderConfig();
+    private       Object            mOverrideConfig = null;
 
-    private final Map<BasicShaderConfig, Writer> mWriters     = new HashMap<BasicShaderConfig, Writer>();
-    private final IndWriter                      mQuadIndexer = new QuadIndWriter();
+    private final Map<Object, Writer> mWriters     = new HashMap<Object, Writer>();
+    private final IndWriter           mQuadIndexer = new QuadIndWriter();
 
     private DrawEnv mDraw;
 
@@ -82,18 +84,80 @@ public class DrawStream {
         DrawUtil.checkErr( gl );
     }
 
-
+    /**
+     * Configures the rendering program for the draw stream.
+     * Some version of {@code config()} or {@code configCustom()}
+     * must be called prior to any {@code begin*()}.
+     *
+     * @param color Enables color information.
+     * @param tex   Enables texture information.
+     * @param norm  Enables normal information.
+     */
     public void config( boolean color, boolean tex, boolean norm ) {
+        config( color, tex, norm, false );
+    }
+
+    /**
+     * Configures the rendering program for the draw stream.
+     * Some version of {@code config()} or {@code configCustom()}
+     * must be called prior to any {@code begin*()}.
+     *
+     * @param color Enables color information.
+     * @param tex   Enables texture information.
+     * @param norm  Enables normal information.
+     * @param fog   Enables fog information.
+     */
+    public void config( boolean color, boolean tex, boolean norm, boolean fog ) {
+        mOverrideConfig = null;
         mConfig.texComponentNum( tex ? 4 : 0 );
         mConfig.color( color );
         mConfig.normals( norm );
+        mConfig.fog( fog );
     }
+
+    /**
+     * Specifies that a custom configuration object will be used for rendering.
+     *
+     * @param key Unique object that identifies configuration.
+     */
+    public void configCustom( Object key ) {
+        mOverrideConfig = key;
+    }
+
+    /**
+     * Enables user to provide a custom configuration that can be used with this DrawStream.
+     *
+     * @param key        Unique object used to identify the configuration.
+     * @param prog       Program to use in configuration.
+     * @param vertWriter BoWriter to serialize data in configuration.
+     */
+    public void createCustomConfig( Object key, Program prog, BoWriter<? super DrawVert> vertWriter ) {
+        Writer writer = new Writer( prog, vertWriter );
+        Writer prev = mWriters.put( key, writer );
+        if( prev != null ) {
+            prev.deref();
+        }
+    }
+
+    /**
+     * Disposes previously created configuration.
+     *
+     * @param key Unique object used to identify the configuration.
+     */
+    public boolean disposeCustomConfig( Object key ) {
+        Writer prev = mWriters.remove( key );
+        if( prev != null ) {
+            prev.deref();
+            return true;
+        }
+        return false;
+    }
+
 
 
     public void beginPoints() {
         mConfig.geomMode( GL_POINTS );
         begin( getWriter(), null, GL_POINTS, 1 );
-
     }
 
 
@@ -328,6 +392,14 @@ public class DrawStream {
 
 
     private Writer getWriter() {
+        if( mOverrideConfig != null ) {
+            Writer ret = mWriters.get( mOverrideConfig );
+            if( ret != null ) {
+                return ret;
+            }
+            throw new IllegalStateException( "DrawStream configuration not found." );
+        }
+
         mConfig.lineWidth( mDraw.mLineWidth.mValue );
         mConfig.chooseAvailable( mChosenConfig );
         Writer writer = mWriters.get( mChosenConfig );
@@ -336,19 +408,33 @@ public class DrawStream {
         }
 
         BoProgram<DrawVert,?> prog = BasicShaders.createProgram( mChosenConfig, mDraw.mShaderMan );
-        writer = new Writer();
-
-        writer.mProgram    = prog.mProgram;
-        writer.mVertWriter = prog.mVertWriter;
-        writer.mVao        = new Vao( mVbo, null );
-
-        writer.mProgram.init( mDraw );
-        writer.mVertWriter.attributes( writer.mVao );
-
-        mWriters.put( mChosenConfig, writer );
-        mChosenConfig = new BasicShaderConfig( mChosenConfig );
-
+        writer = new Writer( prog.mProgram, prog.mVertWriter );
+        mWriters.put( new BasicShaderConfig( mChosenConfig ), writer );
         return writer;
+    }
+
+
+
+    private class Writer extends AbstractRefable {
+        public Object                     mParent;
+        public Program                    mProgram;
+        public BoWriter<? super DrawVert> mVertWriter;
+        public Vao                        mVao;
+
+        public Writer( Program program, BoWriter<? super DrawVert> writer ) {
+            mProgram    = program;
+            mVertWriter = writer;
+            mVao        = new Vao( mVbo, null );
+
+            program.init( mDraw );
+            writer.attributes( mVao );
+        }
+
+        @Override
+        protected void freeObject() {
+            mProgram.dispose( mDraw );
+            mVao.dispose( mDraw );
+        }
     }
 
 
@@ -405,13 +491,6 @@ public class DrawStream {
         public int count() {
             return mCount;
         }
-    }
-
-
-    private static class Writer {
-        public Program            mProgram;
-        public BoWriter<DrawVert> mVertWriter;
-        public Vao                mVao;
     }
 
 }

@@ -49,7 +49,7 @@ public class DrawEnv {
     public final DrawSetting.CullFace      mCullFace      = new DrawSetting.CullFace( this );
     public final DrawSetting.DepthMask     mDepthMask     = new DrawSetting.DepthMask( this );
     public final DrawSetting.DepthTest     mDepthTest     = new DrawSetting.DepthTest( this );
-    public final DrawSetting.Fog           mFog;
+    public final DrawSetting.Fog           mFog           = new DrawSetting.Fog( this );
     public final DrawSetting.LineWidth     mLineWidth     = new DrawSetting.LineWidth( this );
     public final DrawSetting.PolygonOffset mPolygonOffset = new DrawSetting.PolygonOffset( this );
     public final DrawSetting.ScissorTest   mScissorTest   = new DrawSetting.ScissorTest( this );
@@ -57,9 +57,8 @@ public class DrawEnv {
     public final DrawSetting.StencilOp     mStencilOp     = new DrawSetting.StencilOp( this );
     public final DrawSetting.Viewport      mViewport      = new DrawSetting.Viewport( this );
 
-
-    public final ShaderManager mShaderMan;
-    public final FontManager   mFontMan;
+    public final ShaderManager mShaderMan = new ShaderManager();
+    public final FontManager   mFontMan   = new FontManager();
 
     public final Vec2        mWorkVec2   = new Vec2();
     public final Vec3        mWorkVec3   = new Vec3();
@@ -70,15 +69,10 @@ public class DrawEnv {
     public final FloatBuffer mWorkFloats = DrawUtil.allocFloats( 16 );
     public final Rect        mWorkRect   = new Rect();
 
-    private final DrawStream mStream;
+    private final DrawStream mStream = new DrawStream();
 
 
-    public DrawEnv() {
-        mFontMan   = new FontManager();
-        mShaderMan = new ShaderManager();
-        mStream    = new DrawStream();
-        mFog       = new DrawSetting.Fog( this );
-    }
+    public DrawEnv() {}
 
 
     public void checkErr() {

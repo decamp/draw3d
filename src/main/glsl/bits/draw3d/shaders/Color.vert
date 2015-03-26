@@ -5,7 +5,7 @@ uniform mat4 PROJ_VIEW_MAT;
 layout( location = 0 ) in vec4 inVert;
 layout( location = 1 ) in vec4 inColor;
 
-out vec4 color;
+smooth out vec4 color;
 
 
 void main() {
