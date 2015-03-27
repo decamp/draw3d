@@ -39,7 +39,7 @@ import static javax.media.opengl.GL3.*;
  * 
  * @author Philip DeCamp
  */
-public class FontTexture {
+public class FontTexture implements DrawUnit {
 
     private final Font        mFont;
     private final FontMetrics mMetrics;
@@ -93,21 +93,33 @@ public class FontTexture {
     /**
      * You MUST call this method before using texture for rendering.
      */
-    public void bindTex( DrawEnv g ) {
+    public void bind( DrawEnv g ) {
         if( mTexture == null ) {
             init( g );
         }
         mTexture.bind( g );
     }
 
+
+    public void bind( DrawEnv d, int unit ) {
+        d.mGl.glActiveTexture( GL_TEXTURE0 + unit );
+        bind( d );
+    }
+
     /**
      * You MUST call this method after you are done using texture for rendering.
      */
-    public void unbindTex( DrawEnv g ) {
+    public void unbind( DrawEnv g ) {
         if( mTexture == null ) {
             return;
         }
         mTexture.unbind( g );
+    }
+
+
+    public void unbind( DrawEnv g, int unit ) {
+        g.mGl.glActiveTexture( GL_TEXTURE0 + unit );
+        unbind( g );
     }
 
     /**
@@ -255,22 +267,25 @@ public class FontTexture {
     /**
      * Call this before using texture for rendering.
      */
-    public void beginDrawing( DrawEnv g ) {
-        g.drawStream().config( true, true, false );
+    public void beginRenderChars( DrawEnv g ) {
         g.mBlend.push();
         g.mBlend.apply( true );
-        bindTex( g );
+        bind( g );
+        DrawStream s = g.drawStream();
+        s.config( true, true, false );
+        s.beginQuads();
     }
 
     /**
      * You MUST call this method after you are done using texture for rendering.
      */
-    public void endDrawing( DrawEnv g ) {
+    public void endRenderChars( DrawEnv d ) {
         if( mTexture == null ) {
             return;
         }
-        mTexture.unbind( g );
-        g.mBlend.pop();
+        d.drawStream().end();
+        mTexture.unbind( d );
+        d.mBlend.pop();
     }
 
     /**
@@ -302,7 +317,6 @@ public class FontTexture {
         float xx = x;
         float yy = y;
         DrawStream s = d.drawStream();
-        s.beginQuads();
 
         for( int i = 0; i < len; i++ ) {
             char c = chars[i + off];
@@ -323,8 +337,6 @@ public class FontTexture {
             s.vert( g.mX0 + xx, g.mY1 + yy, z );
             xx += g.mAdvance;
         }
-
-        s.end();
     }
     
     /**
@@ -350,7 +362,6 @@ public class FontTexture {
         float xx = x;
         float yy = y;
         DrawStream s = d.drawStream();
-        s.beginQuads();
 
         for( int i = 0; i < len; i++ ) {
             char c = chars.charAt( i );
@@ -372,9 +383,26 @@ public class FontTexture {
 
             xx += g.mAdvance;
         }
-
-        s.end();
    }
+
+    /**
+     * Call this before using texture for rendering.
+     */
+    public void beginRenderBox( DrawEnv d ) {
+        d.mBlend.push();
+        d.mBlend.apply( true );
+        DrawStream s = d.drawStream();
+        s.config( true, false, false );
+        s.beginQuads();
+    }
+
+    /**
+     * You MUST call this method after you are done using texture for rendering boxes.
+     */
+    public void endRenderBox( DrawEnv d ) {
+        d.drawStream().end();
+        d.mBlend.pop();
+    }
 
     /**
      * Convenience method for rendering a box that will surround text.
@@ -464,12 +492,10 @@ public class FontTexture {
         float descent = getDescent();
         float ascent  = getAscent();
 
-        s.beginQuads();
         s.vert( x - margin, y - descent, z );
         s.vert( x + width + margin, y - descent, z );
         s.vert( x + width + margin, y + ascent, z );
         s.vert( x - margin, y + ascent, z );
-        s.end();
     }
 
     

@@ -50,6 +50,7 @@ public class BasicShaderConfig {
         mVertShader = copy.mVertShader;
         mGeomShader = copy.mGeomShader;
         mFragShader = copy.mFragShader;
+        mHash       = copy.mHash;
     }
 
 
