@@ -100,11 +100,4 @@ public class CharSet implements CharSequence {
         return mChars;
     }
 
-    /**
-     * @deprecated Use {@link #asString() } instead. Java 1.8 has added an incompatible chars() method to CharSequence.
-     */
-    public CharSequence chars() {
-        return mChars;
-    }
-
 }
