@@ -12,6 +12,6 @@ package bits.draw3d;
  * @author decamp
  */
 public interface DrawNode extends DrawResource {
-    public void pushDraw( DrawEnv d );
-    public void popDraw( DrawEnv d );
+    void pushDraw( DrawEnv d );
+    void popDraw( DrawEnv d );
 }

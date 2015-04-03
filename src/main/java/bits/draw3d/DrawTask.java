@@ -6,12 +6,9 @@
 
 package bits.draw3d;
 
-import bits.draw3d.DrawEnv;
-
-
 /**
  * @author Philip DeCamp
  */
 public interface DrawTask {
-    public void run( DrawEnv g );
+    void run( DrawEnv g );
 }

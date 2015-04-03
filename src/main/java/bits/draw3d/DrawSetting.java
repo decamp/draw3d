@@ -22,13 +22,13 @@ import static javax.media.opengl.GL2GL3.*;
  */
 public interface DrawSetting {
 
-    public void push();
-    public void pop();
-    public void apply();
-    public int  stackDepth();
+    void push();
+    void pop();
+    void apply();
+    int  stackDepth();
 
 
-    public static class Blend extends Stack<Blend> {
+    class Blend extends Stack<Blend> {
         public boolean mOn       = false;
         public int     mSrcRgb   = GL_ONE;
         public int     mDstRgb   = GL_ZERO;
@@ -107,7 +107,7 @@ public interface DrawSetting {
     }
 
 
-    public static class BlendColor extends Stack<BlendColor> {
+    class BlendColor extends Stack<BlendColor> {
         public float mRed;
         public float mGreen;
         public float mBlue;
@@ -160,7 +160,7 @@ public interface DrawSetting {
     }
 
 
-    public static class Buffer extends Stack<int[]> {
+    class Buffer extends Stack<int[]> {
 
         public final int mTarget;
         public int mId;
@@ -225,7 +225,7 @@ public interface DrawSetting {
     }
 
 
-    public static class ColorMask extends Stack<ColorMask> {
+    class ColorMask extends Stack<ColorMask> {
         public boolean mRed;
         public boolean mGreen;
         public boolean mBlue;
@@ -280,7 +280,7 @@ public interface DrawSetting {
     }
 
 
-    public static class CullFace extends Stack<CullFace> {
+    class CullFace extends Stack<CullFace> {
         public boolean mOn   = false;
         public int     mFunc = GL_LESS;
 
@@ -331,7 +331,7 @@ public interface DrawSetting {
     }
 
 
-    public static class DepthMask extends Stack<DepthMask> {
+    class DepthMask extends Stack<DepthMask> {
 
         public boolean mOn = false;
         private final DrawEnv mG;
@@ -375,7 +375,7 @@ public interface DrawSetting {
     }
 
 
-    public static class DepthTest extends Stack<DepthTest> {
+    class DepthTest extends Stack<DepthTest> {
         public boolean mOn   = false;
         public int     mFunc = GL_LESS;
 
@@ -436,7 +436,7 @@ public interface DrawSetting {
     }
 
 
-    public static class Fog extends Stack<DrawSetting.Fog.State> {
+    class Fog extends Stack<DrawSetting.Fog.State> {
 
         private final DrawEnv mEnv;
 
@@ -565,7 +565,7 @@ public interface DrawSetting {
     }
 
 
-    public static class LineWidth extends Stack<LineWidth> {
+    class LineWidth extends Stack<LineWidth> {
         public float mValue = 1f;
 
         private final DrawEnv mG;
@@ -601,7 +601,7 @@ public interface DrawSetting {
     }
 
 
-    public static class PolygonOffset extends Stack<PolygonOffset> {
+    class PolygonOffset extends Stack<PolygonOffset> {
         public boolean mFillOn  = false;
         public boolean mLineOn  = false;
         public boolean mPointOn = false;
@@ -700,7 +700,7 @@ public interface DrawSetting {
     }
 
 
-    public static class Program extends Stack<int[]> {
+    class Program extends Stack<int[]> {
 
         private final DrawEnv mEnv;
 
@@ -746,7 +746,7 @@ public interface DrawSetting {
     }
 
 
-    public static class ScissorTest extends Stack<ScissorTest> {
+    class ScissorTest extends Stack<ScissorTest> {
         public boolean mOn      = false;
         public int[]   mScissor = { 0, 0, 1, 1 };
 
@@ -809,7 +809,7 @@ public interface DrawSetting {
     }
 
 
-    public static class StencilTest extends Stack<StencilTest> {
+    class StencilTest extends Stack<StencilTest> {
         public boolean mOn        = false;
         public int     mFrontFunc = GL_ALWAYS;
         public int     mFrontRef  = 0;
@@ -896,7 +896,7 @@ public interface DrawSetting {
     }
 
 
-    public static class StencilOp extends Stack<StencilOp> {
+    class StencilOp extends Stack<StencilOp> {
         public int mFrontStencilFail = GL_KEEP;
         public int mFrontDepthFail   = GL_KEEP;
         public int mFrontPass        = GL_KEEP;
@@ -954,7 +954,7 @@ public interface DrawSetting {
     }
 
 
-    public static class Texture extends Stack<int[]> {
+    class Texture extends Stack<int[]> {
 
         public final int mTarget;
         public int mId;
@@ -1009,7 +1009,7 @@ public interface DrawSetting {
     }
 
 
-    public static class Viewport extends Stack<Viewport> {
+    class Viewport extends Stack<Viewport> {
         public int mX = 0;
         public int mY = 0;
         public int mW = 1;
@@ -1072,7 +1072,7 @@ public interface DrawSetting {
     }
 
 
-    static abstract class Stack<T> implements DrawSetting {
+    abstract class Stack<T> implements DrawSetting {
 
         protected static final int DEFAULT_CAP = 8;
 
