@@ -141,7 +141,7 @@ public class LightUniform implements DrawUnit {
                 vec4.z = light.mSpotExp;
             } else {
                 vec4.x = 0f;
-                vec4.y = 10f;
+                vec4.y = -1f;
                 vec4.z = 0f;
             }
             arr4[0] = vec4;

@@ -3,8 +3,6 @@
 #define LIGHT_NUM 1
 
 uniform mat3 NORM_MAT;
-uniform mat4 VIEW_MAT;
-uniform mat4 PROJ_VIEW_MAT;
 
 layout(std140) uniform LIGHTS {
 	vec3 AMBIENT;

@@ -52,7 +52,7 @@ public class VaoMember {
 
     public void disable( GL2ES2 gl ) {
         gl.glVertexAttribPointer( mLocation, mCompNum, mType, mNormalize, mStride, mOffset );
-        gl.glEnableVertexAttribArray( mLocation );
+        gl.glDisableVertexAttribArray( mLocation );
     }
 
 }
