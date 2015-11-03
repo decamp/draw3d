@@ -6,7 +6,7 @@
 
 package bits.draw3d;
 
-import static javax.media.opengl.GL4.*;
+import static com.jogamp.opengl.GL4.*;
 
 /**
  * Information about the OpenGL data component types.

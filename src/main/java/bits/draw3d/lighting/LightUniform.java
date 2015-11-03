@@ -10,7 +10,7 @@ import bits.draw3d.*;
 import bits.math3d.*;
 import bits.math3d.func.SinCosTable;
 
-import static javax.media.opengl.GL2ES2.*;
+import static com.jogamp.opengl.GL2ES2.*;
 
 
 /**

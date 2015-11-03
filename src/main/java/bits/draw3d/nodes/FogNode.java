@@ -9,9 +9,9 @@ package bits.draw3d.nodes;
 import bits.draw3d.DrawEnv;
 import bits.draw3d.DrawNodeAdapter;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
-import static javax.media.opengl.GL2.*;
+import static com.jogamp.opengl.GL2.*;
 
 
 /**

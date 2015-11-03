@@ -9,7 +9,7 @@ package bits.draw3d;
 
 import java.util.*;
 import java.nio.ByteBuffer;
-import static javax.media.opengl.GL3.*;
+import static com.jogamp.opengl.GL3.*;
 
 import bits.draw3d.util.*;
 import bits.collect.PublicList;

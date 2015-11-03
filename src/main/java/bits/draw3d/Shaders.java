@@ -6,12 +6,12 @@
 
 package bits.draw3d;
 
-import javax.media.opengl.*;
+import com.jogamp.opengl.*;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.media.opengl.GL2ES3.*;
+import static com.jogamp.opengl.GL2ES3.*;
 
 
 /**
@@ -44,7 +44,7 @@ public class Shaders {
      * @param shaderType  GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, or GL_GEOMETRY_SHADER
      * @param source      Source GLSL code.
      * @return id of newly created shader.
-     * @throws javax.media.opengl.GLException if shader creation fails.
+     * @throws com.jogamp.opengl.GLException if shader creation fails.
      */
     public static int compile( GL2ES2 gl, int shaderType, String source ) throws GLException {
         int id = gl.glCreateShader( shaderType );

@@ -9,12 +9,12 @@ package bits.draw3d;
 import bits.draw3d.nodes.FogParams;
 import bits.math3d.*;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL3;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL3;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import static javax.media.opengl.GL2GL3.*;
+import static com.jogamp.opengl.GL2GL3.*;
 
 
 /**

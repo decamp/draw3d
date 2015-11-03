@@ -8,7 +8,7 @@ package bits.draw3d;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-import static javax.media.opengl.GL2ES2.*;
+import static com.jogamp.opengl.GL2ES2.*;
 
 /**
  * @author decamp

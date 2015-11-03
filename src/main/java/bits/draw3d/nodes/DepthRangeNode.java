@@ -9,7 +9,7 @@ package bits.draw3d.nodes;
 import bits.draw3d.DrawEnv;
 import bits.draw3d.DrawUnitAdapter;
 
-import javax.media.opengl.GL;
+import com.jogamp.opengl.GL;
 
 
 /**

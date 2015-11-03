@@ -11,8 +11,8 @@ import bits.draw3d.DrawNode;
 import bits.math3d.Vec;
 import bits.math3d.Vec4;
 
-import javax.media.opengl.GLAutoDrawable;
-import static javax.media.opengl.GL.*;
+import com.jogamp.opengl.GLAutoDrawable;
+import static com.jogamp.opengl.GL.*;
 
 
 /**

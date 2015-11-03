@@ -9,9 +9,9 @@ package bits.draw3d;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
-import javax.media.opengl.GL3;
-import javax.media.opengl.GLAutoDrawable;
-import static javax.media.opengl.GL3.*;
+import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.GLAutoDrawable;
+import static com.jogamp.opengl.GL3.*;
 
 import bits.draw3d.text.FontManager;
 import bits.math3d.*;

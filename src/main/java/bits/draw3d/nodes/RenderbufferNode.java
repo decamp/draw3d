@@ -8,7 +8,7 @@ package bits.draw3d.nodes;
 
 import bits.draw3d.DrawEnv;
 import bits.draw3d.Texture;
-import static javax.media.opengl.GL.*;
+import static com.jogamp.opengl.GL.*;
 
 /**
  * @author decamp

@@ -6,7 +6,7 @@
 
 package bits.draw3d.text;
 
-import javax.media.opengl.GLContext;
+import com.jogamp.opengl.GLContext;
 import java.awt.*;
 import java.util.*;
 

@@ -11,8 +11,8 @@ import bits.util.Resources;
 
 import java.io.IOException;
 
-import static javax.media.opengl.GL2ES2.GL_FRAGMENT_SHADER;
-import static javax.media.opengl.GL2ES2.GL_VERTEX_SHADER;
+import static com.jogamp.opengl.GL2ES2.GL_FRAGMENT_SHADER;
+import static com.jogamp.opengl.GL2ES2.GL_VERTEX_SHADER;
 
 
 /**

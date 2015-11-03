@@ -12,14 +12,14 @@ import bits.draw3d.shaders.BasicShaders;
 import bits.math3d.Vec4;
 import com.jogamp.opengl.util.Animator;
 
-import javax.media.opengl.*;
-import javax.media.opengl.awt.GLCanvas;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.awt.GLCanvas;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
-import static javax.media.opengl.GL.*;
-import static javax.media.opengl.GL2ES2.*;
+import static com.jogamp.opengl.GL.*;
+import static com.jogamp.opengl.GL2ES2.*;
 
 
 /**

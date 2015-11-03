@@ -8,7 +8,7 @@ package bits.draw3d;
 
 import bits.util.ref.Refable;
 
-import javax.media.opengl.GL2ES2;
+import com.jogamp.opengl.GL2ES2;
 
 
 /**

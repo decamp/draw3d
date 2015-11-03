@@ -8,8 +8,8 @@ package bits.draw3d;
 
 import java.nio.ByteBuffer;
 
-import static javax.media.opengl.GL2ES2.GL_UNPACK_ROW_LENGTH;
-import static javax.media.opengl.GL2GL3.GL_TEXTURE_3D;
+import static com.jogamp.opengl.GL2ES2.GL_UNPACK_ROW_LENGTH;
+import static com.jogamp.opengl.GL2GL3.GL_TEXTURE_3D;
 
 /**
  * @author decamp

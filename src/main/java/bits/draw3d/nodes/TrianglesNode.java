@@ -7,7 +7,7 @@
 package bits.draw3d.nodes;
 
 import java.util.List;
-import static javax.media.opengl.GL.*;
+import static com.jogamp.opengl.GL.*;
 
 import bits.draw3d.*;
 import bits.draw3d.model.DrawTri;

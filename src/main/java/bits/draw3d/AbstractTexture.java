@@ -6,11 +6,11 @@
 
 package bits.draw3d;
 
-import javax.media.opengl.GL2ES2;
+import com.jogamp.opengl.GL2ES2;
 import java.util.HashMap;
 import java.util.Map;
 
-import static javax.media.opengl.GL2GL3.*;
+import static com.jogamp.opengl.GL2GL3.*;
 
 
 /**

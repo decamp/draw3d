@@ -6,8 +6,8 @@
 
 package bits.draw3d.shaders;
 
-import static javax.media.opengl.GL2ES3.*;
-import static javax.media.opengl.GL3.*;
+import static com.jogamp.opengl.GL2ES3.*;
+import static com.jogamp.opengl.GL3.*;
 
 
 /**

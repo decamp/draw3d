@@ -10,7 +10,7 @@ package bits.draw3d.lighting;
 import bits.draw3d.*;
 import bits.math3d.Vec4;
 
-import static javax.media.opengl.GL3.*;
+import static com.jogamp.opengl.GL3.*;
 
 /**
  * Stores uniforms for materials. Update materials then call bind to flush changes and bind UBO.

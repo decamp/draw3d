@@ -11,15 +11,15 @@ import bits.draw3d.model.*;
 import bits.math3d.*;
 import com.jogamp.opengl.util.Animator;
 
-import javax.media.opengl.*;
-import javax.media.opengl.awt.GLCanvas;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.awt.GLCanvas;
 import javax.swing.*;
 import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.List;
 
-import static javax.media.opengl.GL3.*;
+import static com.jogamp.opengl.GL3.*;
 
 
 /**

@@ -9,8 +9,8 @@ package bits.draw3d.lighting;
 import bits.math3d.Vec;
 import bits.math3d.Vec4;
 
-import javax.media.opengl.*;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.*;
+import com.jogamp.opengl.*;
+import static com.jogamp.opengl.fixedfunc.GLLightingFunc.*;
 
 
 /**

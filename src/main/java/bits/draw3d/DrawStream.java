@@ -12,12 +12,12 @@ import bits.draw3d.shaders.BasicShaders;
 import bits.math3d.*;
 import bits.util.ref.AbstractRefable;
 
-import javax.media.opengl.GL3;
+import com.jogamp.opengl.GL3;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static javax.media.opengl.GL2ES2.*;
+import static com.jogamp.opengl.GL2ES2.*;
 
 
 /**

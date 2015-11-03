@@ -13,7 +13,7 @@ import bits.math3d.func.Gaussian1;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static javax.media.opengl.GL3.*;
+import static com.jogamp.opengl.GL3.*;
 
 
 public final class KernelTexs {

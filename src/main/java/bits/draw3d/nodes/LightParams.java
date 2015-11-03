@@ -6,8 +6,8 @@
 
 package bits.draw3d.nodes;
 
-import javax.media.opengl.*;
-import static javax.media.opengl.GL2.*;
+import com.jogamp.opengl.*;
+import static com.jogamp.opengl.GL2.*;
 
 
 /** 

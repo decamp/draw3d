@@ -9,15 +9,15 @@ package bits.draw3d;
 import bits.math3d.Vec4;
 import com.jogamp.opengl.util.Animator;
 
-import javax.media.opengl.*;
-import javax.media.opengl.awt.GLCanvas;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.awt.GLCanvas;
 import javax.swing.*;
 import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
 
-import static javax.media.opengl.GL3.*;
+import static com.jogamp.opengl.GL3.*;
 
 
 /**

@@ -11,8 +11,8 @@ import bits.draw3d.Texture;
 
 import java.util.*;
 
-import javax.media.opengl.*;
-import static javax.media.opengl.GL3.*;
+import com.jogamp.opengl.*;
+import static com.jogamp.opengl.GL3.*;
 
 /**
  * @author decamp

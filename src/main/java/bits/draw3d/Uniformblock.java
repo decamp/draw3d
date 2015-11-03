@@ -9,7 +9,7 @@ package bits.draw3d;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.media.opengl.GL4.*;
+import static com.jogamp.opengl.GL4.*;
 
 /**
  * @author Philip DeCamp

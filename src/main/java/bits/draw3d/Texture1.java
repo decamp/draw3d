@@ -7,7 +7,7 @@
 package bits.draw3d;
 
 import java.nio.ByteBuffer;
-import static javax.media.opengl.GL2.*;
+import static com.jogamp.opengl.GL2.*;
 
 /**
  * @author decamp

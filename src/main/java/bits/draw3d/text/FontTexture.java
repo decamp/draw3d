@@ -13,7 +13,7 @@ import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.image.*;
 
-import static javax.media.opengl.GL3.*;
+import static com.jogamp.opengl.GL3.*;
 
 
 /**

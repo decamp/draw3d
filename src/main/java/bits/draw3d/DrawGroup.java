@@ -6,7 +6,7 @@
 
 package bits.draw3d;
 
-import static javax.media.opengl.GL2ES3.*;
+import static com.jogamp.opengl.GL2ES3.*;
 
 /**
  * @author Philip DeCamp

@@ -8,12 +8,12 @@ package bits.draw3d;
 
 import bits.util.gui.Images;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GLException;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GLException;
 import java.awt.image.BufferedImage;
 import java.nio.*;
 
-import static javax.media.opengl.GL3.*;
+import static com.jogamp.opengl.GL3.*;
 
 
 /**
@@ -22,7 +22,7 @@ import static javax.media.opengl.GL3.*;
 public class DrawUtil {
 
     /**
-     * @throws javax.media.opengl.GLException if {@code gl.glGetError() != GL_NO_ERROR}
+     * @throws com.jogamp.opengl.GLException if {@code gl.glGetError() != GL_NO_ERROR}
      */
     public static void checkErr( GL gl ) throws GLException {
         int err = gl.glGetError();
